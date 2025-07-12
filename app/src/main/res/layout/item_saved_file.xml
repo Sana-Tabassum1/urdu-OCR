@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:padding="12dp">
+
+    <!-- File Icon -->
+    <ImageView
+        android:id="@+id/ivFileIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_pdf"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- File Info Text -->
+    <LinearLayout
+        android:id="@+id/fileInfoContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="12dp"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toEndOf="@id/ivFileIcon"
+        app:layout_constraintTop_toTopOf="@id/ivFileIcon"
+        app:layout_constraintBottom_toBottomOf="@id/ivFileIcon"
+        app:layout_constraintEnd_toStartOf="@id/viewFileContainer">
+
+        <TextView
+            android:id="@+id/tvFileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Untitled File"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvTimeSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Yesterday - 11:35 am\n6 MB"
+            android:textColor="@color/gray"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- View File + Line -->
+    <LinearLayout
+        android:id="@+id/viewFileContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ivFileIcon"
+        app:layout_constraintBottom_toBottomOf="@id/ivFileIcon">
+
+        <!-- View file text -->
+        <TextView
+            android:id="@+id/textViewFile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View file"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <!-- Small line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/black"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

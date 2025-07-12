@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/font_14"
+        android:title="14" />
+
+    <item
+        android:id="@+id/font_16"
+        android:title="16" />
+
+    <item
+        android:id="@+id/font_18"
+        android:title="18" />
+
+    <item
+        android:id="@+id/font_20"
+        android:title="20" />
+
+    <item
+        android:id="@+id/font_24"
+        android:title="24" />
+
+    <item
+        android:id="@+id/font_32"
+        android:title="32" />
+
+    <item
+        android:id="@+id/font_48"
+        android:title="48" />
+
+    <item
+        android:id="@+id/font_72"
+        android:title="72" />
+
+</menu>
