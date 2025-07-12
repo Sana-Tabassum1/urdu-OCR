@@ -730,33 +730,35 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="10dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="5dp"
                     android:orientation="vertical">
 
                     <!-- Info Item -->
-                    <LinearLayout
+                    <RelativeLayout
                         android:id="@+id/info"
                         android:layout_width="match_parent"
-                        android:layout_height="35dp"
+                        android:layout_height="48dp"
                         android:background="?selectableItemBackground"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp">
 
                         <ImageView
+                            android:id="@+id/appInfoIcon"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/app_info" />
+                            android:src="@drawable/app_info"
+                            android:layout_centerVertical="true"/>
 
                         <TextView
-                            android:layout_width="0dp"
+                            android:id="@+id/infoText"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginStart="10dp"
+                            android:layout_toEndOf="@id/appInfoIcon"
                             android:text="Info"
                             android:textColor="@color/black"
                             android:textSize="12sp"
+                            android:layout_centerVertical="true"
                             android:fontFamily="@font/poppins_regular" />
 
                         <ImageView
@@ -764,30 +766,36 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:padding="3dp"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentEnd="true"
                             android:src="@drawable/arrw" />
-                    </LinearLayout>
+                    </RelativeLayout>
 
                     <!-- Privacy Item -->
-                    <LinearLayout
+                    <RelativeLayout
                         android:id="@+id/privacy"
                         android:layout_width="match_parent"
-                        android:layout_height="35dp"
+                        android:layout_height="48dp"
                         android:background="?selectableItemBackground"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp">
 
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/privacy" />
+                            android:src="@drawable/privacy"
+                            android:id="@+id/privacyIcon"
+                            android:layout_centerVertical="true"/>
 
                         <TextView
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginStart="10dp"
                             android:text="Privacy Policy"
+                            android:layout_toEndOf="@id/privacyIcon"
                             android:textColor="@color/black"
+                            android:layout_centerVertical="true"
                             android:textSize="12sp"
                             android:fontFamily="@font/poppins_regular" />
 
@@ -795,29 +803,35 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:padding="3dp"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentEnd="true"
                             android:src="@drawable/arrw" />
-                    </LinearLayout>
+                    </RelativeLayout>
 
                     <!-- Share Item -->
-                    <LinearLayout
+                    <RelativeLayout
                         android:id="@+id/sharelinear"
                         android:layout_width="match_parent"
-                        android:layout_height="35dp"
+                        android:layout_height="48dp"
                         android:background="?selectableItemBackground"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp">
 
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/shareblack" />
+                            android:src="@drawable/shareblack"
+                            android:layout_centerVertical="true"
+                            android:id="@+id/shareIcon"/>
 
                         <TextView
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginStart="10dp"
                             android:text="Share App"
+                            android:layout_centerVertical="true"
+                            android:layout_toEndOf="@id/shareIcon"
                             android:textColor="@color/black"
                             android:textSize="12sp"
                             android:fontFamily="@font/poppins_regular" />
@@ -826,30 +840,36 @@
                             android:id="@+id/share"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentEnd="true"
                             android:padding="3dp"
                             android:src="@drawable/arrw" />
-                    </LinearLayout>
+                    </RelativeLayout>
 
                     <!-- Rate Item -->
-                    <LinearLayout
+                    <RelativeLayout
                         android:id="@+id/rateSection"
                         android:layout_width="match_parent"
-                        android:layout_height="35dp"
+                        android:layout_height="48dp"
                         android:background="?selectableItemBackground"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp">
 
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/star" />
+                            android:src="@drawable/star"
+                            android:layout_centerVertical="true"
+                            android:id="@+id/rateIcon"/>
 
                         <TextView
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginStart="10dp"
                             android:text="Rate App"
+                            android:layout_centerVertical="true"
+                            android:layout_toEndOf="@id/rateIcon"
                             android:textColor="@color/black"
                             android:textSize="12sp"
                             android:fontFamily="@font/poppins_regular" />
@@ -858,8 +878,10 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:padding="3dp"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentEnd="true"
                             android:src="@drawable/arrw" />
-                    </LinearLayout>
+                    </RelativeLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

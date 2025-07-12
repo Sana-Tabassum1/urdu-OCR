@@ -96,7 +96,7 @@
             android:fontFamily="@font/poppins_bold"
             android:text="OCR-Refine"
             android:textColor="@color/black"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -104,7 +104,7 @@
             android:fontFamily="@font/poppins_medium"
             android:text="Double-checked transcription with cleaner output."
             android:textColor="@color/lightgreen"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
 
     </LinearLayout>
     <LinearLayout
@@ -129,7 +129,7 @@
             android:fontFamily="@font/poppins_bold"
             android:text="OCR-Context"
             android:textColor="@color/black"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -137,7 +137,7 @@
             android:fontFamily="@font/poppins_medium"
             android:text="Flags uncertain words for your review."
             android:textColor="@color/lightgreen"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
 
     </LinearLayout>
     <LinearLayout
@@ -162,7 +162,7 @@
             android:fontFamily="@font/poppins_bold"
             android:text="OCR-Visual"
             android:textColor="@color/black"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -170,7 +170,7 @@
             android:fontFamily="@font/poppins_medium"
             android:text="Adapts to image quality and notes tricky areas."
             android:textColor="@color/lightgreen"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
 
     </LinearLayout>
     <LinearLayout
@@ -195,7 +195,7 @@
             android:fontFamily="@font/poppins_bold"
             android:text="OCR-Semantic"
             android:textColor="@color/black"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -203,7 +203,7 @@
             android:fontFamily="@font/poppins_medium"
             android:text="Auto-corrects text and adds inline summaries."
             android:textColor="@color/lightgreen"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

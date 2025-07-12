@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.3"
+agp = "8.7.3"
 cameraCore = "1.4.2"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
@@ -14,16 +14,17 @@ tessTwo = "9.1.0"
 textRecognition = "16.0.1"
 textRecognitionArabic = "17.0.3"
 ucrop = "2.2.8"
+datastorePreferences = "1.1.7"
 uiToolingAndroid = "1.8.2"
 firebaseCrashlyticsBuildtools = "3.0.3"
 visionCommon = "17.3.0"
 playServicesMlkitTextRecognitionCommon = "19.1.0"
 lifecycleViewmodelKtx = "2.9.1"
 
-
 [libraries]
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCore" }
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraCore" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraCore" }
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraCore" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

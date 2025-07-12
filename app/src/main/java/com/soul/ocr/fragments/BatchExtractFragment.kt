@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -62,7 +63,11 @@ import com.soul.ocr.RetrofitHelper
 import com.soul.ocr.ViewModel.BatchScanningViewModel
 import com.soul.ocr.ViewModel.VoiceSettingsViewModel
 import com.soul.ocr.databinding.FragmentBatchExtractBinding
+import com.soul.ocr.datastore.PreferenceDataStoreAPI
+import com.soul.ocr.datastore.PreferenceDataStoreKeysConstants
+import com.soul.ocr.datastore.PreferencesDataStoreHelper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -77,10 +82,8 @@ class BatchExtractFragment : Fragment() {
 
     private lateinit var imagePagerAdapter: ImagePagerAdapter
     private var currentPage = 0
-    private var selectedTypeface: Typeface? = null
-    private var selectedTextColor: Int = 0xFF000000.toInt()
-    private var selectedBgColor: Int = 0xFFFFFFFF.toInt()
-    private var selectedFontSize = 18f
+
+    private lateinit var dataStoreAPI: PreferenceDataStoreAPI
 
     private lateinit var tts: TextToSpeech
     private var isSpeaking = false
@@ -90,12 +93,9 @@ class BatchExtractFragment : Fragment() {
     private var isUnderline = false
     private var isStrike = false
     private var selectedAlignment: View? = null
-    var isEditing = false
-    private val PREFS_NAME = "ocr_prefs"
-    private val PREF_FIRST_TIME = "used_ocr_once"
     private var alreadyProcessed = false
 
-    private val apiKey = "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"
+    private val apiKey = "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"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -109,15 +109,16 @@ class BatchExtractFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // sabse pehle:
+
+        dataStoreAPI = PreferencesDataStoreHelper(requireActivity())
+
         viewModel.extractedText.value?.let { saved ->
-            if (!saved.isNullOrEmpty()) {
-                binding.etExtractedText.setText(saved)
+            if (saved.isNotEmpty()) {
+                binding.etExtractedText.text = saved
                 binding.progressStepLayout.progressBar.visibility = View.VISIBLE
                 alreadyProcessed = true          // flag bhi true kar do
             }
         }
-
-        val progressBinding = binding.progressStepLayout
 
         voiceSettingsViewModel.settings.observe(viewLifecycleOwner) { settings ->
             if (isTtsReady) {
@@ -240,21 +241,11 @@ class BatchExtractFragment : Fragment() {
             true
         }
 
-
-
-//        binding.btnRetake.setOnClickListener {
-//            viewModel.clearAll()
-//            findNavController().navigate(R.id.action_batchExtractFragment_to_batchScanningFragment)
-//        }
         binding.ivBack.setOnClickListener {
             viewModel.clearAll()
             viewModel.extractedText.value = null
             findNavController().navigate(R.id.action_batchExtractFragment_to_batchScanningFragment)
         }
-//        binding.settingsIcon.setOnClickListener {
-//            findNavController().navigate(R.id.action_batchExtractFragment_to_settingFragment)
-//
-//        }
 
         binding.btnExpand.setOnClickListener {
             val pos = binding.viewPager.currentItem
@@ -266,14 +257,10 @@ class BatchExtractFragment : Fragment() {
 
         // ──────────── OCR FLOW : run only once ────────────
         if (!alreadyProcessed) {
-            alreadyProcessed = true     // guard set ✅
+            alreadyProcessed = true
 
-//            val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-//            prefs.edit().clear().apply()
-//            val hasUsedBefore = prefs.getBoolean(PREF_FIRST_TIME, false)
-
-            // helper that actually does extraction + progress
             val launchExtraction: (String) -> Unit = { prompt ->
+                Log.d(TAG, "onViewCreated123: $prompt")
                 val progressDialog = showProcessingDialog(requireContext())
                 updateProgressInDialog(progressDialog, 1)
 
@@ -293,17 +280,12 @@ class BatchExtractFragment : Fragment() {
                 }
             }
 
-//            if (!hasUsedBefore) {
-                // first time: free basic model
-//                prefs.edit().putBoolean(PREF_FIRST_TIME, true).apply()
-            val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                launchExtraction(getPromptText(prefs.getString()))
-//            } else {
-//                // later times: show model selector
-//                ModelSelectorBottomSheet { chosen ->
-//                    launchExtraction(getPromptText(chosen))
-//                }.show(parentFragmentManager, "ModelSheet")
-//            }
+            lifecycleScope.launch {
+                val selectedModel =
+                    dataStoreAPI.getPreference(PreferenceDataStoreKeysConstants.OCR_MODEL, "OCR-Basic")
+                        .first().takeIf { it.isNotEmpty() }
+                launchExtraction.invoke(getPromptText(selectedModel!!))
+            }
         }
 // ──────────── OCR FLOW END ────────────
 
@@ -333,14 +315,6 @@ class BatchExtractFragment : Fragment() {
             val suggested = "urdu_text_${System.currentTimeMillis()}"
             showSaveDialogWithFileName(suggested)
         }
-
-
-//        binding.save.setOnClickListener {
-//            saveTextAsFile()
-//        }
-//        binding.btnSavePdf.setOnClickListener {
-//            saveTextAsPdf()
-//        }
     }
 
     private fun Bitmap.toBase64Uri(): String {
@@ -709,7 +683,7 @@ class BatchExtractFragment : Fragment() {
     private fun applyAlignment(alignment: Layout.Alignment) {
         val start = binding.editableExtractedText.selectionStart
         val end = binding.editableExtractedText.selectionEnd
-        if (start >= 0 && end > start) {
+        if (start in 0..<end) {
             val spannable = binding.editableExtractedText.text as Spannable
             spannable.setSpan(AlignmentSpan.Standard(alignment), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }

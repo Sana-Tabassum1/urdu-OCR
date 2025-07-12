@@ -5,14 +5,15 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.soul.ocr.ModelSelectorBottomSheet
 import com.soul.ocr.R
@@ -21,24 +22,32 @@ import com.soul.ocr.ViewModel.VoiceSettingsViewModel
 import com.soul.ocr.databinding.FragmentSettingBinding
 import com.soul.ocr.databinding.SelectModeDialogBinding
 import com.soul.ocr.databinding.TextSizeDialogBinding
+import com.soul.ocr.datastore.PreferenceDataStoreAPI
+import com.soul.ocr.datastore.PreferenceDataStoreKeysConstants
+import com.soul.ocr.datastore.PreferencesDataStoreHelper
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 
 class SettingFragment : Fragment() {
     private lateinit var binding: FragmentSettingBinding
     private val voiceSettingsViewModel: VoiceSettingsViewModel by activityViewModels()
+    private lateinit var dataStoreAPI: PreferenceDataStoreAPI
 
-    private var isVoiceSettingVisible = false
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-      binding= FragmentSettingBinding.inflate(layoutInflater,container,false)
+        binding = FragmentSettingBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        dataStoreAPI = PreferencesDataStoreHelper(requireActivity())
+
         fun Float.round1() = String.format("%.1f", this).toFloat()
 
         binding.speechRate.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -47,65 +56,63 @@ class SettingFragment : Fragment() {
                 binding.speechRateValue.setText(rate.toString())
                 saveSettingsFromUI()
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        binding.voiceToneSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.voiceToneSeekbar.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val tone = (progress / 100f).coerceIn(0.5f, 2.0f).round1()
                 binding.voiceToneValue.setText(tone.toString())
                 saveSettingsFromUI()
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        binding.audioClaritySeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.audioClaritySeekbar.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val clarity = (progress / 100f).coerceIn(0.5f, 2.0f).round1()
                 binding.audioClarityValue.setText(clarity.toString())
                 saveSettingsFromUI()
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        binding.responseDelaySeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.responseDelaySeekbar.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 binding.responseDelayValue.setText(progress.toString())
                 saveSettingsFromUI()
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
-
 
 
         // Default: hide voice setting layout
         binding.voicesetting.visibility = View.GONE
 
         binding.voicsettinglayout.setOnClickListener {
-            isVoiceSettingVisible = !isVoiceSettingVisible
-
-            if (isVoiceSettingVisible) {
-                binding.voicesetting.visibility = View.VISIBLE
-                binding.voicebtn.setImageResource(R.drawable.toparrow) // 👈 your upward arrow
-            } else {
+            if (binding.voicesetting.isVisible) {
                 binding.voicesetting.visibility = View.GONE
-                binding.voicebtn.setImageResource(R.drawable.bottomarrow) // 👈 your downward arrow
+                binding.voicebtn.rotation = 180f
+            } else {
+                binding.voicesetting.visibility = View.VISIBLE
+                binding.voicebtn.rotation = 180f
             }
         }
         binding.btncredits.setOnClickListener {
             findNavController().navigate(R.id.action_settingFragment_to_modelScreenFragment)
         }
-       // setAppVersion()
-//        binding.textsizecardview.setOnClickListener {
-//            showTextSizeDialog()
-//        }
-//        binding.modeCardview.setOnClickListener {
-//            showSelectModeDialog()
-//        }
+
         binding.info.setOnClickListener {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             val uri = Uri.fromParts("package", requireContext().packageName, null)
@@ -136,9 +143,11 @@ class SettingFragment : Fragment() {
             builder.setItems(languages) { dialog, which ->
                 when (which) {
                     0 -> {
-                        Toast.makeText(requireContext(), "English Selected", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "English Selected", Toast.LENGTH_SHORT)
+                            .show()
                         // TODO: Language change logic here (optional)
                     }
+
                     1 -> {
                         Toast.makeText(requireContext(), "Urdu Selected", Toast.LENGTH_SHORT).show()
                         // TODO: Language change logic here (optional)
@@ -150,19 +159,23 @@ class SettingFragment : Fragment() {
 
         binding.modelCardview.setOnClickListener {
             val bottomSheet = ModelSelectorBottomSheet { selectedModel ->
-                // User ne jo select kia, wo yahan milta hai
-                Toast.makeText(
-                    requireContext(),
-                    "Selected: $selectedModel",
-                    Toast.LENGTH_SHORT
-                ).show()
+                binding.title2.text = selectedModel
             }
             bottomSheet.show(parentFragmentManager, "ModelSheet")
         }
+
+        lifecycleScope.launch {
+            val selectedModel =
+                dataStoreAPI.getPreference(PreferenceDataStoreKeysConstants.OCR_MODEL, "OCR-Basic")
+                    .first().takeIf { it.isNotEmpty() }
+            binding.title2.text = selectedModel
+        }
+
         binding.btndaimond.setOnClickListener {
             findNavController().navigate(R.id.action_settingFragment_to_modelScreenFragment)
         }
     }
+
     private fun showTextSizeDialog() {
         val dialog = Dialog(requireActivity())
 
@@ -231,12 +244,14 @@ class SettingFragment : Fragment() {
 
         dialog.show()
     }
+
     private fun setAppVersion() {
         val packageManager = requireContext().packageManager
         val packageName = requireContext().packageName
         val versionName = packageManager.getPackageInfo(packageName, 0).versionName
-       // binding.subtitle4.text = versionName
+        // binding.subtitle4.text = versionName
     }
+
     private fun openPlayStoreReview() {
         try {
             val uri = Uri.parse("market://details?id=${requireActivity().packageName}")
@@ -245,7 +260,8 @@ class SettingFragment : Fragment() {
             startActivity(intent)
         } catch (e: Exception) {
             // Play Store not available, open in browser
-            val browserUri = Uri.parse("https://play.google.com/store/apps/details?id=${requireActivity().packageName}")
+            val browserUri =
+                Uri.parse("https://play.google.com/store/apps/details?id=${requireActivity().packageName}")
             startActivity(Intent(Intent.ACTION_VIEW, browserUri))
         }
     }
