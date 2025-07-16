@@ -1,37 +1,9 @@
 <resources>
     <string name="app_name">OCR</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="todo">TODO</string>
     <string name="plus">+</string>
     <string name="text_to_image">Text to Image</string>
     <string name="server_client_id">814397880124-pibgin26vthfs76idl1cb5vkdjm14p39.apps.googleusercontent.com</string>
-
-
-    <string-array name="font_sizes">
-        <item>14</item>
-        <item>18</item>
-        <item>22</item>
-        <item>26</item>
-        <item>30</item>
-    </string-array>
-
-    <string-array name="background_colors">
-        <item>White</item>
-        <item>Yellow</item>
-        <item>Gray</item>
-    </string-array>
-
-    <string-array name="font_families">
-        <item>Alvi Nastaleeq</item>
-        <item>Jameel Noori</item>
-    </string-array>
-
-    <string-array name="text_colors">
-        <item>Black</item>
-        <item>Red</item>
-        <item>Blue</item>
-        <item>Green</item>
-    </string-array>
 
 </resources>

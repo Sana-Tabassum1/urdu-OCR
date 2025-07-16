@@ -17,8 +17,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.auth.AUTH
 import com.soul.ocr.bottomsheet.ModelSelectorBottomSheet
 import com.soul.ocr.R
 import com.soul.ocr.ViewModel.VoiceSettings
@@ -32,7 +30,6 @@ import com.soul.ocr.datastore.PreferenceDataStoreKeysConstants
 import com.soul.ocr.datastore.PreferencesDataStoreHelper
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlin.jvm.java
 
 
 class SettingFragment : Fragment() {
@@ -43,7 +40,7 @@ class SettingFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentSettingBinding.inflate(layoutInflater, container, false)
         return binding.root
@@ -59,7 +56,7 @@ class SettingFragment : Fragment() {
         binding.speechRate.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val rate = (progress / 100f).coerceIn(0.5f, 2.0f).round1()
-                binding.speechRateValue.setText(rate.toString())
+                binding.speechRateValue.setText("$rate")
                 saveSettingsFromUI()
             }
 
@@ -71,7 +68,7 @@ class SettingFragment : Fragment() {
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val tone = (progress / 100f).coerceIn(0.5f, 2.0f).round1()
-                binding.voiceToneValue.setText(tone.toString())
+                binding.voiceToneValue.setText("$tone")
                 saveSettingsFromUI()
             }
 
@@ -83,7 +80,7 @@ class SettingFragment : Fragment() {
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val clarity = (progress / 100f).coerceIn(0.5f, 2.0f).round1()
-                binding.audioClarityValue.setText(clarity.toString())
+                binding.audioClarityValue.setText("$clarity")
                 saveSettingsFromUI()
             }
 
@@ -94,7 +91,7 @@ class SettingFragment : Fragment() {
         binding.responseDelaySeekbar.setOnSeekBarChangeListener(object :
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.responseDelayValue.setText(progress.toString())
+                binding.responseDelayValue.setText("$progress")
                 saveSettingsFromUI()
             }
 
@@ -112,7 +109,7 @@ class SettingFragment : Fragment() {
                 binding.voicebtn.rotation = 180f
             } else {
                 binding.voicesetting.visibility = View.VISIBLE
-                binding.voicebtn.rotation = 180f
+                binding.voicebtn.rotation = 0f
             }
         }
         binding.btncredits.setOnClickListener {
@@ -148,9 +145,9 @@ class SettingFragment : Fragment() {
         }
         binding.langlinaer.setOnClickListener {
             val languages = arrayOf("English", "Urdu")
-            val builder = android.app.AlertDialog.Builder(requireContext())
+            val builder = AlertDialog.Builder(requireContext())
             builder.setTitle("Select Language")
-            builder.setItems(languages) { dialog, which ->
+            builder.setItems(languages) { _, which ->
                 when (which) {
                     0 -> {
                         Toast.makeText(requireContext(), "English Selected", Toast.LENGTH_SHORT)
@@ -309,7 +306,6 @@ class SettingFragment : Fragment() {
 
         // 3️⃣  activity stack pura khatam + app band
         requireActivity().finishAffinity()        // ← sab activities close
-
     }
 
 
