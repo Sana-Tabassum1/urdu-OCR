@@ -5,17 +5,8 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/splashFragment">
 
-    <fragment
-        android:id="@+id/homefragment"
-        android:name="com.soul.ocr.fragments.HomeFragment"
-        android:label="fragment_hme"
-        tools:layout="@layout/fragment_hme" />
 
-    <fragment
-        android:id="@+id/cameraFragment"
-        android:name="com.soul.ocr.fragments.CameraFragment"
-        android:label="CameraFragment"
-        tools:layout="@layout/fragment_camera" />
+
 
     <fragment
         android:id="@+id/editFragment"
@@ -47,42 +38,15 @@
             app:launchSingleTop="true" />
     </fragment>
 
-    <fragment
-        android:id="@+id/texttoImageFragment"
-        android:name="com.soul.ocr.fragments.TexttoImageFragment"
-        android:label="fragment_preview"
-        tools:layout="@layout/fragment_preview">
-        <action
-            android:id="@+id/action_texttoImageFragment_to_cameraFragment"
-            app:destination="@id/cameraFragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/texttoImageFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_texttoImageFragment_to_fullScreenImageFragment"
-            app:destination="@id/fullScreenImageFragment"
-            app:launchSingleTop="true" />
-    </fragment>
 
-    <fragment
-        android:id="@+id/previewFragment"
-        android:name="com.soul.ocr.fragments.previewFragment"
-        android:label="fragment_preview2"
-        tools:layout="@layout/fragment_preview2" />
+
 
     <fragment
         android:id="@+id/nav_home"
         android:name="com.soul.ocr.fragments.home2Fragment"
         android:label="fragment_home2"
         tools:layout="@layout/fragment_home2">
-        <action
-            android:id="@+id/action_home2Fragment_to_cameraFragment"
-            app:destination="@id/cameraFragment"
-            app:launchSingleTop="true" />
-        <action
-            android:id="@+id/action_home2Fragment_to_texttoImageFragment"
-            app:destination="@id/texttoImageFragment"
-            app:launchSingleTop="true" />
+
         <action
             android:id="@+id/action_home2Fragment_to_editFragment"
             app:destination="@id/editFragment"

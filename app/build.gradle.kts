@@ -39,7 +39,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
-    
+
     sourceSets {
         getByName("main") {
             assets {
@@ -62,6 +62,8 @@ dependencies {
 
     implementation(libs.play.services.mlkit.text.recognition.common)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -70,30 +72,43 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
     implementation(libs.ucrop)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.1.0")
 
     // Navigation component
-    implementation("androidx.navigation:navigation-fragment-ktx:2.9.0")
-    implementation("androidx.navigation:navigation-ui-ktx:2.9.0")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.9.1")
+    implementation("androidx.navigation:navigation-ui-ktx:2.9.1")
 
     //viewmodel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
 
     implementation("androidx.camera:camera-core:1.4.2")
     implementation("androidx.camera:camera-camera2:1.4.2")
     implementation("androidx.camera:camera-lifecycle:1.4.2")
     implementation("androidx.camera:camera-view:1.4.2")
     implementation("androidx.camera:camera-extensions:1.4.2")
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.code.gson:gson:2.13.1")
 
     //Circular ImageView
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
     //DataStore
     implementation(libs.androidx.datastore.preferences)
+
+
+
+//    implementation("androidx.credentials:credentials:1.5.0")
+//    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+//    implementation("com.google.android.gms:play-services-auth:22.1.0")   // optional
+//    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+// Use the latest version
+    implementation("com.google.android.gms:play-services-auth-api-phone:18.0.1")
+// For One Tap
+
 }

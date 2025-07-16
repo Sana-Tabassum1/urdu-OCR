@@ -1,6 +1,8 @@
 package com.soul.ocr.fragments
 
+import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,10 +17,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.soul.ocr.ModelSelectorBottomSheet
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.auth.AUTH
+import com.soul.ocr.bottomsheet.ModelSelectorBottomSheet
 import com.soul.ocr.R
 import com.soul.ocr.ViewModel.VoiceSettings
 import com.soul.ocr.ViewModel.VoiceSettingsViewModel
+import com.soul.ocr.bottomsheet.SignInBottomSheet
 import com.soul.ocr.databinding.FragmentSettingBinding
 import com.soul.ocr.databinding.SelectModeDialogBinding
 import com.soul.ocr.databinding.TextSizeDialogBinding
@@ -27,6 +32,7 @@ import com.soul.ocr.datastore.PreferenceDataStoreKeysConstants
 import com.soul.ocr.datastore.PreferencesDataStoreHelper
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlin.jvm.java
 
 
 class SettingFragment : Fragment() {
@@ -112,6 +118,10 @@ class SettingFragment : Fragment() {
         binding.btncredits.setOnClickListener {
             findNavController().navigate(R.id.action_settingFragment_to_modelScreenFragment)
         }
+        binding.btnrestore.setOnClickListener {
+            val sheet = SignInBottomSheet()
+            sheet.show(parentFragmentManager,"SignInSheet")
+        }
 
         binding.info.setOnClickListener {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -171,8 +181,18 @@ class SettingFragment : Fragment() {
             binding.title2.text = selectedModel
         }
 
-        binding.btndaimond.setOnClickListener {
-            findNavController().navigate(R.id.action_settingFragment_to_modelScreenFragment)
+        binding.btnlogout.setOnClickListener {
+            AlertDialog.Builder(requireContext()) // if in Fragment. Use `this` if in Activity
+                .setTitle("Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Yes") { dialog, _ ->
+                    dialog.dismiss()
+                    performLogout()
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
         }
     }
 
@@ -280,5 +300,17 @@ class SettingFragment : Fragment() {
         )
         voiceSettingsViewModel.updateSettings(updatedSettings)
     }
+    private fun performLogout() {
+        // 1️⃣  apna session / prefs clear kar
+        requireContext()
+            .getSharedPreferences("your_prefs", Context.MODE_PRIVATE)
+            .edit().clear().apply()
+
+
+        // 3️⃣  activity stack pura khatam + app band
+        requireActivity().finishAffinity()        // ← sab activities close
+
+    }
+
 
 }

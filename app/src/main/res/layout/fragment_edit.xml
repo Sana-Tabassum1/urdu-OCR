@@ -14,19 +14,7 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         tools:context=".fragments.EditFragment">
-        <TextView
-            android:id="@+id/textsize"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Image Size"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:fontFamily="@font/poppins_medium"
-            android:layout_marginTop="30dp"
-            android:layout_marginStart="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
@@ -64,59 +52,6 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/sizeOptions"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:orientation="horizontal"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="16dp"
-            android:padding="5dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textsize">
-
-            <!-- 1:1 Square -->
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnSize1_1"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/outline_size_button"
-                android:text="1:1"
-                android:layout_marginStart="5dp"
-                android:textColor="@color/black" />
-
-            <!-- 2:3 Portrait -->
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnSize2_3"
-                android:layout_width="65dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="12dp"
-                android:background="@drawable/outline_size_button"
-                android:text="2:3"
-                android:textColor="@color/black" />
-
-            <!-- 3:2 Landscape -->
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnSize3_2"
-                android:layout_width="40dp"
-                android:layout_height="65dp"
-                android:layout_marginStart="12dp"
-                android:background="@drawable/outline_size_button"
-                android:text="3:2"
-                android:textColor="@color/black" />
-
-            <!-- A4 -->
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnSizeA4"
-                android:layout_width="35dp"
-                android:layout_height="55dp"
-                android:layout_marginStart="12dp"
-                android:background="@drawable/outline_size_button"
-                android:text="A4"
-                android:textColor="@color/black" />
-        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/editlayout"
@@ -124,13 +59,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="50dp"
             android:background="@drawable/bg_round_lightgray"
             android:orientation="vertical"
             android:padding="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sizeOptions">
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
 
             <!-- Font Controls -->
@@ -412,7 +347,7 @@
                 <EditText
                     android:id="@+id/etEditText"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@android:color/transparent"
                     android:gravity="right|top"
                     android:hint="یہاں اردو لکھیں..."

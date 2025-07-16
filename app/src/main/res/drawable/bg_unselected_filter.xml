@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="@color/light_gray"/>
-    <corners android:radius="4dp"/>
+<!-- bg_file_unselected.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/light_gray" />
+    <corners android:radius="8dp"/>
 </shape>

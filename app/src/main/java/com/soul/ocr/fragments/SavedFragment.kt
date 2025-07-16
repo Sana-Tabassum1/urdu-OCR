@@ -1,5 +1,6 @@
 package com.soul.ocr.fragments
 
+
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -44,7 +45,13 @@ class SavedFragment : Fragment(), SavedPageFragment.SelectionChangeListener {
         binding.ivDelete.setOnClickListener { currentPage()?.deleteSelectedFiles() }
         binding.ivShare.setOnClickListener { currentPage()?.shareSelectedFiles() }
         binding.ivBackSelection.setOnClickListener { currentPage()?.clearSelection() }
-        binding.ivPin.setOnClickListener { currentPage()?.togglePinSelectedFiles() }
+        binding.ivPin.setOnClickListener {
+            val nowAllPinned = currentPage()?.togglePinSelectedFiles() ?: false
+            binding.ivPin.setImageResource(
+                if (nowAllPinned) R.drawable.unpin else R.drawable.pinblack
+            )
+        }
+
 
         // ---------- SEARCH ----------
         setupSearchUi()
@@ -56,6 +63,7 @@ class SavedFragment : Fragment(), SavedPageFragment.SelectionChangeListener {
                 updateTabTextColor(position)
                 // reset search when user changes tab
                 clearSearch()
+                updatePinIcon()
             }
         })
 
@@ -141,9 +149,19 @@ class SavedFragment : Fragment(), SavedPageFragment.SelectionChangeListener {
             binding.selectionLayout.visibility = View.VISIBLE
             binding.fileTypeFilter.visibility = View.GONE
             binding.tvSelectedCount.text = "$selectedCount× selected"
+
+            updatePinIcon() // 👈 update icon when selection starts
         } else {
             binding.selectionLayout.visibility = View.GONE
             binding.fileTypeFilter.visibility = View.VISIBLE
         }
     }
+
+    private fun updatePinIcon() {
+        val allPinned = currentPage()?.areAllSelectedFilesPinned() ?: false
+        binding.ivPin.setImageResource(
+            if (allPinned) R.drawable.unpin else R.drawable.pinblack
+        )
+    }
+
 }

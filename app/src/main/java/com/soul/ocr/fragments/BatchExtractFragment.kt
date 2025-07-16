@@ -53,7 +53,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.Multimaps.index
 import com.soul.ocr.Adaptors.ImagePagerAdapter
-import com.soul.ocr.ModelSelectorBottomSheet
+import com.soul.ocr.bottomsheet.ModelSelectorBottomSheet
 import com.soul.ocr.ModelClass.Content
 import com.soul.ocr.ModelClass.GPTRequest
 import com.soul.ocr.ModelClass.ImageUrl

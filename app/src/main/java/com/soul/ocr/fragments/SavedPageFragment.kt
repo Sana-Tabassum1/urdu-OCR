@@ -161,50 +161,30 @@ class SavedPageFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
         startActivity(Intent.createChooser(shareIntent, "Share files via"))
     }
 
-    fun togglePinSelectedFiles() {
+    fun togglePinSelectedFiles(): Boolean {
         val selectedItems = adapter.getSelectedFiles()
 
         if (selectedItems.isEmpty()) {
-            Toast.makeText(requireContext(), "Select files first", Toast.LENGTH_SHORT).show()
-            return
+            Toast.makeText(requireContext(), "Select files to pin/unpin", Toast.LENGTH_SHORT).show()
+            return false
         }
 
-        var newlyPinned = 0
-        var alreadyPinned = 0
+        val shouldUnpin = areAllSelectedFilesPinned()
 
-        selectedItems.forEach { item ->
-            val already = pinnedViewModel.pinnedFiles.value
-                ?.any { it.path == item.file.path } == true
-
-            if (already) {
-                alreadyPinned++
+        selectedItems.forEach {
+            val file = it.file
+            if (shouldUnpin) {
+                pinnedViewModel.unpinFile(file)
             } else {
-                pinnedViewModel.pinFile(item.file)
-                newlyPinned++
+                pinnedViewModel.pinFile(file)
             }
         }
 
-        when {
-            newlyPinned > 0 && alreadyPinned == 0 ->
-                Toast.makeText(requireContext(), "Pinned ✔︎", Toast.LENGTH_SHORT).show()
-            newlyPinned > 0 && alreadyPinned > 0 ->
-                Toast.makeText(
-                    requireContext(),
-                    "Some files pinned, some already pinned",
-                    Toast.LENGTH_SHORT
-                ).show()
-            newlyPinned == 0 && alreadyPinned > 0 ->
-                Toast.makeText(
-                    requireContext(),
-                    " selected files are already pinned",
-                    Toast.LENGTH_SHORT
-                ).show()
-        }
-
         clearSelection()
+        Toast.makeText(requireContext(), "Pin state updated", Toast.LENGTH_SHORT).show()
+
+        return !shouldUnpin // return new state: true means now pinned
     }
-
-
 
 
     fun clearSelection() {
@@ -225,4 +205,14 @@ class SavedPageFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
         }
         adapter.updateList(filtered)
     }
+
+
+    fun areAllSelectedFilesPinned(): Boolean {
+        val selectedFiles = adapter.getSelectedFiles()
+        if (selectedFiles.isEmpty()) return false
+        return selectedFiles.all { file ->
+            pinnedViewModel.pinnedFiles.value?.any { it.path == file.file.path } == true
+        }
+    }
+
 }

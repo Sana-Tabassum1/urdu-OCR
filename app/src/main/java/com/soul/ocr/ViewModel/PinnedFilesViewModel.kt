@@ -21,13 +21,12 @@ class PinnedFilesViewModel(application: Application) : AndroidViewModel(applicat
 
     fun pinFile(file: InternalFileModel) {
         val list = _pinnedFiles.value ?: mutableListOf()
-        if (list.none { it.path == file.path }) {   // ✅ skip duplicates
+        if (list.none { it.path == file.path }) {
             list.add(file)
             _pinnedFiles.value = list
             PinnedStorage.savePinnedFiles(getApplication(), list)
         }
     }
-
 
     fun unpinFile(file: InternalFileModel) {
         val list = _pinnedFiles.value ?: return
@@ -36,6 +35,5 @@ class PinnedFilesViewModel(application: Application) : AndroidViewModel(applicat
         PinnedStorage.savePinnedFiles(getApplication(), list)
     }
 }
-
 
 

@@ -15,11 +15,14 @@ textRecognition = "16.0.1"
 textRecognitionArabic = "17.0.3"
 ucrop = "2.2.8"
 datastorePreferences = "1.1.7"
-uiToolingAndroid = "1.8.2"
-firebaseCrashlyticsBuildtools = "3.0.3"
+uiToolingAndroid = "1.8.3"
+firebaseCrashlyticsBuildtools = "3.0.4"
 visionCommon = "17.3.0"
 playServicesMlkitTextRecognitionCommon = "19.1.0"
 lifecycleViewmodelKtx = "2.9.1"
+firebaseAuthKtx = "23.2.1"
+googleid = "1.1.1"
+
 
 [libraries]
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCore" }
@@ -44,8 +47,10 @@ ucrop = { module = "com.github.yalantis:ucrop", version.ref = "ucrop" }
 vision-common = { group = "com.google.mlkit", name = "vision-common", version.ref = "visionCommon" }
 play-services-mlkit-text-recognition-common = { group = "com.google.android.gms", name = "play-services-mlkit-text-recognition-common", version.ref = "playServicesMlkitTextRecognitionCommon" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version = "1.9.22" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version = "2.2.0" }
 

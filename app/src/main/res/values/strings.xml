@@ -5,6 +5,8 @@
     <string name="todo">TODO</string>
     <string name="plus">+</string>
     <string name="text_to_image">Text to Image</string>
+    <string name="server_client_id">814397880124-pibgin26vthfs76idl1cb5vkdjm14p39.apps.googleusercontent.com</string>
+
 
     <string-array name="font_sizes">
         <item>14</item>

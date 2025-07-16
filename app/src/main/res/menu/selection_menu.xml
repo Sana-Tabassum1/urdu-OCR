@@ -4,16 +4,13 @@
     <item
         android:id="@+id/menu_share"
         android:title="Share"
-        android:icon="@drawable/sharefile"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_delete"
         android:title="Delete"
-        android:icon="@drawable/delect"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_pin"
         android:title="Pin"
-        android:icon="@drawable/pin"
         app:showAsAction="ifRoom" />
 </menu>

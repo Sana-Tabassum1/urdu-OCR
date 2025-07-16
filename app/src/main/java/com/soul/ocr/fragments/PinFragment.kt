@@ -57,7 +57,8 @@ class PinFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
         /* -------- Observe pinned list -------- */
         pinnedViewModel.pinnedFiles.observe(viewLifecycleOwner) { pinnedList ->
             allFiles = pinnedList.map { FileListItem.FileItem(it) }
-            filterFiles(currentQuery)        // honour current query
+            filterFiles(currentQuery) // honour current query
+            toggleSelectionBar(false)
         }
 
         /* -------- Selection actions -------- */
@@ -155,6 +156,7 @@ class PinFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
                     pinnedViewModel.unpinFile(it.file)
                 }
                 adapter.clearSelections()
+                toggleSelectionBar(false)
             }
             .setNegativeButton("Cancel", null)
             .show()
@@ -183,7 +185,9 @@ class PinFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
     private fun unpinSelectedFiles() {
         adapter.getSelectedFiles().forEach { pinnedViewModel.unpinFile(it.file) }
         adapter.clearSelections()
+        toggleSelectionBar(false)
     }
+
 
     /* optional: preview click handler */
     fun onFileClick(file: FileListItem.FileItem) { /* open preview etc. */ }
