@@ -110,7 +110,7 @@ class BatchScanningFragment : Fragment() {
 
 
         ivBack.setOnClickListener {
-            viewModel.clearAll() // 👈 yahan bitmap list clear karo
+            viewModel.clearAll() //  bitmap list clear
           findNavController().navigate(R.id.action_batchScanningFragment_to_nav_home)
         }
     }

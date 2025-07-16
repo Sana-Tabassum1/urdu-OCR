@@ -304,8 +304,8 @@ class SettingFragment : Fragment() {
             .edit().clear().apply()
 
 
-        // 3️⃣  activity stack pura khatam + app band
-        requireActivity().finishAffinity()        // ← sab activities close
+        // 3️⃣  activity stack full remove + app close
+        requireActivity().finishAffinity()        // ← All activities close
     }
 
 

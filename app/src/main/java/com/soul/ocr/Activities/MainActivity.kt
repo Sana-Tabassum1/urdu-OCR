@@ -2,6 +2,7 @@ package com.soul.ocr.Activities
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -35,7 +36,17 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
+        onBackPressedDispatcher.addCallback(this /* lifecycleOwner */, true) {
+            if (navController.currentDestination?.id != R.id.nav_home) {
+                navController.popBackStack(R.id.nav_home, false)
 
+                // 2) bottom nav  highlight
+                binding.bottomNavigation.selectedItemId = R.id.nav_home
+            } else {
+                // Home  app close
+                finishAffinity()              // ya super.onBackPressedDispatcher.onBackPressed()
+            }
+        }
         // Setup BottomNavigationView with NavController
         binding.bottomNavigation.setupWithNavController(navController)
 

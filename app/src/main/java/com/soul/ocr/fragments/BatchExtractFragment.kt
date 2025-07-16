@@ -116,7 +116,7 @@ class BatchExtractFragment : Fragment() {
             if (saved.isNotEmpty()) {
                 binding.etExtractedText.text = saved
                 binding.progressStepLayout.progressBar.visibility = View.VISIBLE
-                alreadyProcessed = true          // flag bhi true kar do
+                alreadyProcessed = true
             }
         }
 
@@ -701,7 +701,7 @@ class BatchExtractFragment : Fragment() {
 
     private fun showSaveDialogWithFileName(suggestedName: String) {
 
-        // 1 · layout inflate
+        // layout inflate
         val view = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_save_options, null)
 
@@ -712,7 +712,7 @@ class BatchExtractFragment : Fragment() {
         etName.setText(suggestedName)            // default fill
         etName.setSelection(etName.text.length)  // cursor at end
 
-        // 2 · helper to colour buttons
+        // helper to colour buttons
         fun paint(btn: TextView, selected: Boolean) {
             btn.setBackgroundResource(
                 if (selected) R.drawable.button_selector
@@ -726,7 +726,7 @@ class BatchExtractFragment : Fragment() {
             )
         }
 
-        // 3 · default state → File selected
+        //  default state → File selected
         var saveAsPdf = false
         paint(btnFile, true)
         paint(btnPdf,  false)
@@ -743,7 +743,7 @@ class BatchExtractFragment : Fragment() {
             return if (raw.isEmpty()) "urdu_text_${System.currentTimeMillis()}" else raw
         }
 
-        /* helper to close + go home after 120 ms */
+        /* helper to close + go home after 120ms */
         fun finishDialog() {
             Handler(Looper.getMainLooper()).postDelayed({
                 dlg.dismiss()
