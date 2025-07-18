@@ -22,6 +22,8 @@ playServicesMlkitTextRecognitionCommon = "19.1.0"
 lifecycleViewmodelKtx = "2.9.1"
 firebaseAuthKtx = "23.2.1"
 googleid = "1.1.1"
+playServicesAuth = "22.1.0"
+playServicesMlkitDocumentScanner = "16.0.0-beta1"
 
 
 [libraries]
@@ -49,6 +51,8 @@ play-services-mlkit-text-recognition-common = { group = "com.google.android.gms"
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+play-services-mlkit-document-scanner = { group = "com.google.android.gms", name = "play-services-mlkit-document-scanner", version.ref = "playServicesMlkitDocumentScanner" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

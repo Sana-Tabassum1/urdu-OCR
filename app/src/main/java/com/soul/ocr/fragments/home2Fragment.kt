@@ -46,7 +46,7 @@ class home2Fragment : Fragment()  {
 
         setupSearchUi()
         binding.cameraBox.setOnClickListener {
-            findNavController().navigate(R.id.action_home2Fragment_to_batchScanningFragment)
+            findNavController().navigate(R.id.action_nav_home_to_scannerFragment)
 
         }
         binding.textToImageBox.setOnClickListener {

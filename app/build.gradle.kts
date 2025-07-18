@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.googleid)
+    implementation(libs.play.services.mlkit.document.scanner)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -101,14 +102,18 @@ dependencies {
 
 
 
-//    implementation("androidx.credentials:credentials:1.5.0")
-//    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
-//    implementation("com.google.android.gms:play-services-auth:22.1.0")   // optional
-//    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+        //  implementation("com.google.android.gms:play-services-auth:22.1.0")   // optional
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
     implementation("com.google.android.gms:play-services-auth:21.2.0")
 // Use the latest version
     implementation("com.google.android.gms:play-services-auth-api-phone:18.0.1")
-// For One Tap
+
+    implementation("com.google.mlkit:document-scanner:16.0.0-beta3")
+
+
+
 
 }
