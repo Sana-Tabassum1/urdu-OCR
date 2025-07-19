@@ -111,7 +111,8 @@ dependencies {
 // Use the latest version
     implementation("com.google.android.gms:play-services-auth-api-phone:18.0.1")
 
-    implementation("com.google.mlkit:document-scanner:16.0.0-beta3")
+    implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta3")
+
 
 
 
