@@ -1,75 +1,129 @@
 package com.soul.ocr.fragments
 
-
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
+import android.view.*
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import com.soul.ocr.Adaptors.RecentAdapter
-import com.soul.ocr.Adaptors.SavedFileAdapter
 import com.soul.ocr.ModelClass.FileListItem
 import com.soul.ocr.ModelClass.InternalFileModel
-import com.soul.ocr.ModelClass.RecentItem
 import com.soul.ocr.R
+import com.soul.ocr.ViewModel.BatchScanningViewModel
 import com.soul.ocr.databinding.FragmentHome2Binding
 import java.io.File
 
+class home2Fragment : Fragment() {
 
-class home2Fragment : Fragment()  {
-    private  lateinit var binding: FragmentHome2Binding
+    private lateinit var binding: FragmentHome2Binding
     private lateinit var adapter: RecentAdapter
-    private lateinit var displayList: List<FileListItem.FileItem>
     private lateinit var allFiles: List<FileListItem.FileItem>
+    private lateinit var scannerLauncher: ActivityResultLauncher<IntentSenderRequest>
+    private lateinit var viewModel: BatchScanningViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        viewModel = ViewModelProvider(requireActivity())[BatchScanningViewModel::class.java]
+
+        scannerLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            val resultCode = result.resultCode
+            val data = result.data
+            val scanResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
+
+            if (resultCode == Activity.RESULT_OK && scanResult != null) {
+                val pages = scanResult.pages
+
+                if (!pages.isNullOrEmpty()) {
+                    val bitmaps = pages.mapNotNull { page ->
+                        val inputStream = requireContext().contentResolver.openInputStream(page.imageUri)
+                        BitmapFactory.decodeStream(inputStream)
+                    }
+
+                    viewModel.setImages(bitmaps)
+                    findNavController().navigate(R.id.action_nav_home_to_cropPreviewFragment)
+                }
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                Log.d("Scanner", "User cancelled scan")
+            } else {
+                Log.e("Scanner", "Scan failed or unknown error")
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        binding= FragmentHome2Binding.inflate(layoutInflater,container,false)
+    ): View {
+        binding = FragmentHome2Binding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        allFiles   = loadRecentFiles()
-        adapter    = RecentAdapter(requireContext(), allFiles)
+        allFiles = loadRecentFiles()
+        adapter = RecentAdapter(requireContext(), allFiles)
         binding.homeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.homeRecyclerView.adapter      = adapter
+        binding.homeRecyclerView.adapter = adapter
 
         setupSearchUi()
-        binding.cameraBox.setOnClickListener {
-            findNavController().navigate(R.id.action_nav_home_to_scannerFragment)
 
+        binding.cameraBox.setOnClickListener {
+            launchDocumentScanner()
         }
+
         binding.textToImageBox.setOnClickListener {
             findNavController().navigate(R.id.action_home2Fragment_to_editFragment)
-
         }
 
         binding.scanningBox.setOnClickListener {
             findNavController().navigate(R.id.action_home2Fragment_to_batchScanningFragment)
         }
-       binding.recentlayout.setOnClickListener {
-           findNavController().navigate(R.id.action_home2Fragment_to_savedFragment)
-       }
+
+        binding.recentlayout.setOnClickListener {
+            findNavController().navigate(R.id.action_home2Fragment_to_savedFragment)
+        }
+
         binding.btndaimond.setOnClickListener {
             findNavController().navigate(R.id.action_home2Fragment_to_modelScreenFragment)
         }
-
-
     }
+
+    private fun launchDocumentScanner() {
+        val scannerOptions = GmsDocumentScannerOptions.Builder()
+            .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL)
+            .build()
+
+        val documentScanner = GmsDocumentScanning.getClient(scannerOptions)
+
+        documentScanner.getStartScanIntent(requireActivity())
+            .addOnSuccessListener { intentSender ->
+                val request = IntentSenderRequest.Builder(intentSender).build()
+                scannerLauncher.launch(request)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Error launching scanner: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("Scanner", "Failed to launch: ${e.message}")
+            }
+    }
+
     private fun loadRecentFiles(): List<FileListItem.FileItem> {
         val rootDir = requireContext().filesDir
         val imageDir = File(rootDir, "SavedImages")
-
         val recentFiles = mutableListOf<FileListItem.FileItem>()
 
         val allFiles = (rootDir.listFiles()?.toList() ?: emptyList()) +
@@ -135,7 +189,4 @@ class home2Fragment : Fragment()  {
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
         imm.hideSoftInputFromWindow(binding.etSearch.windowToken, 0)
     }
-
-
-
 }

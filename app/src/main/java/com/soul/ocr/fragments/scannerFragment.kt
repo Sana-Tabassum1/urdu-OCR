@@ -37,7 +37,7 @@ class ScannerFragment : Fragment() {
                     val uri = firstPage.imageUri
                     val inputStream = requireContext().contentResolver.openInputStream(uri)
                     val bitmap = BitmapFactory.decodeStream(inputStream)
-                    binding.ivScannedImage.setImageBitmap(bitmap)
+                    //binding.ivScannedImage.setImageBitmap(bitmap)
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 Log.d("Scanner", "User cancelled scan")
@@ -63,9 +63,9 @@ class ScannerFragment : Fragment() {
                 .build()
         )
 
-        binding.btnScanDocument.setOnClickListener {
-            launchDocumentScanner()
-        }
+//        binding.btnScanDocument.setOnClickListener {
+//            launchDocumentScanner()
+//        }
     }
 
     private fun launchDocumentScanner() {

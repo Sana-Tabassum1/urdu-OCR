@@ -21,6 +21,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+        
+        <com.soul.ocr.OverlayView
+            android:id="@+id/overlayView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:clickable="false"
+            android:focusable="false" />
 
         <LinearLayout
             android:layout_width="match_parent"

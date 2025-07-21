@@ -66,6 +66,9 @@
         <action
             android:id="@+id/action_nav_home_to_scannerFragment"
             app:destination="@id/scannerFragment" />
+        <action
+            android:id="@+id/action_nav_home_to_cropPreviewFragment"
+            app:destination="@id/cropPreviewFragment" />
     </fragment>
 
     <fragment

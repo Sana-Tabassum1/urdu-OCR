@@ -37,5 +37,8 @@ class BatchScanningViewModel : ViewModel() {
 
     fun getImageCount(): Int = _bitmapImages.value?.size ?: 0
 
+    fun setImages(images: List<Bitmap>) {
+        _bitmapImages.value = images.toMutableList()
+    }
 
 }
