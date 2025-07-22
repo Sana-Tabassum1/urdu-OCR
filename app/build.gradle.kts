@@ -113,7 +113,11 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta3")
 
-    implementation("com.google.mlkit:document-detection:16.0.0-beta1")
+// ML Kit object detection (not scanner UI)
+    implementation("com.google.mlkit:object-detection:17.0.0")
+
+
+
 
 
 

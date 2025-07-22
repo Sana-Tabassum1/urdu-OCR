@@ -2,7 +2,6 @@ package com.soul.ocr.fragments
 
 import android.animation.*
 import android.app.Activity
-import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -29,6 +28,8 @@ import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import android.media.MediaPlayer
+import com.soul.ocr.ObjectDetectionAnalyzer
+import com.soul.ocr.ScanType
 
 
 class BatchScanningFragment : Fragment() {
@@ -41,6 +42,12 @@ class BatchScanningFragment : Fragment() {
     private var flashEnabled = false
     private var camera: Camera? = null
     private var mediaPlayer: MediaPlayer? = null
+    var selectedMode = "DOCUMENT"
+
+    private var currentScanType: ScanType = ScanType.DOCUMENT
+
+
+
 
     // 🔊 System shutter sound
     private val shutterSound = MediaActionSound().apply {
@@ -89,6 +96,22 @@ class BatchScanningFragment : Fragment() {
         checkAndLaunchCamera()
         observeImages()
         updateFlashIcon()
+
+
+
+        binding.tabDocument.setOnClickListener {
+            currentScanType = ScanType.DOCUMENT
+            updateTabUI(binding.tabDocument)
+        }
+        binding.tabBusinessCard.setOnClickListener {
+            currentScanType = ScanType.BUSINESS_CARD
+            updateTabUI(binding.tabBusinessCard)
+        }
+        binding.tabIdCard.setOnClickListener {
+            currentScanType = ScanType.ID_CARD
+            updateTabUI(binding.tabIdCard)
+        }
+
     }
 
     private fun setupListeners() = with(binding) {
@@ -134,6 +157,21 @@ class BatchScanningFragment : Fragment() {
     }
 
 
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    private fun setupCamera() {
+//        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+//        cameraProviderFuture.addListener({
+//            val cameraProvider = cameraProviderFuture.get()
+//
+//            val preview = Preview.Builder().build().apply {
+//                setSurfaceProvider(binding.previewView.surfaceProvider)
+//            }
+//            imageCapture = ImageCapture.Builder().build()
+//            camera = cameraProvider.bindToLifecycle(viewLifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture)
+//            updateFlashIcon()
+//        }, ContextCompat.getMainExecutor(requireContext()))
+//    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setupCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -143,11 +181,33 @@ class BatchScanningFragment : Fragment() {
             val preview = Preview.Builder().build().apply {
                 setSurfaceProvider(binding.previewView.surfaceProvider)
             }
+
             imageCapture = ImageCapture.Builder().build()
-            camera = cameraProvider.bindToLifecycle(viewLifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture)
+
+            // 👇 Add ImageAnalysis for detection
+            val analyzer = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+                .also {
+                    it.setAnalyzer(
+                        cameraExecutor,
+                        ObjectDetectionAnalyzer(currentScanType.name, binding.overlayView)
+                    )
+                }
+
+            camera = cameraProvider.bindToLifecycle(
+                viewLifecycleOwner,
+                CameraSelector.DEFAULT_BACK_CAMERA,
+                preview,
+                imageCapture,
+                analyzer
+            )
+
             updateFlashIcon()
+
         }, ContextCompat.getMainExecutor(requireContext()))
     }
+
 
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
@@ -279,6 +339,13 @@ class BatchScanningFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun startCameraFlow() {
         setupCamera()      // tumhari existing function
+    }
+    private fun updateTabUI(selected: TextView) {
+        val allTabs = listOf(binding.tabDocument, binding.tabIdCard, binding.tabBusinessCard)
+        allTabs.forEach {
+            it.setBackgroundResource(R.drawable.bg_background_unselector)
+        }
+        selected.setBackgroundResource(R.drawable.bg_background_selector)
     }
 
 
