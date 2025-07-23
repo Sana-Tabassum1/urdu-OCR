@@ -6,8 +6,167 @@
     app:startDestination="@id/splashFragment">
 
 
+    <fragment
+        android:id="@+id/nav_home2"
+        android:name="com.soul.ocr.fragments.home2Fragment"
+        android:label="fragment_home2"
+        tools:layout="@layout/fragment_home2">
 
+        <action
+            android:id="@+id/action_home2Fragment_to_editFragment"
+            app:destination="@id/editFragment"
+            app:launchSingleTop="true" />
+        <action
+            android:id="@+id/action_home2Fragment_to_savedFragment"
+            app:destination="@id/nav_library"
+            app:launchSingleTop="true" />
+        <action
+            android:id="@+id/action_home2Fragment_to_modelScreenFragment"
+            app:destination="@id/modelScreenFragment"
+            app:launchSingleTop="true" />
+        <action
+            android:id="@+id/action_nav_home_to_scannerFragment"
+            app:destination="@id/scannerFragment" />
+        <action
+            android:id="@+id/action_nav_home2_to_batchExtractFragment"
+            app:destination="@id/batchExtractFragment" />
+    </fragment>
+    <action
+        android:id="@+id/action_home2Fragment_to_modelScreenFragment"
+        app:destination="@id/modelScreenFragment"
+        app:launchSingleTop="true" />
+    <action
+        android:id="@+id/action_savedFragment_to_settingFragment"
+        app:destination="@id/nav_settings"
+        app:launchSingleTop="true"
+        app:popUpTo="@id/nav_library"
+        app:popUpToInclusive="true" />
+    <action
+        android:id="@+id/action_editFragment_to_settingFragment"
+        app:destination="@id/nav_settings"
+        app:launchSingleTop="true"
+        app:popUpTo="@id/editFragment"
+        app:popUpToInclusive="true" />
+    <action
+        android:id="@+id/action_batchExtractFragment_to_nav_home"
+        app:destination="@id/nav_home" />
+    <fragment
+        android:id="@+id/batchExtractFragment2"
+        android:name="com.soul.ocr.fragments.BatchExtractFragment"
+        android:label="fragment_batch_extract"
+        tools:layout="@layout/fragment_batch_extract">
+        <action
+            android:id="@+id/action_batchExtractFragment_to_fullScreenImageFragment"
+            app:destination="@id/fullScreenImageFragment"
+            app:launchSingleTop="true" />
+        <action
+            android:id="@+id/action_batchExtractFragment_to_nav_home"
+            app:destination="@id/nav_home" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_settings2"
+        android:name="com.soul.ocr.fragments.SettingFragment"
+        android:label="fragment_setting"
+        tools:layout="@layout/fragment_setting">
+        <action
+            android:id="@+id/action_settingFragment_to_modelScreenFragment"
+            app:destination="@id/modelScreenFragment"
+            app:launchSingleTop="true" />
+    </fragment>
+    <action
+        android:id="@+id/action_home2Fragment_to_savedFragment"
+        app:destination="@id/nav_library"
+        app:launchSingleTop="true" />
+    <action
+        android:id="@+id/action_splashFragment_to_home2Fragment"
+        app:destination="@id/nav_home"
+        app:launchSingleTop="true"
+        app:popUpTo="@id/splashFragment"
+        app:popUpToInclusive="true" />
+    <fragment
+        android:id="@+id/nav_library2"
+        android:name="com.soul.ocr.fragments.SavedFragment"
+        android:label="fragment_saved"
+        tools:layout="@layout/fragment_saved">
+        <action
+            android:id="@+id/action_savedFragment_to_settingFragment"
+            app:destination="@id/nav_settings"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/nav_library"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_savedFragment_to_modelScreenFragment"
+            app:destination="@id/modelScreenFragment"
+            app:launchSingleTop="true" />
+    </fragment>
+    <action
+        android:id="@+id/action_batchScanningFragment_to_nav_home"
+        app:destination="@id/nav_home" />
+    <action
+        android:id="@+id/action_modelScreenFragment_to_nav_settings"
+        app:destination="@id/nav_settings" />
+    <fragment
+        android:id="@+id/fullScreenImageFragment2"
+        android:name="com.soul.ocr.fragments.FullScreenImageFragment"
+        android:label="fragment_full_screen_image"
+        tools:layout="@layout/fragment_full_screen_image" />
+    <action
+        android:id="@+id/action_batchExtractFragment_to_fullScreenImageFragment"
+        app:destination="@id/fullScreenImageFragment"
+        app:launchSingleTop="true" />
+    <action
+        android:id="@+id/action_home2Fragment_to_editFragment"
+        app:destination="@id/editFragment"
+        app:launchSingleTop="true" />
 
+    <action
+        android:id="@+id/action_settingFragment_to_modelScreenFragment"
+        app:destination="@id/modelScreenFragment"
+        app:launchSingleTop="true" />
+    <fragment
+        android:id="@+id/scannerFragment2"
+        android:name="com.soul.ocr.fragments.ScannerFragment"
+        android:label="ScannerFragment" >
+    </fragment>
+
+    <action
+        android:id="@+id/action_savedFragment_to_modelScreenFragment"
+        app:destination="@id/modelScreenFragment"
+        app:launchSingleTop="true" />
+    <fragment
+        android:id="@+id/editFragment2"
+        android:name="com.soul.ocr.fragments.EditFragment"
+        android:label="fragment_edit"
+        tools:layout="@layout/fragment_edit">
+        <action
+            android:id="@+id/action_editFragment_to_settingFragment"
+            app:destination="@id/nav_settings"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/editFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_pinned2"
+        android:name="com.soul.ocr.fragments.PinFragment"
+        android:label="Pinned"
+        tools:layout="@layout/fragment_pin">
+        <action
+            android:id="@+id/action_nav_pinned_to_modelScreenFragment"
+            app:destination="@id/modelScreenFragment" />
+    </fragment>
+    <action
+        android:id="@+id/action_nav_home_to_scannerFragment"
+        app:destination="@id/scannerFragment" />
+    <fragment
+        android:id="@+id/modelScreenFragment2"
+        android:name="com.soul.ocr.fragments.ModelScreenFragment"
+        android:label="Pinned"
+        tools:layout="@layout/fragment_model_screen">
+        <action
+            android:id="@+id/action_modelScreenFragment_to_nav_settings"
+            app:destination="@id/nav_settings" />
+    </fragment>
     <fragment
         android:id="@+id/editFragment"
         android:name="com.soul.ocr.fragments.EditFragment"
@@ -56,10 +215,6 @@
             app:destination="@id/nav_library"
             app:launchSingleTop="true" />
         <action
-            android:id="@+id/action_home2Fragment_to_batchScanningFragment"
-            app:destination="@id/batchScanningFragment"
-            app:launchSingleTop="true" />
-        <action
             android:id="@+id/action_home2Fragment_to_modelScreenFragment"
             app:destination="@id/modelScreenFragment"
             app:launchSingleTop="true" />
@@ -67,8 +222,8 @@
             android:id="@+id/action_nav_home_to_scannerFragment"
             app:destination="@id/scannerFragment" />
         <action
-            android:id="@+id/action_nav_home_to_cropPreviewFragment"
-            app:destination="@id/cropPreviewFragment" />
+            android:id="@+id/action_nav_home_to_scannerFragment2"
+            app:destination="@id/scannerFragment2" />
     </fragment>
 
     <fragment
@@ -96,38 +251,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/batchScanningFragment"
-        android:name="com.soul.ocr.fragments.BatchScanningFragment"
-        android:label="fragment_batch_scanning"
-        tools:layout="@layout/fragment_batch_scanning">
-        <action
-            android:id="@+id/action_batchScanningFragment_to_cropPreviewFragment"
-            app:destination="@id/cropPreviewFragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/batchScanningFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_batchScanningFragment_to_nav_home"
-            app:destination="@id/nav_home" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/cropPreviewFragment"
-        android:name="com.soul.ocr.fragments.CropPreviewFragment"
-        android:label="fragment_crop_preview"
-        tools:layout="@layout/fragment_crop_preview">
-        <action
-            android:id="@+id/action_cropPreviewFragment_to_batchExtractFragment"
-            app:destination="@id/batchExtractFragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/cropPreviewFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_cropPreviewFragment_to_batchScanningFragment"
-            app:destination="@id/batchScanningFragment" />
-    </fragment>
-
-    <fragment
         android:id="@+id/batchExtractFragment"
         android:name="com.soul.ocr.fragments.BatchExtractFragment"
         android:label="fragment_batch_extract"
@@ -137,14 +260,11 @@
             app:destination="@id/fullScreenImageFragment"
             app:launchSingleTop="true" />
         <action
-            android:id="@+id/action_batchExtractFragment_to_batchScanningFragment"
-            app:destination="@id/batchScanningFragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/batchExtractFragment"
-            app:popUpToInclusive="true" />
-        <action
             android:id="@+id/action_batchExtractFragment_to_nav_home"
             app:destination="@id/nav_home" />
+        <action
+            android:id="@+id/action_batchExtractFragment_to_scannerFragment"
+            app:destination="@id/scannerFragment" />
     </fragment>
 
     <fragment

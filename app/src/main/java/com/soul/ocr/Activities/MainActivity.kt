@@ -1,25 +1,68 @@
 package com.soul.ocr.Activities
 
+import android.app.Activity
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import com.soul.ocr.R
+import com.soul.ocr.ViewModel.BatchScanningViewModel
 import com.soul.ocr.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var scannerLauncher: ActivityResultLauncher<IntentSenderRequest>
+    private lateinit var viewModel: BatchScanningViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        viewModel = ViewModelProvider(this)[BatchScanningViewModel::class.java]
+
+        scannerLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            val resultCode = result.resultCode
+            val data = result.data
+            val scanResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
+
+            if (resultCode == Activity.RESULT_OK && scanResult != null) {
+                val pages = scanResult.pages
+
+                if (!pages.isNullOrEmpty()) {
+                    val bitmaps = pages.mapNotNull { page ->
+                        val inputStream = this.contentResolver.openInputStream(page.imageUri)
+                        BitmapFactory.decodeStream(inputStream)
+                    }
+
+                    viewModel.setImages(bitmaps)
+                    findNavController(R.id.nav_host_fragment).navigate(R.id.batchExtractFragment)
+
+                }
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                Log.d("Scanner", "User cancelled scan")
+            } else {
+                Log.e("Scanner", "Scan failed or unknown error")
+            }
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         window.statusBarColor = ContextCompat.getColor(this, R.color.green1)
@@ -89,9 +132,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btncamera.setOnClickListener {
-            navController.navigate(R.id.batchScanningFragment)
+            launchDocumentScanner()
         }
         
     }
+    private fun launchDocumentScanner() {
+        val scannerOptions = GmsDocumentScannerOptions.Builder()
+            .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL)
+            .build()
 
+        val documentScanner = GmsDocumentScanning.getClient(scannerOptions)
+
+        documentScanner.getStartScanIntent(this)
+            .addOnSuccessListener { intentSender ->
+                val request = IntentSenderRequest.Builder(intentSender).build()
+                scannerLauncher.launch(request)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error launching scanner: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("Scanner", "Failed to launch: ${e.message}")
+            }
+    }
 }

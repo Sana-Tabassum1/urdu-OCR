@@ -54,7 +54,7 @@ class home2Fragment : Fragment() {
                     }
 
                     viewModel.setImages(bitmaps)
-                    findNavController().navigate(R.id.action_nav_home_to_cropPreviewFragment)
+                    findNavController().navigate(R.id.batchExtractFragment)
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 Log.d("Scanner", "User cancelled scan")
@@ -91,7 +91,7 @@ class home2Fragment : Fragment() {
         }
 
         binding.scanningBox.setOnClickListener {
-            findNavController().navigate(R.id.action_home2Fragment_to_batchScanningFragment)
+            launchDocumentScanner()
         }
 
         binding.recentlayout.setOnClickListener {

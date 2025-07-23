@@ -51,7 +51,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
-import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.Multimaps.index
 import com.soul.ocr.Adaptors.ImagePagerAdapter
 import com.soul.ocr.bottomsheet.ModelSelectorBottomSheet
 import com.soul.ocr.ModelClass.Content
@@ -244,7 +243,7 @@ class BatchExtractFragment : Fragment() {
         binding.ivBack.setOnClickListener {
             viewModel.clearAll()
             viewModel.extractedText.value = null
-            findNavController().navigate(R.id.action_batchExtractFragment_to_batchScanningFragment)
+            findNavController().navigate(R.id.action_batchExtractFragment_to_nav_home)
         }
 
         binding.btnExpand.setOnClickListener {

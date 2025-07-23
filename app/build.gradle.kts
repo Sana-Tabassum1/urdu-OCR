@@ -50,29 +50,18 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.ui.tooling.android)
-    implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.vision.common)
 
     implementation(libs.play.services.mlkit.text.recognition.common)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.googleid)
     implementation(libs.play.services.mlkit.document.scanner)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    implementation(libs.androidx.camera.core)
-    implementation(libs.androidx.camera.camera2)
-    implementation(libs.androidx.camera.lifecycle)
-    implementation(libs.androidx.camera.view)
-    implementation(libs.ucrop)
+
+    // Retrofit & Coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
@@ -82,44 +71,32 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.9.1")
     implementation("androidx.navigation:navigation-ui-ktx:2.9.1")
 
-    //viewmodel
+    // ViewModel + LiveData
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
 
-    implementation("androidx.camera:camera-core:1.4.2")
-    implementation("androidx.camera:camera-camera2:1.4.2")
-    implementation("androidx.camera:camera-lifecycle:1.4.2")
-    implementation("androidx.camera:camera-view:1.4.2")
-    implementation("androidx.camera:camera-extensions:1.4.2")
-    implementation("com.google.code.gson:gson:2.13.1")
-
-    //Circular ImageView
-    implementation("de.hdodenhof:circleimageview:3.1.0")
-
-    //DataStore
+    // DataStore
     implementation(libs.androidx.datastore.preferences)
 
+    // uCrop
+    implementation(libs.ucrop)
 
-
+    // Credentials (Google ID, phone, etc.)
     implementation("androidx.credentials:credentials:1.5.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
-        //  implementation("com.google.android.gms:play-services-auth:22.1.0")   // optional
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
-
     implementation("com.google.android.gms:play-services-auth:21.2.0")
-// Use the latest version
     implementation("com.google.android.gms:play-services-auth-api-phone:18.0.1")
 
-    implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta3")
-
-// ML Kit object detection (not scanner UI)
-    implementation("com.google.mlkit:object-detection:17.0.0")
 
 
+    // Billing
+    val billing_version = "8.0.0"
+    implementation("com.android.billingclient:billing:$billing_version")
 
-
-
-
-
+    // Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
