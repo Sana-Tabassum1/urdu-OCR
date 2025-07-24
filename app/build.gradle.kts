@@ -6,13 +6,22 @@ plugins {
 }
 
 android {
-    namespace = "com.soul.ocr"
-    compileSdk = 35
+    namespace = "com.urduocr.scanner"
+    compileSdk = 36
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("C:\\Users\\nisar\\Desktop\\Urdu OCR KeyStore\\keystore")
+            storePassword = project.findProperty("KEYSTORE_PASSWORD") as String
+            keyPassword = project.findProperty("KEY_PASSWORD") as String
+            keyAlias = project.findProperty("KEY_ALIAS") as String
+        }
+    }
 
     defaultConfig {
-        applicationId = "com.soul.ocr"
+        applicationId = "com.urduocr.scanner"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -20,20 +29,33 @@ android {
     }
 
     buildTypes {
-        release {
-            isMinifyEnabled = false
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+
+        debug {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            isDebuggable = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -62,38 +84,28 @@ dependencies {
     implementation(libs.play.services.mlkit.document.scanner)
 
     // Retrofit & Coroutine
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
-    implementation("com.squareup.retrofit2:retrofit:3.0.0")
-    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.1.0")
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
 
     // Navigation component
-    implementation("androidx.navigation:navigation-fragment-ktx:2.9.1")
-    implementation("androidx.navigation:navigation-ui-ktx:2.9.1")
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
     // ViewModel + LiveData
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
 
     // DataStore
     implementation(libs.androidx.datastore.preferences)
 
-    // uCrop
-    implementation(libs.ucrop)
-
-    // Credentials (Google ID, phone, etc.)
-    implementation("androidx.credentials:credentials:1.5.0")
-    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
-    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
-    implementation("com.google.android.gms:play-services-auth:21.2.0")
-    implementation("com.google.android.gms:play-services-auth-api-phone:18.0.1")
-
-
+    //Google Auth
+    implementation(libs.play.services.auth.v2130)
 
     // Billing
-    val billing_version = "8.0.0"
-    implementation("com.android.billingclient:billing:$billing_version")
+    implementation(libs.billing)
 
     // Testing
     testImplementation(libs.junit)

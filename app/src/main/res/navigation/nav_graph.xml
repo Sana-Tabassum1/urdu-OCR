@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/nav_home2"
-        android:name="com.soul.ocr.fragments.home2Fragment"
+        android:name="com.urduocr.scanner.fragments.home2Fragment"
         android:label="fragment_home2"
         tools:layout="@layout/fragment_home2">
 
@@ -52,7 +52,7 @@
         app:destination="@id/nav_home" />
     <fragment
         android:id="@+id/batchExtractFragment2"
-        android:name="com.soul.ocr.fragments.BatchExtractFragment"
+        android:name="com.urduocr.scanner.fragments.BatchExtractFragment"
         android:label="fragment_batch_extract"
         tools:layout="@layout/fragment_batch_extract">
         <action
@@ -65,7 +65,7 @@
     </fragment>
     <fragment
         android:id="@+id/nav_settings2"
-        android:name="com.soul.ocr.fragments.SettingFragment"
+        android:name="com.urduocr.scanner.fragments.SettingFragment"
         android:label="fragment_setting"
         tools:layout="@layout/fragment_setting">
         <action
@@ -85,7 +85,7 @@
         app:popUpToInclusive="true" />
     <fragment
         android:id="@+id/nav_library2"
-        android:name="com.soul.ocr.fragments.SavedFragment"
+        android:name="com.urduocr.scanner.fragments.SavedFragment"
         android:label="fragment_saved"
         tools:layout="@layout/fragment_saved">
         <action
@@ -107,7 +107,7 @@
         app:destination="@id/nav_settings" />
     <fragment
         android:id="@+id/fullScreenImageFragment2"
-        android:name="com.soul.ocr.fragments.FullScreenImageFragment"
+        android:name="com.urduocr.scanner.fragments.FullScreenImageFragment"
         android:label="fragment_full_screen_image"
         tools:layout="@layout/fragment_full_screen_image" />
     <action
@@ -125,7 +125,7 @@
         app:launchSingleTop="true" />
     <fragment
         android:id="@+id/scannerFragment2"
-        android:name="com.soul.ocr.fragments.ScannerFragment"
+        android:name="com.urduocr.scanner.fragments.ScannerFragment"
         android:label="ScannerFragment" >
     </fragment>
 
@@ -135,7 +135,7 @@
         app:launchSingleTop="true" />
     <fragment
         android:id="@+id/editFragment2"
-        android:name="com.soul.ocr.fragments.EditFragment"
+        android:name="com.urduocr.scanner.fragments.EditFragment"
         android:label="fragment_edit"
         tools:layout="@layout/fragment_edit">
         <action
@@ -148,7 +148,7 @@
 
     <fragment
         android:id="@+id/nav_pinned2"
-        android:name="com.soul.ocr.fragments.PinFragment"
+        android:name="com.urduocr.scanner.fragments.PinFragment"
         android:label="Pinned"
         tools:layout="@layout/fragment_pin">
         <action
@@ -160,16 +160,16 @@
         app:destination="@id/scannerFragment" />
     <fragment
         android:id="@+id/modelScreenFragment2"
-        android:name="com.soul.ocr.fragments.ModelScreenFragment"
+        android:name="com.urduocr.scanner.fragments.inapp_purchaseFragment"
         android:label="Pinned"
-        tools:layout="@layout/fragment_model_screen">
+        tools:layout="@layout/fragment_inapp_purchase">
         <action
             android:id="@+id/action_modelScreenFragment_to_nav_settings"
             app:destination="@id/nav_settings" />
     </fragment>
     <fragment
         android:id="@+id/editFragment"
-        android:name="com.soul.ocr.fragments.EditFragment"
+        android:name="com.urduocr.scanner.fragments.EditFragment"
         android:label="fragment_edit"
         tools:layout="@layout/fragment_edit">
         <action
@@ -182,7 +182,7 @@
 
     <fragment
         android:id="@+id/nav_library"
-        android:name="com.soul.ocr.fragments.SavedFragment"
+        android:name="com.urduocr.scanner.fragments.SavedFragment"
         android:label="fragment_saved"
         tools:layout="@layout/fragment_saved">
         <action
@@ -202,7 +202,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.soul.ocr.fragments.home2Fragment"
+        android:name="com.urduocr.scanner.fragments.home2Fragment"
         android:label="fragment_home2"
         tools:layout="@layout/fragment_home2">
 
@@ -228,7 +228,7 @@
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="com.soul.ocr.fragments.SettingFragment"
+        android:name="com.urduocr.scanner.fragments.SettingFragment"
         android:label="fragment_setting"
         tools:layout="@layout/fragment_setting">
         <action
@@ -239,7 +239,7 @@
 
     <fragment
         android:id="@+id/splashFragment"
-        android:name="com.soul.ocr.fragments.SplashFragment"
+        android:name="com.urduocr.scanner.fragments.SplashFragment"
         android:label="fragment_splash"
         tools:layout="@layout/fragment_splash">
         <action
@@ -252,7 +252,7 @@
 
     <fragment
         android:id="@+id/batchExtractFragment"
-        android:name="com.soul.ocr.fragments.BatchExtractFragment"
+        android:name="com.urduocr.scanner.fragments.BatchExtractFragment"
         android:label="fragment_batch_extract"
         tools:layout="@layout/fragment_batch_extract">
         <action
@@ -269,13 +269,13 @@
 
     <fragment
         android:id="@+id/fullScreenImageFragment"
-        android:name="com.soul.ocr.fragments.FullScreenImageFragment"
+        android:name="com.urduocr.scanner.fragments.FullScreenImageFragment"
         android:label="fragment_full_screen_image"
         tools:layout="@layout/fragment_full_screen_image" />
 
     <fragment
         android:id="@+id/nav_pinned"
-        android:name="com.soul.ocr.fragments.PinFragment"
+        android:name="com.urduocr.scanner.fragments.PinFragment"
         android:label="Pinned"
         tools:layout="@layout/fragment_pin" >
         <action
@@ -285,16 +285,16 @@
 
     <fragment
         android:id="@+id/modelScreenFragment"
-        android:name="com.soul.ocr.fragments.ModelScreenFragment"
+        android:name="com.urduocr.scanner.fragments.inapp_purchaseFragment"
         android:label="Pinned"
-        tools:layout="@layout/fragment_model_screen" >
+        tools:layout="@layout/fragment_inapp_purchase" >
         <action
             android:id="@+id/action_modelScreenFragment_to_nav_settings"
             app:destination="@id/nav_settings" />
     </fragment>
     <fragment
         android:id="@+id/scannerFragment"
-        android:name="com.soul.ocr.fragments.ScannerFragment"
+        android:name="com.urduocr.scanner.fragments.ScannerFragment"
         android:label="ScannerFragment" />
 
 </navigation>

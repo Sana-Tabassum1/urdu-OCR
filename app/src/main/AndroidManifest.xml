@@ -29,7 +29,7 @@
 
 
         <activity
-            android:name=".Activities.MainActivity"
+            android:name="com.urduocr.scanner.activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

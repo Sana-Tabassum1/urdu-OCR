@@ -1,5 +1,6 @@
 [versions]
 agp = "8.7.3"
+billing = "8.0.0"
 cameraCore = "1.4.2"
 credentials = "1.5.0"
 kotlin = "2.0.21"
@@ -8,10 +9,18 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
+kotlinxCoroutinesAndroid = "1.10.2"
+lifecycleRuntimeKtx = "2.9.2"
+lifecycleLivedataKtx = "2.9.2"
+loggingInterceptor = "5.1.0"
 material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
+navigationFragmentKtx = "2.9.2"
+navigationUiKtx = "2.9.2"
+playServicesAuthVersion = "21.3.0"
 playServicesMlkitDocumentScannerVersion = "16.0.0-beta3"
+retrofit = "3.0.0"
 tessTwo = "9.1.0"
 textRecognition = "16.0.1"
 textRecognitionArabic = "17.0.3"
@@ -36,16 +45,26 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraCore" }
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraCore" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationUiKtx" }
+androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
+billing = { module = "com.android.billingclient:billing", version.ref = "billing" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-ui-tooling-android = { group = "androidx.compose.ui", name = "ui-tooling-android", version.ref = "uiToolingAndroid" }
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
+play-services-auth-v2130 = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
 play-services-mlkit-document-scanner-v1600beta3 = { module = "com.google.android.gms:play-services-mlkit-document-scanner", version.ref = "playServicesMlkitDocumentScannerVersion" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 tess-two = { module = "com.googlecode.tesseract.android:tess-two", version.ref = "tessTwo" }
 text-recognition = { module = "com.google.mlkit:text-recognition", version.ref = "textRecognition" }
 text-recognition-arabic = { module = "com.google.mlkit:text-recognition-arabic", version.ref = "textRecognitionArabic" }

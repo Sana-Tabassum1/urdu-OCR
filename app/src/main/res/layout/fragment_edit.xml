@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        tools:context=".fragments.EditFragment">
+        tools:context="com.urduocr.scanner.fragments.EditFragment">
 
         <LinearLayout
             android:id="@+id/linearLayout"

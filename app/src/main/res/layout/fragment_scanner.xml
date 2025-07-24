@@ -7,6 +7,6 @@
     android:padding="16dp"
     android:gravity="center_horizontal"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".fragments.ScannerFragment">
+    tools:context="com.urduocr.scanner.fragments.ScannerFragment">
 
 </androidx.constraintlayout.widget.ConstraintLayout>

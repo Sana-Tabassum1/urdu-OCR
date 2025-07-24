@@ -9,7 +9,7 @@
     android:scrollbars="none"
     android:overScrollMode="never"
     android:background="@color/white"
-    tools:context=".fragments.BatchExtractFragment">
+    tools:context="com.urduocr.scanner.fragments.BatchExtractFragment">
 
     <LinearLayout
         android:id="@+id/linearLayout"
