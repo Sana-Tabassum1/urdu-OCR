@@ -97,10 +97,14 @@ class MainActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.nav_home, R.id.nav_pinned, R.id.nav_settings, R.id.nav_library -> {
                     binding.relativeLayout.visibility = View.VISIBLE
+                    binding.btncamera.visibility = View.VISIBLE
                 }
 
                 else -> {
                     binding.relativeLayout.visibility = View.GONE
+                    binding.btncamera.visibility = View.GONE
+
+
 
                 }
             }

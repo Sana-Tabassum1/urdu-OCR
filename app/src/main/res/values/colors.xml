@@ -11,4 +11,7 @@
     <color name="clay">#E5EFE9</color>
     <color name="pink">#E9C7C7</color>
     <color name="light_green">#C8E6C9</color>
+    <color name="outlinpink">#FFDED5</color>
+    <color name="pinkfiller">#FFEBE6</color>
+    <color name="greenlight">#C1DFCE</color>
 </resources>

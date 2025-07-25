@@ -91,7 +91,7 @@ class home2Fragment : Fragment() {
         }
 
         binding.textToImageBox.setOnClickListener {
-            findNavController().navigate(R.id.editFragment)
+            findNavController().navigate(R.id.kFragment)
         }
 
         binding.scanningBox.setOnClickListener {

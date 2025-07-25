@@ -296,5 +296,14 @@
         android:id="@+id/scannerFragment"
         android:name="com.urduocr.scanner.fragments.ScannerFragment"
         android:label="ScannerFragment" />
+    <fragment
+        android:id="@+id/kFragment"
+        android:name="com.urduocr.scanner.fragments.kFragment"
+        android:label="fragment_k"
+        tools:layout="@layout/fragment_k" >
+        <action
+            android:id="@+id/action_kFragment_to_editFragment"
+            app:destination="@id/editFragment" />
+    </fragment>
 
 </navigation>

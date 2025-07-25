@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:backgroundTint="@color/white"
+    android:gravity="center_vertical">
+
+    <!-- Vertical container for both TextViews -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/sliderText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Your slider text here"
+            android:textSize="16sp"
+            android:textColor="@color/green1"
+            android:fontFamily="@font/nunito_bold" />
+
+        <TextView
+            android:id="@+id/sliderSubText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Subtext goes here"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/nunito_regular" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/sliderImage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_launcher_foreground" />
+</LinearLayout>

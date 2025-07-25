@@ -1,0 +1,76 @@
+package com.urduocr.scanner.fragments
+
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
+import com.urduocr.scanner.R
+import com.urduocr.scanner.adapters.HomeSliderAdapter
+import com.urduocr.scanner.databinding.FragmentKBinding
+import com.urduocr.scanner.models.SliderItem
+
+class kFragment : Fragment() {
+
+    private lateinit var binding: FragmentKBinding
+    private lateinit var sliderAdapter: HomeSliderAdapter
+    private lateinit var sliderHandler: Handler
+    private lateinit var sliderRunnable: Runnable
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentKBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val sliderItems = listOf(
+            SliderItem(R.drawable.urduu, "Convert text from images instantly","Whether its handwriting or a book,\n" +
+                    "Urdu OCR recogize text with 90% accuracy"),
+            SliderItem(R.drawable.urduu, "Capture photos and extract Urdu text","Whether its handwriting or a book,\n" +
+                    "Urdu OCR recogize text with 90% accuracy"),
+            SliderItem(R.drawable.urduu, "Batch scan multiple documents quickly","Whether its handwriting or a book,\n" +
+                    "Urdu OCR recogize text with 90% accuracy")
+        )
+
+        sliderAdapter = HomeSliderAdapter(sliderItems)
+        binding.homeSlider.adapter = sliderAdapter
+        val dotsIndicator = binding.sliderDots
+        dotsIndicator.setViewPager2(binding.homeSlider)
+
+        // Optional: Smooth left/right transition
+        binding.homeSlider.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+
+        // Auto-slide setup
+        sliderHandler = Handler(Looper.getMainLooper())
+        sliderRunnable = Runnable {
+            val nextItem = (binding.homeSlider.currentItem + 1) % sliderItems.size
+            binding.homeSlider.setCurrentItem(nextItem, true)
+            sliderHandler.postDelayed(sliderRunnable, 3000) // 3 seconds
+        }
+
+        // Start auto sliding
+        sliderHandler.postDelayed(sliderRunnable, 3000)
+
+        // Reset timer on manual swipe
+        binding.homeSlider.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                sliderHandler.removeCallbacks(sliderRunnable)
+                sliderHandler.postDelayed(sliderRunnable, 3000)
+            }
+        })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        sliderHandler.removeCallbacks(sliderRunnable)
+    }
+}
