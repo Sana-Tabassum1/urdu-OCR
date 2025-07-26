@@ -35,7 +35,7 @@
 
     <ImageView
         android:id="@+id/sliderImage"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:src="@drawable/ic_launcher_foreground" />
 </LinearLayout>

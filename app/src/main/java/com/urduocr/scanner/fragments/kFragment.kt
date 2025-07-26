@@ -32,12 +32,12 @@ class kFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val sliderItems = listOf(
-            SliderItem(R.drawable.urduu, "Convert text from images instantly","Whether its handwriting or a book,\n" +
+            SliderItem(R.drawable.urduu, "Most accurate Urdu OCR","Whether its handwriting or a book,\n" +
                     "Urdu OCR recogize text with 90% accuracy"),
-            SliderItem(R.drawable.urduu, "Capture photos and extract Urdu text","Whether its handwriting or a book,\n" +
-                    "Urdu OCR recogize text with 90% accuracy"),
-            SliderItem(R.drawable.urduu, "Batch scan multiple documents quickly","Whether its handwriting or a book,\n" +
-                    "Urdu OCR recogize text with 90% accuracy")
+            SliderItem(R.drawable.file, "Image to Urdu image","Type Urdu and generate image of Urdu text.\n" +
+                    "Choose from five different Urdu fonts."),
+            SliderItem(R.drawable.photo, "Organize your files","Type Urdu and generate image of Urdu text.\n" +
+                    "Choose from five different Urdu fonts.")
         )
 
         sliderAdapter = HomeSliderAdapter(sliderItems)

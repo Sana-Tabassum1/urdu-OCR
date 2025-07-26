@@ -25,7 +25,7 @@
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="70dp"
         android:layout_alignParentBottom="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -47,17 +47,22 @@
             app:menu="@menu/bottom_nav_menu" />
 
 
-        <!-- Center Floating Action Button -->
-        <ImageButton
-            android:id="@+id/btncamera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/circl_design"
-            android:elevation="4dp"
-            android:src="@drawable/cameraoutline" />
+
 
     </RelativeLayout>
+    <ImageButton
+        android:id="@+id/btncamera"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="@drawable/circl_design"
+        android:elevation="8dp"
+        android:src="@drawable/cameraoutline"
+        app:layout_constraintBottom_toBottomOf="@+id/relativeLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        android:translationY="-10dp"
+    android:scaleType="centerInside" />
 
 
 

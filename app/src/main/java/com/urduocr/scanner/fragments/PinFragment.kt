@@ -63,7 +63,7 @@ class PinFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
 
         /* -------- Selection actions -------- */
         binding.ivBackSelection.setOnClickListener {
-            adapter.clearSelections()
+            adapter.clearSelection()
             toggleSelectionBar(false)
         }
         binding.ivDelete.setOnClickListener { deleteSelectedFiles() }
@@ -155,7 +155,7 @@ class PinFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
                     File(it.file.path).delete()
                     pinnedViewModel.unpinFile(it.file)
                 }
-                adapter.clearSelections()
+                adapter.clearSelection()
                 toggleSelectionBar(false)
             }
             .setNegativeButton("Cancel", null)
@@ -184,7 +184,7 @@ class PinFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
 
     private fun unpinSelectedFiles() {
         adapter.getSelectedFiles().forEach { pinnedViewModel.unpinFile(it.file) }
-        adapter.clearSelections()
+        adapter.clearSelection()
         toggleSelectionBar(false)
     }
 

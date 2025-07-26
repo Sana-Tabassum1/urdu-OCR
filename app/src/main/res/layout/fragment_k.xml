@@ -20,20 +20,21 @@
         <!-- Title -->
         <TextView
             android:id="@+id/titleText"
-            android:layout_width="127dp"
-            android:layout_height="30dp"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:fontFamily="@font/nunito_extrabold"
             android:text="Urdu OCR"
             android:textColor="@color/white"
-            android:textSize="25sp"
+            android:textSize="30sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Subtitle + Icon on same line -->
 
         <!-- Search bar -->
+
         <TextView
             android:id="@+id/subtitleText"
             android:layout_width="0dp"
@@ -72,6 +73,9 @@
         android:id="@+id/viewpagerhome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_round_green"
         app:layout_constraintTop_toBottomOf="@id/linearLayout2"
         app:layout_constraintBottom_toBottomOf="@id/linearLayout2"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,13 +84,11 @@
         <!-- FrameLayout to allow overlaying dots on top of the ViewPager -->
         <FrameLayout
             android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/bg_round_green"
+            android:layout_height="90dp"
             android:backgroundTint="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -103,10 +105,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"
-                android:layout_marginBottom="8dp"
-                app:dotsColor="@color/gray"
+                android:layout_marginBottom="15dp"
+                app:dotsColor="@color/green1"
                 app:dotsSize="6dp"
-                app:dotsSpacing="4dp"
+                app:dotsSpacing="2dp"
+                android:layout_marginStart="130dp"
                 app:selectedDotColor="@color/black"/>
 
         </FrameLayout>
@@ -125,7 +128,7 @@
         android:layout_marginEnd="5dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="5dp"
+        android:padding="8dp"
         android:weightSum="3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -134,8 +137,8 @@
         <!-- Box 1 -->
         <LinearLayout
             android:id="@+id/camera_box"
-            android:layout_width="120dp"
-            android:layout_height="100dp"
+            android:layout_width="140dp"
+            android:layout_height="105dp"
             android:layout_margin="4dp"
             android:layout_weight="1"
             android:background="@drawable/rounded_outline"
@@ -144,8 +147,8 @@
             android:padding="8dp">
 
             <ImageView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:contentDescription="Read Text"
                 android:src="@drawable/camera" />
 
@@ -163,8 +166,8 @@
         <!-- Box 2 -->
         <LinearLayout
             android:id="@+id/scanning_box"
-            android:layout_width="120dp"
-            android:layout_height="130dp"
+            android:layout_width="140dp"
+            android:layout_height="105dp"
             android:layout_margin="4dp"
             android:layout_weight="1"
             android:background="@drawable/rounded_outline_yellow"
@@ -173,8 +176,8 @@
             android:padding="8dp">
 
             <ImageView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:contentDescription="Scan Batch"
                 android:src="@drawable/batchfile" />
 
@@ -192,8 +195,8 @@
         <!-- Box 3 -->
         <LinearLayout
             android:id="@+id/textToImage_box"
-            android:layout_width="130dp"
-            android:layout_height="130dp"
+            android:layout_width="140dp"
+            android:layout_height="105dp"
             android:layout_margin="4dp"
             android:layout_weight="1"
             android:background="@drawable/rounded_outline_skyblue"
@@ -202,8 +205,8 @@
             android:padding="8dp">
 
             <ImageView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:contentDescription="Text to Image"
                 android:src="@drawable/galleryicon" />
 

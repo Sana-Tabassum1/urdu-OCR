@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -17,6 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
@@ -24,8 +27,10 @@ import com.urduocr.scanner.adapters.RecentAdapter
 import com.urduocr.scanner.models.FileListItem
 import com.urduocr.scanner.models.InternalFileModel
 import com.urduocr.scanner.R
+import com.urduocr.scanner.adapters.HomeSliderAdapter
 import com.urduocr.scanner.viewmodels.BatchScanningViewModel
 import com.urduocr.scanner.databinding.FragmentHome2Binding
+import com.urduocr.scanner.models.SliderItem
 import java.io.File
 
 class home2Fragment : Fragment() {
@@ -35,6 +40,9 @@ class home2Fragment : Fragment() {
     private lateinit var allFiles: List<FileListItem.FileItem>
     private lateinit var scannerLauncher: ActivityResultLauncher<IntentSenderRequest>
     private lateinit var viewModel: BatchScanningViewModel
+    private lateinit var sliderAdapter: HomeSliderAdapter
+    private lateinit var sliderHandler: Handler
+    private lateinit var sliderRunnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,18 +88,25 @@ class home2Fragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         allFiles = loadRecentFiles()
-        adapter = RecentAdapter(requireContext(), allFiles)
+        adapter = RecentAdapter(requireContext(), allFiles, object : RecentAdapter.FileAdapterListener {
+            override fun onItemSelectionChanged() {
+              
+
+
+            }
+        })
         binding.homeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.homeRecyclerView.adapter = adapter
 
-        setupSearchUi()
+
+
 
         binding.cameraBox.setOnClickListener {
             launchDocumentScanner()
         }
 
         binding.textToImageBox.setOnClickListener {
-            findNavController().navigate(R.id.kFragment)
+            findNavController().navigate(R.id.editFragment)
         }
 
         binding.scanningBox.setOnClickListener {
@@ -105,6 +120,42 @@ class home2Fragment : Fragment() {
         binding.btndaimond.setOnClickListener {
             findNavController().navigate(R.id.modelScreenFragment)
         }
+        val sliderItems = listOf(
+            SliderItem(R.drawable.urduu, "Most accurate Urdu OCR","Whether its handwriting or a book,\n" +
+                    "Urdu OCR recogize text with 90% accuracy"),
+            SliderItem(R.drawable.file, "Image to Urdu image","Type Urdu and generate image of Urdu text.\n" +
+                    "Choose from five different Urdu fonts."),
+            SliderItem(R.drawable.photo, "Organize your files","Type Urdu and generate image of Urdu text.\n" +
+                    "Choose from five different Urdu fonts.")
+        )
+
+        sliderAdapter = HomeSliderAdapter(sliderItems)
+        binding.homeSlider.adapter = sliderAdapter
+        val dotsIndicator = binding.sliderDots
+        dotsIndicator.setViewPager2(binding.homeSlider)
+
+        // Optional: Smooth left/right transition
+        binding.homeSlider.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+
+        // Auto-slide setup
+        sliderHandler = Handler(Looper.getMainLooper())
+        sliderRunnable = Runnable {
+            val nextItem = (binding.homeSlider.currentItem + 1) % sliderItems.size
+            binding.homeSlider.setCurrentItem(nextItem, true)
+            sliderHandler.postDelayed(sliderRunnable, 3000) // 3 seconds
+        }
+
+        // Start auto sliding
+        sliderHandler.postDelayed(sliderRunnable, 3000)
+
+        // Reset timer on manual swipe
+        binding.homeSlider.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                sliderHandler.removeCallbacks(sliderRunnable)
+                sliderHandler.postDelayed(sliderRunnable, 3000)
+            }
+        })
     }
 
     private fun launchDocumentScanner() {
@@ -148,24 +199,7 @@ class home2Fragment : Fragment() {
         return recentFiles
     }
 
-    private fun setupSearchUi() {
-        binding.ivSearch.setOnClickListener {
-            binding.etSearch.requestFocus()
-            showKeyboard()
-        }
 
-        binding.ivClear.setOnClickListener { clearSearch() }
-
-        binding.etSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(s: Editable?) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val query = s?.toString() ?: ""
-                binding.ivClear.visibility = if (query.isNotEmpty()) View.VISIBLE else View.GONE
-                filterFiles(query)
-            }
-        })
-    }
 
     private fun filterFiles(query: String) {
         val filtered = if (query.isBlank()) {
@@ -175,22 +209,9 @@ class home2Fragment : Fragment() {
         }
         adapter.updateList(filtered)
     }
-
-    private fun clearSearch() {
-        binding.etSearch.text?.clear()
-        binding.etSearch.clearFocus()
-        hideKeyboard()
-        adapter.updateList(allFiles)
-        binding.ivClear.visibility = View.GONE
+    override fun onDestroyView() {
+        super.onDestroyView()
+        sliderHandler.removeCallbacks(sliderRunnable)
     }
 
-    private fun showKeyboard() {
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT)
-    }
-
-    private fun hideKeyboard() {
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(binding.etSearch.windowToken, 0)
-    }
 }

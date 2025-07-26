@@ -3,10 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.urduocr.scanner.fragments.home2Fragment">
 
 
+
+    <!-- Header -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
@@ -20,20 +23,21 @@
         <!-- Title -->
         <TextView
             android:id="@+id/titleText"
-            android:layout_width="127dp"
-            android:layout_height="30dp"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
-            android:fontFamily="@font/poppins_extrabold"
+            android:fontFamily="@font/nunito_extrabold"
             android:text="Urdu OCR"
             android:textColor="@color/white"
-            android:textSize="25sp"
+            android:textSize="30sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Subtitle + Icon on same line -->
 
         <!-- Search bar -->
+
         <TextView
             android:id="@+id/subtitleText"
             android:layout_width="0dp"
@@ -41,9 +45,9 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
-            android:fontFamily="@font/poppins_regular"
+            android:fontFamily="@font/nunito_regular"
             android:text="Instantly capture and convert text from any image"
-            android:textColor="@color/white"
+            android:textColor="@color/greenlight"
             android:textSize="12sp"
             app:layout_constraintEnd_toStartOf="@+id/btndaimond"
             app:layout_constraintStart_toStartOf="parent"
@@ -62,225 +66,176 @@
             app:layout_constraintStart_toEndOf="@id/subtitleText"
             app:layout_constraintTop_toTopOf="@+id/titleText" />
 
-        <RelativeLayout
-            android:id="@+id/searchContainer"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/bg_rounded"
-            android:backgroundTint="@color/green2"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btndaimond">
 
-
-            <ImageView
-                android:id="@+id/ivSearch"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/searchwhite"
-                android:background="@android:color/transparent"
-                android:contentDescription="Search"/>
-
-            <!-- EDITTEXT -->
-            <EditText
-                android:id="@+id/etSearch"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="12dp"
-                android:layout_toEndOf="@id/ivSearch"
-                android:layout_toStartOf="@id/ivClear"
-                android:background="@android:color/transparent"
-                android:fontFamily="@font/poppins_regular"
-                android:hint="Search here"
-                android:textCursorDrawable="@drawable/white_cursor"
-                android:inputType="text"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white"
-                android:textSize="14sp" />
-
-            <!-- CROSS (CLEAR) ICON -->
-            <ImageView
-                android:id="@+id/ivClear"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/crosswhite"
-                android:background="@android:color/transparent"
-                android:contentDescription="Clear text"
-                android:visibility="gone"/>
-        </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Credits Card -->
 
-    <TextView
-        android:id="@+id/textView3"
+
+    <!-- Slider -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/viewpagerhome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:text="Quick Action"
-        android:fontFamily="@font/poppins_medium"
-        android:textColor="@color/black"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        android:background="@drawable/round_bggreen"
+        app:layout_constraintTop_toBottomOf="@id/linearLayout2"
+        app:layout_constraintBottom_toBottomOf="@id/linearLayout2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- FrameLayout to allow overlaying dots on top of the ViewPager -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- ViewPager2 inside FrameLayout -->
+
+            <!-- DotsIndicator overlaid inside the ViewPager -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/homeSlider"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+                android:id="@+id/sliderDots"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="15dp"
+                app:dotsColor="@color/greenlight"
+                app:dotsSize="4dp"
+                app:dotsSpacing="2dp"
+                android:layout_marginStart="130dp"
+                app:selectedDotColor="@color/green1"/>
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    <!-- Quick Action Buttons -->
     <LinearLayout
         android:id="@+id/quickActions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="5dp"
         android:gravity="center"
         android:orientation="horizontal"
+        android:padding="8dp"
         android:weightSum="3"
-        android:padding="5dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3">
+        app:layout_constraintTop_toBottomOf="@id/viewpagerhome">
 
-        <!-- Box 1: Read Text -->
+        <!-- Box 1 -->
         <LinearLayout
             android:id="@+id/camera_box"
-            android:layout_width="0dp"
-            android:layout_height="130dp"
-            android:layout_weight="1"
+            android:layout_width="140dp"
+            android:layout_height="105dp"
             android:layout_margin="4dp"
-            android:orientation="vertical"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_outline"
             android:gravity="center"
-            android:padding="8dp"
-            android:backgroundTint="@color/light_gray"
-            android:background="@drawable/bg_rounded">
+            android:orientation="vertical"
+            android:padding="8dp">
 
             <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/camera"
-                android:contentDescription="Read Text" />
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:contentDescription="Read Text"
+                android:src="@drawable/camera" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Read Text"
-                android:textColor="@color/black"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_medium"
-                android:textSize="13sp"
+                android:fontFamily="@font/nunito_bold"
+                android:text="Read Text"
+                android:textColor="@color/green1"
+                android:textSize="12sp"
                 android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_medium"
-                android:text="Start instant text recognition"
-                android:textColor="@color/lightgreen"
-                android:gravity="center"
-                android:textSize="11sp" />
         </LinearLayout>
 
-        <!-- Box 2: Scan Batch -->
+        <!-- Box 2 -->
         <LinearLayout
             android:id="@+id/scanning_box"
-            android:layout_width="0dp"
-            android:layout_height="130dp"
-            android:layout_weight="1"
+            android:layout_width="140dp"
+            android:layout_height="105dp"
             android:layout_margin="4dp"
-            android:orientation="vertical"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_outline_yellow"
             android:gravity="center"
-            android:padding="8dp"
-            android:backgroundTint="@color/light_gray"
-            android:background="@drawable/bg_rounded">
+            android:orientation="vertical"
+            android:padding="8dp">
 
             <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:contentDescription="Scan Batch"
                 android:src="@drawable/batchfile" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Scan Batch"
-                android:textColor="@color/black"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_medium"
-                android:textSize="13sp"
+                android:fontFamily="@font/nunito_bold"
+                android:text="Scan Batch"
+                android:textColor="@color/green1"
+                android:textSize="12sp"
                 android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Capture multiple pages at once"
-                android:textColor="@color/lightgreen"
-                android:textSize="11sp"
-                android:fontFamily="@font/poppins_medium"
-                android:gravity="center" />
         </LinearLayout>
 
-        <!-- Box 3: Text to Image -->
+        <!-- Box 3 -->
         <LinearLayout
             android:id="@+id/textToImage_box"
-            android:layout_width="0dp"
-            android:layout_height="130dp"
-            android:layout_weight="1"
+            android:layout_width="140dp"
+            android:layout_height="105dp"
             android:layout_margin="4dp"
-            android:orientation="vertical"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_outline_skyblue"
             android:gravity="center"
-            android:padding="8dp"
-            android:backgroundTint="@color/light_gray"
-            android:background="@drawable/bg_rounded">
+            android:orientation="vertical"
+            android:padding="8dp">
 
             <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/galleryicon"
-                android:contentDescription="Text to Image" />
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:contentDescription="Text to Image"
+                android:src="@drawable/galleryicon" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Text to Image"
-                android:textSize="13sp"
                 android:layout_marginTop="5dp"
-                android:textStyle="bold"
-                android:fontFamily="@font/poppins_medium"
-                android:textColor="@color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Customize fonts &amp; export as image"
-                android:textColor="@color/lightgreen"
-                android:textSize="11sp"
-                android:fontFamily="@font/poppins_medium"
-                android:gravity="center" />
+                android:fontFamily="@font/nunito_bold"
+                android:text="Text to Image"
+                android:textColor="@color/green1"
+                android:textSize="12sp"
+                android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
 
-
+    <!-- Recent Documents -->
     <LinearLayout
         android:id="@+id/recentlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
         android:orientation="horizontal"
-        android:layout_marginTop="5dp"
         android:gravity="center_vertical"
         android:padding="4dp"
         android:background="?selectableItemBackground"
-        app:layout_constraintTop_toBottomOf="@+id/quickActions"
+        app:layout_constraintTop_toBottomOf="@id/quickActions"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -290,7 +245,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Recent Documents"
-            android:fontFamily="@font/poppins_medium"
+            android:fontFamily="@font/nunito_bold"
             android:textColor="@color/black"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -299,22 +254,22 @@
             android:id="@+id/arrowrighticon"
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:src="@drawable/rightarrow" />  <!-- replace with your icon -->/>
+            android:src="@drawable/rightarrow" />
     </LinearLayout>
 
-
-
-    <!-- RecyclerView -->
+    <!-- Recycler View -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/homeRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:paddingHorizontal="5dp"
         android:nestedScrollingEnabled="false"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toBottomOf="@id/recentlayout"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/recentlayout" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 

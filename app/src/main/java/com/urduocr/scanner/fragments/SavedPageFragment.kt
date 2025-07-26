@@ -187,7 +187,7 @@ class SavedPageFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
 
 
     fun clearSelection() {
-        adapter.clearSelections()
+        adapter.clearSelection()
         onItemSelectionChanged()
     }
     private fun refreshList() {
