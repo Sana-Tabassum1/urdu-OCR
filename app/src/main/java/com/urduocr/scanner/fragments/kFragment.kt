@@ -40,33 +40,7 @@ class kFragment : Fragment() {
                     "Choose from five different Urdu fonts.")
         )
 
-        sliderAdapter = HomeSliderAdapter(sliderItems)
-        binding.homeSlider.adapter = sliderAdapter
-        val dotsIndicator = binding.sliderDots
-        dotsIndicator.setViewPager2(binding.homeSlider)
 
-        // Optional: Smooth left/right transition
-        binding.homeSlider.orientation = ViewPager2.ORIENTATION_HORIZONTAL
-
-        // Auto-slide setup
-        sliderHandler = Handler(Looper.getMainLooper())
-        sliderRunnable = Runnable {
-            val nextItem = (binding.homeSlider.currentItem + 1) % sliderItems.size
-            binding.homeSlider.setCurrentItem(nextItem, true)
-            sliderHandler.postDelayed(sliderRunnable, 3000) // 3 seconds
-        }
-
-        // Start auto sliding
-        sliderHandler.postDelayed(sliderRunnable, 3000)
-
-        // Reset timer on manual swipe
-        binding.homeSlider.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                sliderHandler.removeCallbacks(sliderRunnable)
-                sliderHandler.postDelayed(sliderRunnable, 3000)
-            }
-        })
     }
 
     override fun onDestroyView() {

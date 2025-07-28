@@ -2,10 +2,12 @@ package com.urduocr.scanner.adapters
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.Toast
@@ -98,18 +100,32 @@ class RecentAdapter(
 
         // ✅ Popup menu (3-dot)
         holder.binding.menuButton.setOnClickListener { view ->
-            val popupView =
-                LayoutInflater.from(context).inflate(R.layout.custom_file_popup, null)
-
+            val popupView = LayoutInflater.from(view.context).inflate(R.layout.custom_file_popup, null)
             val popupWindow = PopupWindow(
                 popupView,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
+                (200 * view.resources.displayMetrics.density).toInt(),
+                WindowManager.LayoutParams.WRAP_CONTENT,
                 true
             )
+
             popupWindow.elevation = 10f
             popupWindow.isOutsideTouchable = true
             popupWindow.isFocusable = true
+            // --- Calculate offset so popup stays a bit inside from right edge ---
+            val location = IntArray(2)
+            view.getLocationOnScreen(location)
+
+            val screenWidth = Resources.getSystem().displayMetrics.widthPixels
+            val popWidth = (200 * view.resources.displayMetrics.density).toInt()
+            val viewWidth = view.width
+
+            // 16dp margin from the right side
+            val rightMargin = (16 * view.resources.displayMetrics.density).toInt()
+
+            // xOffset: align popup's right edge with screenWidth - rightMargin
+            val xOffset = screenWidth - (location[0] + popWidth) - rightMargin
+
+            popupWindow.showAsDropDown(view, xOffset, 0)
 
             popupView.findViewById<LinearLayout>(R.id.menuSelect).setOnClickListener {
                 isSelectionMode = true

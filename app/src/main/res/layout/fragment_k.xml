@@ -6,265 +6,56 @@
     android:layout_height="match_parent"
     tools:context=".fragments.kFragment">
 
-    <!-- Header -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/headerRow"
         android:layout_width="match_parent"
-        android:layout_height="160dp"
-        android:background="@drawable/top_design"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/white"
+        android:paddingHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Title -->
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="0dp"
-            android:layout_height="35dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:fontFamily="@font/nunito_extrabold"
-            android:text="Urdu OCR"
-            android:textColor="@color/white"
-            android:textSize="30sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Subtitle + Icon on same line -->
-
-        <!-- Search bar -->
-
-        <TextView
-            android:id="@+id/subtitleText"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="8dp"
-            android:fontFamily="@font/nunito_regular"
-            android:text="Instantly capture and convert text from any image"
-            android:textColor="@color/greenlight"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toStartOf="@+id/btndaimond"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/titleText" />
-
-        <ImageView
-            android:id="@+id/btndaimond"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/circle"
-            android:scaleType="centerInside"
-            android:src="@drawable/white_daimond"
-            app:layout_constraintBottom_toBottomOf="@+id/subtitleText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/subtitleText"
-            app:layout_constraintTop_toTopOf="@+id/titleText" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- Credits Card -->
-
-
-    <!-- Slider -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/viewpagerhome"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/bg_round_green"
-        app:layout_constraintTop_toBottomOf="@id/linearLayout2"
-        app:layout_constraintBottom_toBottomOf="@id/linearLayout2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- FrameLayout to allow overlaying dots on top of the ViewPager -->
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="90dp"
-            android:backgroundTint="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:padding="10dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <!-- ViewPager2 inside FrameLayout -->
-
-            <!-- DotsIndicator overlaid inside the ViewPager -->
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/homeSlider"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
-                android:id="@+id/sliderDots"
+            <ImageView
+                android:id="@+id/toparrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center_horizontal"
-                android:layout_marginBottom="15dp"
-                app:dotsColor="@color/green1"
-                app:dotsSize="6dp"
-                app:dotsSpacing="2dp"
-                android:layout_marginStart="130dp"
-                app:selectedDotColor="@color/black"/>
+                android:src="@drawable/toparrow"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </FrameLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/bottom_arrow"
+                app:layout_constraintEnd_toEndOf="@+id/toparrow"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toparrow" />
+
+            <TextView
+                android:id="@+id/tvSortName"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:drawableEnd="@drawable/bottom_arrow"
+                android:gravity="center_vertical"
+                android:text="Name"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toEndOf="@+id/toparrow"
+                tools:layout_editor_absoluteY="10dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-    <!-- Quick Action Buttons -->
-    <LinearLayout
-        android:id="@+id/quickActions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="5dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:weightSum="3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewpagerhome">
-
-        <!-- Box 1 -->
-        <LinearLayout
-            android:id="@+id/camera_box"
-            android:layout_width="140dp"
-            android:layout_height="105dp"
-            android:layout_margin="4dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_outline"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:contentDescription="Read Text"
-                android:src="@drawable/camera" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:fontFamily="@font/nunito_bold"
-                android:text="Read Text"
-                android:textColor="@color/green1"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- Box 2 -->
-        <LinearLayout
-            android:id="@+id/scanning_box"
-            android:layout_width="140dp"
-            android:layout_height="105dp"
-            android:layout_margin="4dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_outline_yellow"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:contentDescription="Scan Batch"
-                android:src="@drawable/batchfile" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:fontFamily="@font/nunito_bold"
-                android:text="Scan Batch"
-                android:textColor="@color/green1"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- Box 3 -->
-        <LinearLayout
-            android:id="@+id/textToImage_box"
-            android:layout_width="140dp"
-            android:layout_height="105dp"
-            android:layout_margin="4dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_outline_skyblue"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:contentDescription="Text to Image"
-                android:src="@drawable/galleryicon" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:fontFamily="@font/nunito_bold"
-                android:text="Text to Image"
-                android:textColor="@color/green1"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Recent Documents -->
-    <LinearLayout
-        android:id="@+id/recentlayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="4dp"
-        android:background="?selectableItemBackground"
-        app:layout_constraintTop_toBottomOf="@id/quickActions"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Recent Documents"
-            android:fontFamily="@font/nunito_bold"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <ImageView
-            android:id="@+id/arrowrighticon"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:src="@drawable/rightarrow" />
-    </LinearLayout>
-
-    <!-- Recycler View -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/homeRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:paddingHorizontal="5dp"
-        android:nestedScrollingEnabled="false"
-        app:layout_constraintTop_toBottomOf="@id/recentlayout"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

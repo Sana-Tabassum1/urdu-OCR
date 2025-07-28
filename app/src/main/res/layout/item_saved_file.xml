@@ -13,6 +13,7 @@
         android:layout_height="24dp"
         android:layout_gravity="center"
         android:src="@drawable/ratio_unchecked"
+        android:layout_marginEnd="4dp"
         android:visibility="gone"
         android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"

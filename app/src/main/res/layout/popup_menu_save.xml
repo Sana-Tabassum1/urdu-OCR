@@ -6,31 +6,7 @@
     android:orientation="vertical"
     android:layout_margin="6dp"
     android:padding="8dp">
-    <LinearLayout
-        android:id="@+id/menuviewfile"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="12dp"
-        android:clickable="true"
-        android:focusable="true">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="viewfile"
-            android:textColor="@color/black"
-            android:textSize="14sp"/>
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/check"
-            />
-    </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#EEEEEE"/>
+
     <LinearLayout
         android:id="@+id/menuSelect"
         android:layout_width="match_parent"
@@ -50,8 +26,34 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/check"
-          />
+            />
     </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#EEEEEE"/>
+    <LinearLayout
+        android:id="@+id/menufolder"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:clickable="true"
+        android:focusable="true">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="New Folder"
+            android:textColor="@color/black"
+            android:textSize="14sp"/>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/folder"
+            />
+    </LinearLayout>
+
 
     <View
         android:layout_width="match_parent"
@@ -77,7 +79,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/copy_file"
-           />
+            />
     </LinearLayout>
     <View
         android:layout_width="match_parent"
@@ -147,19 +149,45 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Pin"
+            android:text="Icons"
             android:textColor="@color/black"
             android:textSize="14sp"/>
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/pinblack"
+            android:src="@drawable/icon"
             />
     </LinearLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#EEEEEE"/>
+    <LinearLayout
+        android:id="@+id/menuviewfile"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:clickable="true"
+        android:focusable="true">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="List"
+            android:textColor="@color/black"
+            android:textSize="14sp"/>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/list"
+            />
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#EEEEEE"/>
+
 
     <LinearLayout
         android:id="@+id/menudelete"

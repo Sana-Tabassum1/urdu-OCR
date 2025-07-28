@@ -120,145 +120,176 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <FrameLayout
-        android:id="@+id/filterContainer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-    <LinearLayout
-        android:id="@+id/fileTypeFilter"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerRow"
         android:layout_width="match_parent"
-        android:layout_height="35dp"
+        android:layout_height="48dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:gravity="center"
-        android:padding="2dp"
-        android:background="@drawable/round_corner"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        android:weightSum="3"
-        android:backgroundTint="@color/light_gray"
+        android:background="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
-        <!-- All -->
 
-        <!-- PDF -->
-
-        <TextView
-            android:id="@+id/btnAll"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:background="@drawable/round_corner"
-            android:gravity="center"
-            android:text="All"
-            android:clipToOutline="true"
-            android:textColor="@color/lightgreen"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/btnPdf"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_unselected_filter"
-            android:gravity="center"
-            android:text="PDF"
-            android:textColor="@color/lightgreen"
-            android:textStyle="bold" />
-
-        <!-- TXT -->
-        <TextView
-            android:id="@+id/btnTxt"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_unselected_filter"
-            android:gravity="center"
-            android:text="TXT"
-            android:textColor="@color/lightgreen"
-            android:textStyle="bold" />
-    </LinearLayout>
-    <!-- Selection Layout (Initially GONE) -->
-    <LinearLayout
-        android:id="@+id/selectionLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/round_corner"
-        android:backgroundTint="@color/light_gray"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:visibility="gone"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="@+id/fileTypeFilter"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
-
-        <ImageView
-            android:id="@+id/ivBackSelection"
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:contentDescription="Back"
-            android:src="@drawable/crossblack" />
-
-        <TextView
-            android:id="@+id/tvSelectedCount"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="1dp"
-            android:fontFamily="@font/poppins_medium"
-            android:text="1× selected"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:padding="10dp"
+            app:layout_constraintEnd_toStartOf="@+id/date"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            <ImageView
+                android:id="@+id/toparrow"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginTop="3dp"
+                android:src="@drawable/arrow"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/ivPin"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="12dp"
-            android:src="@drawable/pinblack" />
+            <ImageView
+                android:id="@+id/downarrow"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:src="@drawable/down"
+                app:layout_constraintEnd_toEndOf="@+id/toparrow"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toparrow" />
 
-        <ImageView
-            android:id="@+id/ivDelete"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="12dp"
-            android:src="@drawable/deleted" />
+            <TextView
+                android:id="@+id/tvSortName"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="3dp"
+                android:gravity="center_vertical"
+                android:text="Name"
+                android:fontFamily="@font/nunito_bold"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toEndOf="@+id/toparrow"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/ivShare"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="12dp"
-            android:src="@drawable/shareblack" />
-    </LinearLayout>
-    </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPagerFiles"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            app:layout_constraintEnd_toStartOf="@+id/size"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/name"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/toparrow2"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginTop="3dp"
+                android:src="@drawable/arrow"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/downarrow2"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:src="@drawable/down"
+                app:layout_constraintEnd_toEndOf="@+id/toparrow2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toparrow2" />
+
+            <TextView
+                android:id="@+id/tvSortDate"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="3dp"
+                android:fontFamily="@font/nunito_bold"
+                android:gravity="center_vertical"
+                android:text="Date"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toEndOf="@+id/toparrow2"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            app:layout_constraintEnd_toStartOf="@+id/ivMenu"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/date"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/toparrow3"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginTop="3dp"
+                android:src="@drawable/arrow"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/downarrow3"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:src="@drawable/down"
+                app:layout_constraintEnd_toEndOf="@+id/toparrow3"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toparrow3" />
+
+            <TextView
+                android:id="@+id/tvSortSize"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="3dp"
+                android:fontFamily="@font/nunito_bold"
+                android:gravity="center_vertical"
+                android:text="Size"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toEndOf="@+id/toparrow3"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageButton
+            android:id="@+id/ivMenu"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:contentDescription="More"
+            android:src="@drawable/green_dot"
+            android:foregroundGravity="center"
+            android:background="@drawable/circle_lightgray"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/size"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewAllFiles"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@id/filterContainer"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerRow" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
