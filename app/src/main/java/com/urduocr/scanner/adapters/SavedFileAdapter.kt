@@ -16,18 +16,26 @@ import androidx.recyclerview.widget.RecyclerView
 import com.urduocr.scanner.R
 import com.urduocr.scanner.databinding.ItemFileHeaderBinding
 import com.urduocr.scanner.databinding.ItemSavedFileBinding
+import com.urduocr.scanner.interfaces.OnFileActionListener
 import com.urduocr.scanner.models.FileListItem
 import java.io.File
 
 class SavedFileAdapter(
     private val context: Context,
     private var fileList: List<FileListItem>,
-    private val listener: FileAdapterListener?
+    var listener: OnSelectionChangedListener? = null,
+    var fileActionListener: OnFileActionListener? = null,
+    var onFolderClick: ((File) -> Unit)? = null
+
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         private const val VIEW_TYPE_HEADER = 0
         private const val VIEW_TYPE_FILE = 1
+    }
+
+    interface OnSelectionChangedListener {
+        fun onItemSelectionChanged()
     }
 
     private var isSelectionMode = false
@@ -38,9 +46,6 @@ class SavedFileAdapter(
     inner class HeaderViewHolder(val binding: ItemFileHeaderBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-    interface FileAdapterListener {
-        fun onItemSelectionChanged()
-    }
 
     override fun getItemViewType(position: Int): Int {
         return when (fileList[position]) {
@@ -74,12 +79,25 @@ class SavedFileAdapter(
 
                 // File icon
                 when {
-                    file.name.endsWith(".png", true) -> fileHolder.binding.ivFileIcon.setImageResource(R.drawable.png)
-                    file.name.endsWith(".pdf", true) -> fileHolder.binding.ivFileIcon.setImageResource(R.drawable.pdf)
-                    file.name.endsWith(".txt", true) -> fileHolder.binding.ivFileIcon.setImageResource(R.drawable.txt)
+                    file.isFolder -> fileHolder.binding.ivFileIcon.setImageResource(R.drawable.folder)
+                    file.name.endsWith(
+                        ".png",
+                        true
+                    ) -> fileHolder.binding.ivFileIcon.setImageResource(R.drawable.png)
+
+                    file.name.endsWith(
+                        ".pdf",
+                        true
+                    ) -> fileHolder.binding.ivFileIcon.setImageResource(R.drawable.pdf)
+
+                    file.name.endsWith(
+                        ".txt",
+                        true
+                    ) -> fileHolder.binding.ivFileIcon.setImageResource(R.drawable.txt)
                 }
 
                 fileHolder.binding.tvFileName.text = file.name
+
 
                 // Date + Size
                 val formattedDate =
@@ -92,6 +110,16 @@ class SavedFileAdapter(
                 }
                 fileHolder.binding.tvTimeSize.text =
                     "SIZE: $sizeFormatted    DATE: $formattedDate"
+                val selectedCount = fileList.count { it is FileListItem.FileItem && it.file.isSelected }
+
+                fileHolder.binding.menuButton.visibility = when {
+                    selectedCount > 1 -> View.GONE
+                    selectedCount == 1 && file.isSelected -> View.VISIBLE
+                    selectedCount == 1 && !file.isSelected -> View.GONE
+                    else -> View.VISIBLE
+                }
+
+
 
                 // ✅ Show selection icon only in selection mode
                 fileHolder.binding.checkBoxSelect.visibility =
@@ -116,7 +144,13 @@ class SavedFileAdapter(
                         notifyDataSetChanged()
                         listener?.onItemSelectionChanged()
                     } else {
-                        openFile(fileObj, file.name)
+                        if (file.isFolder) {
+                            fileHolder.binding.root.setOnClickListener {
+                                onFolderClick?.invoke(File(file.path))
+                            }
+                        } else {
+                            openFile(fileObj, file.name)
+                        }
                     }
                 }
 
@@ -131,7 +165,8 @@ class SavedFileAdapter(
 
                 // ✅ Menu button logic
                 fileHolder.binding.menuButton.setOnClickListener { view ->
-                    val popupView = LayoutInflater.from(view.context).inflate(R.layout.custom_file_popup, null)
+                    val popupView =
+                        LayoutInflater.from(view.context).inflate(R.layout.custom_file_popup, null)
                     val popupWindow = PopupWindow(
                         popupView,
                         (200 * view.resources.displayMetrics.density).toInt(),
@@ -166,19 +201,32 @@ class SavedFileAdapter(
                     }
 
                     popupView.findViewById<LinearLayout>(R.id.menuCopy).setOnClickListener {
-                        Toast.makeText(context, "Copy clicked", Toast.LENGTH_SHORT).show()
+                        fileActionListener?.onCopy(fileObj)
                         popupWindow.dismiss()
                     }
+
                     popupView.findViewById<LinearLayout>(R.id.menuCut).setOnClickListener {
-                        Toast.makeText(context, "Cut clicked", Toast.LENGTH_SHORT).show()
+                        fileActionListener?.onCut(fileObj)
                         popupWindow.dismiss()
                     }
+
                     popupView.findViewById<LinearLayout>(R.id.menuPaste).setOnClickListener {
-                        Toast.makeText(context, "Paste clicked", Toast.LENGTH_SHORT).show()
+                        fileActionListener?.onPaste()
                         popupWindow.dismiss()
                     }
+
                     popupView.findViewById<LinearLayout>(R.id.menudelete).setOnClickListener {
-                        Toast.makeText(context, "Delete clicked", Toast.LENGTH_SHORT).show()
+                        fileActionListener?.onDelete(fileObj)
+                        popupWindow.dismiss()
+                    }
+
+                    popupView.findViewById<LinearLayout>(R.id.menupin).setOnClickListener {
+                        fileActionListener?.onPin(fileObj)
+                        popupWindow.dismiss()
+                    }
+
+                    popupView.findViewById<LinearLayout>(R.id.menushare).setOnClickListener {
+                        fileActionListener?.onShare(fileObj)
                         popupWindow.dismiss()
                     }
 

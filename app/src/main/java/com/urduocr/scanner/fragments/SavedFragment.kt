@@ -1,40 +1,48 @@
 package com.urduocr.scanner.fragments
 
 
-import android.content.Context
+import android.app.AlertDialog
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.res.Resources
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.TypedValue
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.urduocr.scanner.R
 import com.urduocr.scanner.adapters.SavedFileAdapter
 import com.urduocr.scanner.databinding.FragmentSavedBinding
+import com.urduocr.scanner.interfaces.OnFileActionListener
 import com.urduocr.scanner.models.FileListItem
 import com.urduocr.scanner.models.InternalFileModel
+import com.urduocr.scanner.viewmodels.SavedFileViewModel
 import java.io.File
 
-class SavedFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
+class SavedFragment : Fragment() {
 
     private lateinit var binding: FragmentSavedBinding
     private lateinit var adapter: SavedFileAdapter
-    private var allFiles: List<FileListItem.FileItem> = emptyList()
     private var currentQuery: String = ""
     private var isNameAsc = true
     private var isDateAsc = true
     private var isSizeAsc = true
+
+    private var allFiles: List<FileListItem> = emptyList()
+    private val clipboard = mutableListOf<File>()
+    private var isCut = false
+    private lateinit var currentDir: File
+    private val fileViewModel: SavedFileViewModel by activityViewModels()
 
 
     override fun onCreateView(
@@ -45,44 +53,136 @@ class SavedFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onViewCreated(view: View, bundle: Bundle?) {
+        super.onViewCreated(view, bundle)
 
-        // 1) Load all files
-        allFiles = loadAllFiles()
+        currentDir = arguments?.getString("dirPath")?.let(::File)
+            ?: requireContext().filesDir
 
-        // 2) Set adapter
-        adapter = SavedFileAdapter(requireContext(), allFiles, this)
+        adapter = SavedFileAdapter(requireContext(), emptyList())
+        adapter.fileActionListener = object : OnFileActionListener {
+            override fun onCopy(file: File) = doCopy(file)
+            override fun onCut(file: File) = doCut(file)
+            override fun onPaste() = doPaste()
+            override fun onDelete(file: File) = doDelete(file)
+            override fun onShare(file: File) = doShare(file)
+            override fun onPin(file: File) = doPin(file)
+        }
+        adapter.listener = object : SavedFileAdapter.OnSelectionChangedListener {
+            override fun onItemSelectionChanged() {
+                val selectedFiles = adapter.getSelectedFiles()
+                    .filterIsInstance<FileListItem.FileItem>()
+                    .map { File(it.file.path) }
+
+                fileViewModel.setSelectedFiles(selectedFiles)
+
+                Toast.makeText(requireContext(), "${selectedFiles.size} selected", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         binding.recyclerViewAllFiles.adapter = adapter
-        //sorting setup
-        setupSorting()
-        /* -------- Search UI setup -------- */
         setupSearchUi()
-
-        binding.ivMenu.setOnClickListener {
-            showCustomPopupMenu(it)
-        }
-
+        setupSorting()
+        binding.ivMenu.setOnClickListener { showCustomPopupMenu(it) }
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadAllFiles()
+    }
+    private fun loadAllFiles() {
+        allFiles = buildList {
+            val items = currentDir.listFiles()?.toList() ?: emptyList()
+            val folders = items.filter { it.isDirectory }.sortedBy { it.name }
+            val docs = items.filter { it.isFile && listOf(".pdf",".txt",".png",".jpg",".jpeg")
+                .any { ext -> it.name.endsWith(ext, true) } }
+                .filter { !fileViewModel.removedFilePaths.contains(it.absolutePath) }
+                .sortedByDescending { it.lastModified() }
 
-    private fun loadAllFiles(): List<FileListItem.FileItem> {
-        val dir = requireContext().filesDir
-        val files = dir.listFiles() ?: return emptyList()
 
-        return files.filter {
-            it.name.endsWith(".pdf", true) ||
-                    it.name.endsWith(".txt", true) ||
-                    it.name.endsWith(".png", true) ||
-                    it.name.endsWith(".jpg", true) ||
-                    it.name.endsWith(".jpeg", true)
-        }.map {
-            FileListItem.FileItem(
-                InternalFileModel(it.name, it.absolutePath)
+            if (folders.isNotEmpty()) add(FileListItem.Header("Folders"))
+            addAll(
+                folders.map {
+                    FileListItem.FileItem(
+                        InternalFileModel(
+                            name = it.name,
+                            path = it.absolutePath,
+                            isFolder = true,
+                            file = File(it.absolutePath)
+                        )
+                    )
+                }
             )
+            if (docs.isNotEmpty()) add(FileListItem.Header("Files"))
+            addAll(
+                docs.map {
+                    FileListItem.FileItem(
+                        InternalFileModel(
+                            name = it.name,
+                            path = it.absolutePath,
+                            isFolder = false,
+                            file = it
+                        )
+                    )
+                }
+            )
+
+        }
+        adapter.updateList(allFiles)
+
+        // When user taps folder item:
+        adapter.onFolderClick = { f ->
+            childFragmentManager.beginTransaction()
+                .replace(
+                    R.id.container,
+                    SavedFragment().apply {
+                        arguments = Bundle().apply { putString("dirPath", f.absolutePath) }
+                    }
+                )
+                .addToBackStack(null)
+                .commit()
         }
     }
 
+    private fun doCopy(file: File) {
+        fileViewModel.clearSelection()
+        fileViewModel.selectFile(file)
+        fileViewModel.copyFiles()
+        Toast.makeText(requireActivity(), "Copied ${file.name}",Toast.LENGTH_SHORT).show()
+    }
+    private fun doCut(file: File) {
+        fileViewModel.clearSelection()
+        fileViewModel.selectFile(file)
+        fileViewModel.cutFiles()
+        Toast.makeText(requireActivity(), "Cut ${file.name}",Toast.LENGTH_SHORT).show()
+    }
+    private fun doPaste() {
+        fileViewModel.pasteFiles(currentDir)
+        loadAllFiles()
+        Toast.makeText(requireContext(), "Pasted to ${currentDir.name}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun doDelete(file: File) {
+        fileViewModel.clearSelection()
+        fileViewModel.selectFile(file)
+        fileViewModel.deleteSelected()
+        loadAllFiles()
+        Toast.makeText(requireContext(), "Deleted selected files", Toast.LENGTH_SHORT).show()
+    }
+    private fun doShare(file: File) { /* ... */ }
+    private fun doPin(file: File) { /* ... */ }
+
+    private fun showCreateFolderDialog() {
+        val input = EditText(requireContext())
+        AlertDialog.Builder(requireContext())
+            .setTitle("Create Folder")
+            .setView(input)
+            .setPositiveButton("Create") { _, _ ->
+                val newF = File(currentDir, input.text.toString())
+                if (!newF.exists() && newF.mkdir()) loadAllFiles()
+                else Toast.makeText(requireContext(), "Failed or exists", Toast.LENGTH_SHORT).show()
+            }.setNegativeButton("Cancel",null).show()
+    }
 
     private fun setupSearchUi() {
         binding.ivSearch.setOnClickListener {
@@ -132,7 +232,7 @@ class SavedFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
     }
 
 
-//sorting
+    //sorting
     private fun setupSorting() {
         binding.name.setOnClickListener {
             if (isNameAsc) {
@@ -172,32 +272,59 @@ class SavedFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
     }
 
     private fun sortByNameAsc() {
-        allFiles = allFiles.sortedBy { it.file.name.lowercase() }
+        val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
+            .sortedBy { it.file.name.lowercase() }
+
+        val headers = allFiles.filterIsInstance<FileListItem.Header>()
+
+        allFiles = headers + sortedFiles
         adapter.updateList(allFiles)
     }
 
     private fun sortByNameDesc() {
-        allFiles = allFiles.sortedByDescending { it.file.name.lowercase() }
+        val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
+            .sortedByDescending { it.file.name.lowercase() }
+
+        val headers = allFiles.filterIsInstance<FileListItem.Header>()
+        allFiles = headers + sortedFiles
         adapter.updateList(allFiles)
     }
+
 
     private fun sortByDateAsc() {
-        allFiles = allFiles.sortedBy { File(it.file.path).lastModified() }
+        val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
+            .sortedBy { File(it.file.path).lastModified() }
+
+        val headers = allFiles.filterIsInstance<FileListItem.Header>()
+        allFiles = headers + sortedFiles
         adapter.updateList(allFiles)
     }
 
+
     private fun sortByDateDesc() {
-        allFiles = allFiles.sortedByDescending { File(it.file.path).lastModified() }
+        val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
+            .sortedByDescending { File(it.file.path).lastModified() }
+
+        val headers = allFiles.filterIsInstance<FileListItem.Header>()
+        allFiles = headers + sortedFiles
         adapter.updateList(allFiles)
     }
 
     private fun sortBySizeAsc() {
-        allFiles = allFiles.sortedBy { File(it.file.path).length() }
+        val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
+            .sortedBy { File(it.file.path).length() }
+
+        val headers = allFiles.filterIsInstance<FileListItem.Header>()
+        allFiles = headers + sortedFiles
         adapter.updateList(allFiles)
     }
 
     private fun sortBySizeDesc() {
-        allFiles = allFiles.sortedByDescending { File(it.file.path).length() }
+        val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
+            .sortedByDescending { File(it.file.path).length() }
+
+        val headers = allFiles.filterIsInstance<FileListItem.Header>()
+        allFiles = headers + sortedFiles
         adapter.updateList(allFiles)
     }
 
@@ -209,55 +336,81 @@ class SavedFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
     //popup menu
     private fun showCustomPopupMenu(anchor: View) {
         val popupView = LayoutInflater.from(requireContext()).inflate(R.layout.popup_menu_save, null)
+        val popupWidth = (200 * resources.displayMetrics.density).toInt()
+
         val popupWindow = PopupWindow(
             popupView,
-            (200 * resources.displayMetrics.density).toInt(),
+            popupWidth,
             WindowManager.LayoutParams.WRAP_CONTENT,
             true
         )
 
-        popupWindow.isOutsideTouchable = true
-
         popupWindow.elevation = 10f
         popupWindow.isOutsideTouchable = true
 
-
-        val anchor = binding.ivMenu
         val location = IntArray(2)
         anchor.getLocationOnScreen(location)
-
         val screenWidth = Resources.getSystem().displayMetrics.widthPixels
-        val density = resources.displayMetrics.density
-        val popupWidth = (200 * density).toInt()
-
-        val anchorWidth = anchor.width
-        val anchorHeight = anchor.height
-
-        val xOffset = location[0] - (popupWidth - anchorWidth)
-        val yOffset = location[1] + anchorHeight
-
+        val rightMargin = (16 * resources.displayMetrics.density).toInt()
+        val xOffset = screenWidth - (location[0] + popupWidth) - rightMargin
         popupWindow.showAsDropDown(anchor, xOffset, 0)
 
-
-
-        // --- Handle clicks ---
+        // Select Mode (you can enhance this later)
         popupView.findViewById<LinearLayout>(R.id.menuSelect).setOnClickListener {
-            Toast.makeText(requireContext(), "Select clicked", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Select Mode Enabled", Toast.LENGTH_SHORT).show()
             popupWindow.dismiss()
         }
 
-        popupView.findViewById<LinearLayout>(R.id.menufolder).setOnClickListener {
-            Toast.makeText(requireContext(), "New Folder clicked", Toast.LENGTH_SHORT).show()
-            popupWindow.dismiss()
-        }
+        // 🔄 Get current selected files
+        val selectedFiles = adapter.getSelectedFiles()
+            .filterIsInstance<FileListItem.FileItem>()
+            .map { File(it.file.path) }
 
+        // 📋 COPY
         popupView.findViewById<LinearLayout>(R.id.menuCopy).setOnClickListener {
-            Toast.makeText(requireContext(), "Copy clicked", Toast.LENGTH_SHORT).show()
+            fileViewModel.clearSelection()
+            selectedFiles.forEach { fileViewModel.selectFile(it) }
+            fileViewModel.copyFiles()
+            Toast.makeText(requireContext(), "Copied ${selectedFiles.size} file(s)", Toast.LENGTH_SHORT).show()
             popupWindow.dismiss()
         }
 
-        // Repeat for menuCut, menuPaste, menudelete, etc.
+        // ✂ CUT
+        popupView.findViewById<LinearLayout>(R.id.menuCut).setOnClickListener {
+            fileViewModel.clearSelection()
+            selectedFiles.forEach { fileViewModel.selectFile(it) }
+            fileViewModel.cutFiles()
+            Toast.makeText(requireContext(), "Cut ${selectedFiles.size} file(s)", Toast.LENGTH_SHORT).show()
+            popupWindow.dismiss()
+        }
+
+        // 📌 PASTE
+        popupView.findViewById<LinearLayout>(R.id.menuPaste).setOnClickListener {
+            fileViewModel.pasteFiles(currentDir)
+            loadAllFiles()
+            Toast.makeText(requireContext(), "Pasted to ${currentDir.name}", Toast.LENGTH_SHORT).show()
+            popupWindow.dismiss()
+        }
+
+        // 🗑 DELETE
+        popupView.findViewById<LinearLayout>(R.id.menudelete).setOnClickListener {
+            fileViewModel.clearSelection()
+            selectedFiles.forEach { fileViewModel.selectFile(it) }
+            fileViewModel.deleteSelected()
+            loadAllFiles()
+            Toast.makeText(requireContext(), "Deleted ${selectedFiles.size} file(s)", Toast.LENGTH_SHORT).show()
+            popupWindow.dismiss()
+        }
+
+        // 📁 Create Folder
+        popupView.findViewById<LinearLayout>(R.id.menufolder).setOnClickListener {
+            showCreateFolderDialog()
+            popupWindow.dismiss()
+        }
     }
+
+
+
 
 
     private fun resetOtherSortIcons(activeColumn: String) {
@@ -267,15 +420,27 @@ class SavedFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
         }
         if (activeColumn != "date") {
             binding.toparrow2.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
-            binding.downarrow2.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
+            binding.downarrow2.setColorFilter(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.gray
+                )
+            )
         }
         if (activeColumn != "size") {
             binding.toparrow3.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
-            binding.downarrow3.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
+            binding.downarrow3.setColorFilter(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.gray
+                )
+            )
         }
     }
-    override fun onItemSelectionChanged() {
-        val count = adapter.getSelectedCount()
-        // later: show/hide your selection bar
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fileViewModel.removedFilePaths.clear()
     }
+
+
 }

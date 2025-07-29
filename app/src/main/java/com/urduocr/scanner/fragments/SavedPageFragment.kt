@@ -20,7 +20,7 @@ import com.urduocr.scanner.viewmodels.PinnedFilesViewModel
 import com.urduocr.scanner.databinding.FragmentSavedPageBinding
 import java.io.File
 
-class SavedPageFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
+class SavedPageFragment : Fragment(){
 
     private lateinit var binding: FragmentSavedPageBinding
     private lateinit var adapter: SavedFileAdapter
@@ -69,8 +69,8 @@ class SavedPageFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        allFiles = loadFilesByType()
-        adapter  = SavedFileAdapter(requireContext(), allFiles, this)
+       // allFiles = loadFilesByType()
+        //adapter  = SavedFileAdapter(requireContext(), allFiles, this)
 
         binding.recyclerViewFiles.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewFiles.adapter      = adapter
@@ -78,46 +78,46 @@ class SavedPageFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
 
     }
 
-    private fun loadFilesByType(): List<FileListItem> {
-        val rootDir = requireContext().filesDir
-        val allFiles = rootDir.listFiles()?.toList() ?: emptyList()
+//    private fun loadFilesByType(): List<FileListItem> {
+//        val rootDir = requireContext().filesDir
+//        val allFiles = rootDir.listFiles()?.toList() ?: emptyList()
+//
+//        // ❗ Get list of pinned file paths from ViewModel
+//        val pinnedPaths = pinnedViewModel.pinnedFiles.value?.map { it.path } ?: emptyList()
+//
+//        val filtered = allFiles.filter {
+//            when (fileType) {
+//                "PDF" -> it.name.endsWith(".pdf")
+//                "TXT" -> it.name.endsWith(".txt")
+//                else -> it.name.endsWith(".pdf", true) ||
+//                        it.name.endsWith(".txt", true) ||
+//                        it.name.endsWith(".png", true) || it.name.endsWith(".jpg", true) || it.name.endsWith(".jpeg", true)
+//
+//            }
+//        }.map {
+//            val isPinned = pinnedPaths.contains(it.absolutePath)
+//            val model = InternalFileModel(
+//                name = it.name,
+//                path = it.absolutePath
+//            ).apply {
+//                this.isPinned = isPinned
+//            }
+//            FileListItem.FileItem(model)
+//        }
+//
+//
+//        return filtered
+//    }
 
-        // ❗ Get list of pinned file paths from ViewModel
-        val pinnedPaths = pinnedViewModel.pinnedFiles.value?.map { it.path } ?: emptyList()
 
-        val filtered = allFiles.filter {
-            when (fileType) {
-                "PDF" -> it.name.endsWith(".pdf")
-                "TXT" -> it.name.endsWith(".txt")
-                else -> it.name.endsWith(".pdf", true) ||
-                        it.name.endsWith(".txt", true) ||
-                        it.name.endsWith(".png", true) || it.name.endsWith(".jpg", true) || it.name.endsWith(".jpeg", true)
-
-            }
-        }.map {
-            val isPinned = pinnedPaths.contains(it.absolutePath)
-            val model = InternalFileModel(
-                name = it.name,
-                path = it.absolutePath
-            ).apply {
-                this.isPinned = isPinned
-            }
-            FileListItem.FileItem(model)
-        }
-
-
-        return filtered
-    }
-
-
-    override fun onItemSelectionChanged() {
-        val selectedCount = adapter.getSelectedCount()
-        if (selectedCount > 0) {
-            selectionListener?.onSelectionChanged(true, selectedCount)
-        } else {
-            selectionListener?.onSelectionChanged(false, 0)
-        }
-    }
+//    override fun onItemSelectionChanged() {
+//        val selectedCount = adapter.getSelectedCount()
+//        if (selectedCount > 0) {
+//            selectionListener?.onSelectionChanged(true, selectedCount)
+//        } else {
+//            selectionListener?.onSelectionChanged(false, 0)
+//        }
+//    }
 
     fun deleteSelectedFiles() {
         val selectedFiles = adapter.getSelectedFiles()
@@ -133,7 +133,7 @@ class SavedPageFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
                     if (file.exists()) file.delete()
                 }
                 refreshList()
-                onItemSelectionChanged()
+                //onItemSelectionChanged()
             }
             .setNegativeButton("Cancel", null)
             .show()
@@ -188,11 +188,11 @@ class SavedPageFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
 
     fun clearSelection() {
         adapter.clearSelection()
-        onItemSelectionChanged()
+       // onItemSelectionChanged()
     }
     private fun refreshList() {
-        val updatedFiles = loadFilesByType()
-        adapter.updateList(updatedFiles)
+        //val updatedFiles = loadFilesByType()
+        //adapter.updateList(updatedFiles)
     }
     /* ------------ PUBLIC FUNCTION CALLED FROM PARENT ------------ */
     fun filterFiles(query: String) {

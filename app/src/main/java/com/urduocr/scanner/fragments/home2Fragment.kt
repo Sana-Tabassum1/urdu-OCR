@@ -31,6 +31,7 @@ import com.urduocr.scanner.adapters.HomeSliderAdapter
 import com.urduocr.scanner.viewmodels.BatchScanningViewModel
 import com.urduocr.scanner.databinding.FragmentHome2Binding
 import com.urduocr.scanner.models.SliderItem
+import com.urduocr.scanner.models.recentInternalFileModel
 import java.io.File
 
 class home2Fragment : Fragment() {
@@ -178,26 +179,37 @@ class home2Fragment : Fragment() {
 
     private fun loadRecentFiles(): List<FileListItem.FileItem> {
         val rootDir = requireContext().filesDir
-        val imageDir = File(rootDir, "SavedImages")
+        val savedImagesDir = File(rootDir, "SavedImages")
+        val savedFilesDir = File(rootDir, "SavedFiles")
         val recentFiles = mutableListOf<FileListItem.FileItem>()
 
-        val allFiles = (rootDir.listFiles()?.toList() ?: emptyList()) +
-                (imageDir.listFiles()?.toList() ?: emptyList())
+        val targetDirs = listOf(savedImagesDir, savedFilesDir)
 
-        for (file in allFiles) {
-            if (!file.name.endsWith(".txt") && !file.name.endsWith(".png") && !file.name.endsWith(".pdf")) continue
+        val twelveHoursAgo = System.currentTimeMillis() - 12 * 60 * 60 * 1000
 
-            val diff = System.currentTimeMillis() - file.lastModified()
-            val hours = diff / (1000 * 60 * 60)
+        for (dir in targetDirs) {
+            if (dir.exists()) {
+                val files = dir.listFiles()?.toList() ?: emptyList()
+                for (file in files) {
+                    if (!file.name.endsWith(".txt") && !file.name.endsWith(".png") && !file.name.endsWith(".pdf")) continue
 
-            if (hours < 12) {
-                val model = InternalFileModel(name = file.name, path = file.absolutePath)
-                recentFiles.add(FileListItem.FileItem(model))
+                    if (file.lastModified() >= twelveHoursAgo) {
+                        val model = InternalFileModel(
+                            name = file.name,
+                            path = file.absolutePath,
+                            file = file,
+                            isFolder = false
+                        )
+                        recentFiles.add(FileListItem.FileItem(model))
+                    }
+                }
             }
         }
 
         return recentFiles
     }
+
+
 
 
 

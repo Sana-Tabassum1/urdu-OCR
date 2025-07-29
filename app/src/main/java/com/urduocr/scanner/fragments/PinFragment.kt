@@ -24,7 +24,7 @@ import com.urduocr.scanner.databinding.FragmentPinBinding
 import java.io.File
 import java.util.ArrayList
 
-class PinFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
+class PinFragment : Fragment() {
 
     private lateinit var binding: FragmentPinBinding
     private lateinit var adapter: SavedFileAdapter
@@ -47,7 +47,7 @@ class PinFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
         super.onViewCreated(view, savedInstanceState)
 
         /* -------- RecyclerView -------- */
-        adapter = SavedFileAdapter(requireContext(), emptyList(), this)
+       // adapter = SavedFileAdapter(requireContext(), emptyList(), this)
         binding.pinrecyclerview.layoutManager = LinearLayoutManager(requireContext())
         binding.pinrecyclerview.adapter = adapter
 
@@ -132,16 +132,16 @@ class PinFragment : Fragment(), SavedFileAdapter.FileAdapterListener {
     private fun toggleSelectionBar(visible: Boolean) {
         binding.selectionLayout.visibility = if (visible) View.VISIBLE else View.GONE
     }
-
-    override fun onItemSelectionChanged() {
-        val count = adapter.getSelectedFiles().size
-        if (count > 0) {
-            toggleSelectionBar(true)
-            binding.tvSelectedCount.text = "$count× selected"
-        } else {
-            toggleSelectionBar(false)
-        }
-    }
+//
+//    override fun onItemSelectionChanged() {
+//        val count = adapter.getSelectedFiles().size
+//        if (count > 0) {
+//            toggleSelectionBar(true)
+//            binding.tvSelectedCount.text = "$count× selected"
+//        } else {
+//            toggleSelectionBar(false)
+//        }
+//    }
 
     private fun deleteSelectedFiles() {
         val selectedFiles = adapter.getSelectedFiles()
