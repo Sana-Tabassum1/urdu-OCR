@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.text.format.DateFormat
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -79,7 +81,7 @@ class SavedFileAdapter(
 
                 // File icon
                 when {
-                    file.isFolder -> fileHolder.binding.ivFileIcon.setImageResource(R.drawable.folder)
+                    file.isFolder -> fileHolder.binding.ivFileIcon.setImageResource(R.drawable.saved_folder)
                     file.name.endsWith(
                         ".png",
                         true
@@ -164,12 +166,11 @@ class SavedFileAdapter(
                 }
 
                 // ✅ Menu button logic
-                fileHolder.binding.menuButton.setOnClickListener { view ->
-                    val popupView =
-                        LayoutInflater.from(view.context).inflate(R.layout.custom_file_popup, null)
+                fileHolder.binding.menuButton.setOnClickListener { anchorView ->
+                    val popupView = LayoutInflater.from(anchorView.context).inflate(R.layout.custom_file_popup, null)
                     val popupWindow = PopupWindow(
                         popupView,
-                        (200 * view.resources.displayMetrics.density).toInt(),
+                        WindowManager.LayoutParams.WRAP_CONTENT,
                         WindowManager.LayoutParams.WRAP_CONTENT,
                         true
                     )
@@ -177,21 +178,42 @@ class SavedFileAdapter(
                     popupWindow.elevation = 10f
                     popupWindow.isOutsideTouchable = true
                     popupWindow.isFocusable = true
-                    // --- Calculate offset so popup stays a bit inside from right edge ---
-                    val location = IntArray(2)
-                    view.getLocationOnScreen(location)
 
+                    // Measure popup size
+                    popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                    val popupWidth = popupView.measuredWidth
+                    val popupHeight = popupView.measuredHeight
+
+                    // Screen dimensions
                     val screenWidth = Resources.getSystem().displayMetrics.widthPixels
-                    val popWidth = (200 * view.resources.displayMetrics.density).toInt()
-                    val viewWidth = view.width
+                    val screenHeight = Resources.getSystem().displayMetrics.heightPixels
 
-                    // 16dp margin from the right side
-                    val rightMargin = (16 * view.resources.displayMetrics.density).toInt()
+                    // Get anchor (button) position on screen
+                    val location = IntArray(2)
+                    anchorView.getLocationOnScreen(location)
+                    val anchorX = location[0]
+                    val anchorY = location[1]
+                    val anchorHeight = anchorView.height
 
-                    // xOffset: align popup's right edge with screenWidth - rightMargin
-                    val xOffset = screenWidth - (location[0] + popWidth) - rightMargin
+                    // Optional margin
+                    val margin = (8 * anchorView.resources.displayMetrics.density).toInt()
 
-                    popupWindow.showAsDropDown(view, xOffset, 0)
+                    // Determine where to show popup: above or below anchor
+                    val showAbove = popupHeight + margin > screenHeight - (anchorY + anchorHeight)
+
+                    // Calculate x: right-align with anchor (or clamp within screen)
+                    val x = minOf(anchorX + anchorView.width - popupWidth, screenWidth - popupWidth - margin)
+
+                    // Calculate y: show above or below the anchor
+                    val y = if (showAbove) {
+                        maxOf(anchorY - popupHeight - margin, margin)
+                    } else {
+                        anchorY + anchorHeight + margin
+                    }
+
+                    popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, x, y)
+
+                    // --- Menu options ---
                     popupView.findViewById<LinearLayout>(R.id.menuSelect).setOnClickListener {
                         isSelectionMode = true
                         file.isSelected = true
@@ -203,11 +225,13 @@ class SavedFileAdapter(
                     popupView.findViewById<LinearLayout>(R.id.menuCopy).setOnClickListener {
                         fileActionListener?.onCopy(fileObj)
                         popupWindow.dismiss()
+                        clearSelection()
                     }
 
                     popupView.findViewById<LinearLayout>(R.id.menuCut).setOnClickListener {
                         fileActionListener?.onCut(fileObj)
                         popupWindow.dismiss()
+                        clearSelection()
                     }
 
                     popupView.findViewById<LinearLayout>(R.id.menuPaste).setOnClickListener {
@@ -218,22 +242,22 @@ class SavedFileAdapter(
                     popupView.findViewById<LinearLayout>(R.id.menudelete).setOnClickListener {
                         fileActionListener?.onDelete(fileObj)
                         popupWindow.dismiss()
+                        clearSelection()
                     }
 
                     popupView.findViewById<LinearLayout>(R.id.menupin).setOnClickListener {
                         fileActionListener?.onPin(fileObj)
                         popupWindow.dismiss()
+                        clearSelection()
                     }
 
                     popupView.findViewById<LinearLayout>(R.id.menushare).setOnClickListener {
                         fileActionListener?.onShare(fileObj)
                         popupWindow.dismiss()
+                        clearSelection()
                     }
-
-                    popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-                    val popupWidth = popupView.measuredWidth
-                    popupWindow.showAsDropDown(view, view.width - popupWidth, 0)
                 }
+
             }
         }
     }

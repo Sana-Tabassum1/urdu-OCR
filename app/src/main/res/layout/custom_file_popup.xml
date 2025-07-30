@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/menuviewfile"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
@@ -34,7 +34,7 @@
     <LinearLayout
         android:id="@+id/menuSelect"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
@@ -61,7 +61,7 @@
     <LinearLayout
         android:id="@+id/menuCopy"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
@@ -87,7 +87,7 @@
     <LinearLayout
         android:id="@+id/menuCut"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
@@ -113,7 +113,7 @@
     <LinearLayout
         android:id="@+id/menuPaste"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
@@ -138,7 +138,7 @@
     <LinearLayout
         android:id="@+id/menupin"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
@@ -163,7 +163,7 @@
     <LinearLayout
         android:id="@+id/menushare"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
@@ -189,7 +189,7 @@
     <LinearLayout
         android:id="@+id/menudelete"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"

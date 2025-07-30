@@ -107,7 +107,7 @@ class home2Fragment : Fragment() {
         }
 
         binding.textToImageBox.setOnClickListener {
-            findNavController().navigate(R.id.editFragment)
+            findNavController().navigate(R.id.kFragment)
         }
 
         binding.scanningBox.setOnClickListener {
@@ -177,32 +177,29 @@ class home2Fragment : Fragment() {
             }
     }
 
+
     private fun loadRecentFiles(): List<FileListItem.FileItem> {
         val rootDir = requireContext().filesDir
-        val savedImagesDir = File(rootDir, "SavedImages")
-        val savedFilesDir = File(rootDir, "SavedFiles")
+        val imageDir = File(rootDir, "SavedImages")
         val recentFiles = mutableListOf<FileListItem.FileItem>()
 
-        val targetDirs = listOf(savedImagesDir, savedFilesDir)
+        val allFiles = (rootDir.listFiles()?.toList() ?: emptyList()) +
+                (imageDir.listFiles()?.toList() ?: emptyList())
 
-        val twelveHoursAgo = System.currentTimeMillis() - 12 * 60 * 60 * 1000
+        for (file in allFiles) {
+            if (!file.name.endsWith(".txt") && !file.name.endsWith(".png") && !file.name.endsWith(".pdf")) continue
 
-        for (dir in targetDirs) {
-            if (dir.exists()) {
-                val files = dir.listFiles()?.toList() ?: emptyList()
-                for (file in files) {
-                    if (!file.name.endsWith(".txt") && !file.name.endsWith(".png") && !file.name.endsWith(".pdf")) continue
+            val diff = System.currentTimeMillis() - file.lastModified()
+            val hours = diff / (1000 * 60 * 60)
 
-                    if (file.lastModified() >= twelveHoursAgo) {
-                        val model = InternalFileModel(
-                            name = file.name,
-                            path = file.absolutePath,
-                            file = file,
-                            isFolder = false
-                        )
-                        recentFiles.add(FileListItem.FileItem(model))
-                    }
-                }
+            if (hours < 12) {
+                val model = InternalFileModel(
+                    name = file.name,
+                    path = file.absolutePath,
+                    file = file,
+                    isFolder = false
+                )
+                recentFiles.add(FileListItem.FileItem(model))
             }
         }
 

@@ -1,50 +1,103 @@
 package com.urduocr.scanner.fragments
 
+import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebChromeClient
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.widget.ViewPager2
-import com.urduocr.scanner.R
-import com.urduocr.scanner.adapters.HomeSliderAdapter
 import com.urduocr.scanner.databinding.FragmentKBinding
-import com.urduocr.scanner.models.SliderItem
 
 class kFragment : Fragment() {
 
-    private lateinit var binding: FragmentKBinding
-    private lateinit var sliderAdapter: HomeSliderAdapter
-    private lateinit var sliderHandler: Handler
-    private lateinit var sliderRunnable: Runnable
+    private var _binding: FragmentKBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentKBinding.inflate(inflater, container, false)
+        _binding = FragmentKBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val sliderItems = listOf(
-            SliderItem(R.drawable.urduu, "Most accurate Urdu OCR","Whether its handwriting or a book,\n" +
-                    "Urdu OCR recogize text with 90% accuracy"),
-            SliderItem(R.drawable.file, "Image to Urdu image","Type Urdu and generate image of Urdu text.\n" +
-                    "Choose from five different Urdu fonts."),
-            SliderItem(R.drawable.photo, "Organize your files","Type Urdu and generate image of Urdu text.\n" +
-                    "Choose from five different Urdu fonts.")
-        )
+        binding.editor.setEditorHeight(200)
+        binding.editor.setEditorFontSize(16)
+        binding.editor.setEditorFontColor(Color.BLACK)
+        binding.editor.setPadding(10, 10, 10, 10)
+        binding.editor.setPlaceholder("Start writing here...")
+        binding.editor.setWebChromeClient(WebChromeClient())
 
+        binding.actionBold.setOnClickListener { binding.editor.setBold() }
+        binding.actionItalic.setOnClickListener { binding.editor.setItalic() }
+        binding.actionUnderline.setOnClickListener { binding.editor.setUnderline() }
+        binding.actionStrikethrough.setOnClickListener { binding.editor.setStrikeThrough() }
+        binding.actionSubscript.setOnClickListener { binding.editor.setSubscript() }
+        binding.actionSuperscript.setOnClickListener { binding.editor.setSuperscript() }
 
+        binding.actionJustifyLeft.setOnClickListener { binding.editor.setAlignLeft() }
+        binding.actionJustifyCenter.setOnClickListener { binding.editor.setAlignCenter() }
+        binding.actionJustifyRight.setOnClickListener { binding.editor.setAlignRight() }
+
+        binding.actionH1.setOnClickListener { binding.editor.setHeading(1) }
+        binding.actionH2.setOnClickListener { binding.editor.setHeading(2) }
+        binding.actionH3.setOnClickListener { binding.editor.setHeading(3) }
+        binding.actionH4.setOnClickListener { binding.editor.setHeading(4) }
+        binding.actionH5.setOnClickListener { binding.editor.setHeading(5) }
+        binding.actionH6.setOnClickListener { binding.editor.setHeading(6) }
+
+        binding.actionUndo.setOnClickListener { binding.editor.undo() }
+        binding.actionRedo.setOnClickListener { binding.editor.redo() }
+
+        binding.actionIndent.setOnClickListener { binding.editor.setIndent() }
+        binding.actionOutdent.setOnClickListener { binding.editor.setOutdent() }
+
+        binding.actionUl.setOnClickListener { binding.editor.setBullets() }
+        binding.actionOl.setOnClickListener { binding.editor.setNumbers() }
+
+        binding.actionInsertImage.setOnClickListener {
+            binding.editor.insertImage("https://placekitten.com/200/300", "Kitten")
+        }
+
+        binding.actionInsertYoutube.setOnClickListener {
+            binding.editor.insertYoutubeVideo("https://www.youtube.com/watch?v=QHH3iSeDBLo")
+        }
+
+        binding.actionInsertVideo.setOnClickListener {
+            binding.editor.insertVideo("https://www.w3schools.com/html/mov_bbb.mp4")
+        }
+
+        binding.actionInsertAudio.setOnClickListener {
+            binding.editor.insertAudio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
+        }
+
+        binding.actionInsertLink.setOnClickListener {
+            binding.editor.insertLink("https://openai.com", "OpenAI")
+        }
+
+        binding.actionCheckbox.setOnClickListener {
+            binding.editor.insertTodo()
+        }
+
+        binding.actionTextColor.setOnClickListener {
+            binding.editor.setTextColor(Color.RED)
+        }
+
+        binding.actionBgColor.setOnClickListener {
+            binding.editor.setTextBackgroundColor(Color.YELLOW)
+        }
+
+        binding.actionFontSize.setOnClickListener {
+            binding.editor.setFontSize(24)
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        sliderHandler.removeCallbacks(sliderRunnable)
+        _binding = null
     }
 }

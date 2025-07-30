@@ -372,6 +372,7 @@ class SavedFragment : Fragment() {
             selectedFiles.forEach { fileViewModel.selectFile(it) }
             fileViewModel.copyFiles()
             Toast.makeText(requireContext(), "Copied ${selectedFiles.size} file(s)", Toast.LENGTH_SHORT).show()
+            adapter.clearSelection()
             popupWindow.dismiss()
         }
 
@@ -381,6 +382,7 @@ class SavedFragment : Fragment() {
             selectedFiles.forEach { fileViewModel.selectFile(it) }
             fileViewModel.cutFiles()
             Toast.makeText(requireContext(), "Cut ${selectedFiles.size} file(s)", Toast.LENGTH_SHORT).show()
+            adapter.clearSelection()
             popupWindow.dismiss()
         }
 
@@ -389,6 +391,7 @@ class SavedFragment : Fragment() {
             fileViewModel.pasteFiles(currentDir)
             loadAllFiles()
             Toast.makeText(requireContext(), "Pasted to ${currentDir.name}", Toast.LENGTH_SHORT).show()
+            adapter.clearSelection()
             popupWindow.dismiss()
         }
 
@@ -399,12 +402,14 @@ class SavedFragment : Fragment() {
             fileViewModel.deleteSelected()
             loadAllFiles()
             Toast.makeText(requireContext(), "Deleted ${selectedFiles.size} file(s)", Toast.LENGTH_SHORT).show()
+            adapter.clearSelection()
             popupWindow.dismiss()
         }
 
         // 📁 Create Folder
         popupView.findViewById<LinearLayout>(R.id.menufolder).setOnClickListener {
             showCreateFolderDialog()
+            adapter.clearSelection()
             popupWindow.dismiss()
         }
     }

@@ -22,6 +22,7 @@ navigationUiKtx = "2.9.2"
 playServicesAuthVersion = "21.3.0"
 playServicesMlkitDocumentScannerVersion = "16.0.0-beta3"
 retrofit = "3.0.0"
+richeditorAndroid = "2.0.0"
 tessTwo = "9.1.0"
 textRecognition = "16.0.1"
 textRecognitionArabic = "17.0.3"
@@ -67,6 +68,7 @@ firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "fireb
 play-services-auth-v2130 = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
 play-services-mlkit-document-scanner-v1600beta3 = { module = "com.google.android.gms:play-services-mlkit-document-scanner", version.ref = "playServicesMlkitDocumentScannerVersion" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+richeditor-android = { module = "jp.wasabeef:richeditor-android", version.ref = "richeditorAndroid" }
 tess-two = { module = "com.googlecode.tesseract.android:tess-two", version.ref = "tessTwo" }
 text-recognition = { module = "com.google.mlkit:text-recognition", version.ref = "textRecognition" }
 text-recognition-arabic = { module = "com.google.mlkit:text-recognition-arabic", version.ref = "textRecognitionArabic" }
