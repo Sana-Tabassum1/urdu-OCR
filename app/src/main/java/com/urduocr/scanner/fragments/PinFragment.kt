@@ -58,17 +58,17 @@ class PinFragment : Fragment() {
         pinnedViewModel.pinnedFiles.observe(viewLifecycleOwner) { pinnedList ->
             allFiles = pinnedList.map { FileListItem.FileItem(it) }
             filterFiles(currentQuery) // honour current query
-            toggleSelectionBar(false)
+           // toggleSelectionBar(false)
         }
 
         /* -------- Selection actions -------- */
         binding.ivBackSelection.setOnClickListener {
             adapter.clearSelection()
-            toggleSelectionBar(false)
+          //  toggleSelectionBar(false)
         }
-        binding.ivDelete.setOnClickListener { deleteSelectedFiles() }
-        binding.ivShare.setOnClickListener { shareSelectedFiles() }
-        binding.ivunPin.setOnClickListener { unpinSelectedFiles() }
+//        binding.ivDelete.setOnClickListener { deleteSelectedFiles() }
+//        binding.ivShare.setOnClickListener { shareSelectedFiles() }
+//        binding.ivunPin.setOnClickListener { unpinSelectedFiles() }
 
         /* -------- Diamond nav -------- */
         binding.btndaimond.setOnClickListener {
@@ -129,64 +129,52 @@ class PinFragment : Fragment() {
     /* ============================================================
        SELECTION + SHARE / DELETE / UNPIN
        ============================================================ */
-    private fun toggleSelectionBar(visible: Boolean) {
-        binding.selectionLayout.visibility = if (visible) View.VISIBLE else View.GONE
-    }
+
 //
-//    override fun onItemSelectionChanged() {
-//        val count = adapter.getSelectedFiles().size
-//        if (count > 0) {
-//            toggleSelectionBar(true)
-//            binding.tvSelectedCount.text = "$count× selected"
-//        } else {
-//            toggleSelectionBar(false)
-//        }
+//    private fun deleteSelectedFiles() {
+//        val selectedFiles = adapter.getSelectedFiles()
+//        if (selectedFiles.isEmpty()) return
+//
+//        AlertDialog.Builder(requireContext())
+//            .setTitle("Delete Files")
+//            .setMessage("Are you sure you want to delete these files?")
+//            .setPositiveButton("Delete") { _, _ ->
+//                selectedFiles.forEach {
+//                    File(it.file.path).delete()
+//                    pinnedViewModel.unpinFile(it.file)
+//                }
+//                adapter.clearSelection()
+//                toggleSelectionBar(false)
+//            }
+//            .setNegativeButton("Cancel", null)
+//            .show()
 //    }
-
-    private fun deleteSelectedFiles() {
-        val selectedFiles = adapter.getSelectedFiles()
-        if (selectedFiles.isEmpty()) return
-
-        AlertDialog.Builder(requireContext())
-            .setTitle("Delete Files")
-            .setMessage("Are you sure you want to delete these files?")
-            .setPositiveButton("Delete") { _, _ ->
-                selectedFiles.forEach {
-                    File(it.file.path).delete()
-                    pinnedViewModel.unpinFile(it.file)
-                }
-                adapter.clearSelection()
-                toggleSelectionBar(false)
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun shareSelectedFiles() {
-        val selectedFiles = adapter.getSelectedFiles()
-        if (selectedFiles.isEmpty()) return
-
-        val uris = selectedFiles.map {
-            FileProvider.getUriForFile(
-                requireContext(),
-                "${requireContext().packageName}.fileprovider",
-                File(it.file.path)
-            )
-        }
-
-        val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-            type = "*/*"
-            putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList<Uri>(uris))
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        startActivity(Intent.createChooser(shareIntent, "Share files via"))
-    }
-
-    private fun unpinSelectedFiles() {
-        adapter.getSelectedFiles().forEach { pinnedViewModel.unpinFile(it.file) }
-        adapter.clearSelection()
-        toggleSelectionBar(false)
-    }
+//
+//    private fun shareSelectedFiles() {
+//        val selectedFiles = adapter.getSelectedFiles()
+//        if (selectedFiles.isEmpty()) return
+//
+//        val uris = selectedFiles.map {
+//            FileProvider.getUriForFile(
+//                requireContext(),
+//                "${requireContext().packageName}.fileprovider",
+//                File(it.file.path)
+//            )
+//        }
+//
+//        val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+//            type = "*/*"
+//            putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList<Uri>(uris))
+//            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//        }
+//        startActivity(Intent.createChooser(shareIntent, "Share files via"))
+//    }
+//
+//    private fun unpinSelectedFiles() {
+//        adapter.getSelectedFiles().forEach { pinnedViewModel.unpinFile(it.file) }
+//        adapter.clearSelection()
+//        toggleSelectionBar(false)
+//    }
 
 
     /* optional: preview click handler */

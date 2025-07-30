@@ -167,10 +167,14 @@ class SavedFileAdapter(
 
                 // ✅ Menu button logic
                 fileHolder.binding.menuButton.setOnClickListener { anchorView ->
-                    val popupView = LayoutInflater.from(anchorView.context).inflate(R.layout.custom_file_popup, null)
+                    val context = anchorView.context
+                    val density = context.resources.displayMetrics.density
+                    val popupWidth = (150 * density).toInt() // Fixed 200dp width
+
+                    val popupView = LayoutInflater.from(context).inflate(R.layout.custom_file_popup, null)
                     val popupWindow = PopupWindow(
                         popupView,
-                        WindowManager.LayoutParams.WRAP_CONTENT,
+                        popupWidth,
                         WindowManager.LayoutParams.WRAP_CONTENT,
                         true
                     )
@@ -179,41 +183,40 @@ class SavedFileAdapter(
                     popupWindow.isOutsideTouchable = true
                     popupWindow.isFocusable = true
 
-                    // Measure popup size
+                    // Measure height after inflating
                     popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-                    val popupWidth = popupView.measuredWidth
                     val popupHeight = popupView.measuredHeight
 
-                    // Screen dimensions
-                    val screenWidth = Resources.getSystem().displayMetrics.widthPixels
+                    // Get screen dimensions
                     val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+                    val screenWidth = Resources.getSystem().displayMetrics.widthPixels
 
-                    // Get anchor (button) position on screen
+                    // Get anchor view location on screen
                     val location = IntArray(2)
                     anchorView.getLocationOnScreen(location)
                     val anchorX = location[0]
                     val anchorY = location[1]
                     val anchorHeight = anchorView.height
 
-                    // Optional margin
-                    val margin = (8 * anchorView.resources.displayMetrics.density).toInt()
+                    val bottomSpace = screenHeight - (anchorY + anchorHeight)
+                    val topSpace = anchorY
 
-                    // Determine where to show popup: above or below anchor
-                    val showAbove = popupHeight + margin > screenHeight - (anchorY + anchorHeight)
-
-                    // Calculate x: right-align with anchor (or clamp within screen)
-                    val x = minOf(anchorX + anchorView.width - popupWidth, screenWidth - popupWidth - margin)
-
-                    // Calculate y: show above or below the anchor
-                    val y = if (showAbove) {
-                        maxOf(anchorY - popupHeight - margin, margin)
+                    val x = anchorX + anchorView.width - popupWidth // Align right edge of popup to anchor
+                    val y = if (bottomSpace >= popupHeight) {
+                        // Show below anchor
+                        anchorY + anchorHeight
+                    } else if (topSpace >= popupHeight) {
+                        // Show above anchor
+                        anchorY - popupHeight
                     } else {
-                        anchorY + anchorHeight + margin
+                        // Fit within available space (e.g., center aligned)
+                        (screenHeight - popupHeight) / 2
                     }
 
-                    popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, x, y)
+                    // Show at calculated position
+                    popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, x.coerceAtLeast(0), y)
 
-                    // --- Menu options ---
+                    // --- Setup menu item clicks ---
                     popupView.findViewById<LinearLayout>(R.id.menuSelect).setOnClickListener {
                         isSelectionMode = true
                         file.isSelected = true
@@ -257,6 +260,7 @@ class SavedFileAdapter(
                         clearSelection()
                     }
                 }
+
 
             }
         }
