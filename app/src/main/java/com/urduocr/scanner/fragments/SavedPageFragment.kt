@@ -15,7 +15,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.urduocr.scanner.adapters.SavedFileAdapter
 import com.urduocr.scanner.models.FileListItem
-import com.urduocr.scanner.models.InternalFileModel
 import com.urduocr.scanner.viewmodels.PinnedFilesViewModel
 import com.urduocr.scanner.databinding.FragmentSavedPageBinding
 import java.io.File

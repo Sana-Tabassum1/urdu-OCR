@@ -29,6 +29,7 @@ class SavedFileAdapter(
     var fileActionListener: OnFileActionListener? = null,
     var onFolderClick: ((File) -> Unit)? = null
 
+
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -216,7 +217,22 @@ class SavedFileAdapter(
                     // Show at calculated position
                     popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, x.coerceAtLeast(0), y)
 
-                    // --- Setup menu item clicks ---
+                    // Get selected files
+                    val selectedFiles = getSelectedFiles()
+                    val isMultiSelect = selectedFiles.size > 1
+
+                    // Show/hide menu items based on selection state
+                    popupView.findViewById<LinearLayout>(R.id.menuSelect).visibility =
+                        if (isSelectionMode) View.GONE else View.VISIBLE
+
+                    popupView.findViewById<LinearLayout>(R.id.menupin).visibility =
+                        if (file.isPinned || isMultiSelect) View.GONE else View.VISIBLE
+
+
+
+                    // [Keep your existing popup positioning code here]
+
+                    // Set up click listeners
                     popupView.findViewById<LinearLayout>(R.id.menuSelect).setOnClickListener {
                         isSelectionMode = true
                         file.isSelected = true
@@ -226,27 +242,30 @@ class SavedFileAdapter(
                     }
 
                     popupView.findViewById<LinearLayout>(R.id.menuCopy).setOnClickListener {
-                        fileActionListener?.onCopy(fileObj)
+                        if (isSelectionMode) {
+                            selectedFiles.forEach { fileItem ->
+                                fileActionListener?.onCopy(File(fileItem.file.path))
+                            }
+                        } else {
+                            fileActionListener?.onCopy(fileObj)
+                        }
                         popupWindow.dismiss()
                         clearSelection()
                     }
 
                     popupView.findViewById<LinearLayout>(R.id.menuCut).setOnClickListener {
-                        fileActionListener?.onCut(fileObj)
+                        if (isSelectionMode) {
+                            selectedFiles.forEach { fileItem ->
+                                fileActionListener?.onCut(File(fileItem.file.path))
+                            }
+                        } else {
+                            fileActionListener?.onCut(fileObj)
+                        }
                         popupWindow.dismiss()
                         clearSelection()
                     }
 
-                    popupView.findViewById<LinearLayout>(R.id.menuPaste).setOnClickListener {
-                        fileActionListener?.onPaste()
-                        popupWindow.dismiss()
-                    }
-
-                    popupView.findViewById<LinearLayout>(R.id.menudelete).setOnClickListener {
-                        fileActionListener?.onDelete(fileObj)
-                        popupWindow.dismiss()
-                        clearSelection()
-                    }
+                    // [Keep other menu item click listeners unchanged]
 
                     popupView.findViewById<LinearLayout>(R.id.menupin).setOnClickListener {
                         fileActionListener?.onPin(fileObj)
@@ -254,11 +273,6 @@ class SavedFileAdapter(
                         clearSelection()
                     }
 
-                    popupView.findViewById<LinearLayout>(R.id.menushare).setOnClickListener {
-                        fileActionListener?.onShare(fileObj)
-                        popupWindow.dismiss()
-                        clearSelection()
-                    }
                 }
 
 

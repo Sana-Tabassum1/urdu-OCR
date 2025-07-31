@@ -26,6 +26,7 @@ import com.urduocr.scanner.databinding.FragmentSavedBinding
 import com.urduocr.scanner.interfaces.OnFileActionListener
 import com.urduocr.scanner.models.FileListItem
 import com.urduocr.scanner.models.InternalFileModel
+import com.urduocr.scanner.viewmodels.PinnedFilesViewModel
 import com.urduocr.scanner.viewmodels.SavedFileViewModel
 import java.io.File
 
@@ -43,6 +44,7 @@ class SavedFragment : Fragment() {
     private var isCut = false
     private lateinit var currentDir: File
     private val fileViewModel: SavedFileViewModel by activityViewModels()
+    private val pinnedViewModel: PinnedFilesViewModel by activityViewModels()
 
 
     override fun onCreateView(
@@ -66,7 +68,44 @@ class SavedFragment : Fragment() {
             override fun onPaste() = doPaste()
             override fun onDelete(file: File) = doDelete(file)
             override fun onShare(file: File) = doShare(file)
-            override fun onPin(file: File) = doPin(file)
+            override fun onPin(file: File) {
+                val internalModel = InternalFileModel(
+                    path = file.path,
+                    name = file.name,
+                    isSelected = false,
+                    isPinned = true,
+                    file = file,
+                    isFolder = file.isDirectory
+                )
+
+                if (!pinnedViewModel.isPinned(internalModel)) {
+                    pinnedViewModel.pinFile(internalModel)
+                    Toast.makeText(requireContext(), "File pinned", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "Already pinned", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onUnpin(file: File) {
+                val internalModel = InternalFileModel(
+                    path = file.path,
+                    name = file.name,
+                    isSelected = false,
+                    isPinned = false,
+                    file = file,
+                    isFolder = file.isDirectory
+                )
+
+                pinnedViewModel.unpinFile(internalModel)
+                Toast.makeText(requireContext(), "File unpinned", Toast.LENGTH_SHORT).show()
+            }
+
+
+
+
+
+
+
         }
         adapter.listener = object : SavedFileAdapter.OnSelectionChangedListener {
             override fun onItemSelectionChanged() {
@@ -80,6 +119,7 @@ class SavedFragment : Fragment() {
             }
         }
 
+
         binding.recyclerViewAllFiles.adapter = adapter
         setupSearchUi()
         setupSorting()
@@ -90,59 +130,45 @@ class SavedFragment : Fragment() {
         super.onResume()
         loadAllFiles()
     }
+
     private fun loadAllFiles() {
         allFiles = buildList {
             val items = currentDir.listFiles()?.toList() ?: emptyList()
             val folders = items.filter { it.isDirectory }.sortedBy { it.name }
-            val docs = items.filter { it.isFile && listOf(".pdf",".txt",".png",".jpg",".jpeg")
+            val docs = items.filter { it.isFile && listOf(".pdf", ".txt", ".png", ".jpg", ".jpeg")
                 .any { ext -> it.name.endsWith(ext, true) } }
                 .filter { !fileViewModel.removedFilePaths.contains(it.absolutePath) }
                 .sortedByDescending { it.lastModified() }
 
-
             if (folders.isNotEmpty()) add(FileListItem.Header("Folders"))
-            addAll(
-                folders.map {
-                    FileListItem.FileItem(
-                        InternalFileModel(
-                            name = it.name,
-                            path = it.absolutePath,
-                            isFolder = true,
-                            file = File(it.absolutePath)
-                        )
+            addAll(folders.map {
+                FileListItem.FileItem(
+                    InternalFileModel(
+                        name = it.name,
+                        path = it.absolutePath,
+                        isFolder = true,
+                        file = it,
+                        isPinned = pinnedViewModel.isPinned(it) // Use the File version of isPinned
                     )
-                }
-            )
-            if (docs.isNotEmpty()) add(FileListItem.Header("Files"))
-            addAll(
-                docs.map {
-                    FileListItem.FileItem(
-                        InternalFileModel(
-                            name = it.name,
-                            path = it.absolutePath,
-                            isFolder = false,
-                            file = it
-                        )
-                    )
-                }
-            )
+                )
+            })
 
+            if (docs.isNotEmpty()) add(FileListItem.Header("Files"))
+            addAll(docs.map {
+                FileListItem.FileItem(
+                    InternalFileModel(
+                        name = it.name,
+                        path = it.absolutePath,
+                        isFolder = false,
+                        file = it,
+                        isPinned = pinnedViewModel.isPinned(it) // Use the File version of isPinned
+                    )
+                )
+            })
         }
         adapter.updateList(allFiles)
-
-        // When user taps folder item:
-        adapter.onFolderClick = { f ->
-            childFragmentManager.beginTransaction()
-                .replace(
-                    R.id.container,
-                    SavedFragment().apply {
-                        arguments = Bundle().apply { putString("dirPath", f.absolutePath) }
-                    }
-                )
-                .addToBackStack(null)
-                .commit()
-        }
     }
+
 
     private fun doCopy(file: File) {
         fileViewModel.clearSelection()
@@ -170,7 +196,10 @@ class SavedFragment : Fragment() {
         Toast.makeText(requireContext(), "Deleted selected files", Toast.LENGTH_SHORT).show()
     }
     private fun doShare(file: File) { /* ... */ }
-    private fun doPin(file: File) { /* ... */ }
+
+
+
+
 
     private fun showCreateFolderDialog() {
         val input = EditText(requireContext())
@@ -412,6 +441,37 @@ class SavedFragment : Fragment() {
             adapter.clearSelection()
             popupWindow.dismiss()
         }
+        // 📌 PIN
+        popupView.findViewById<LinearLayout>(R.id.menupin).setOnClickListener {
+            if (selectedFiles.isNotEmpty()) {
+                selectedFiles.forEach { file ->
+                    val model = InternalFileModel(
+                        path = file.path,
+                        name = file.name,
+                        isSelected = false,
+                        isPinned = false,
+                        file = file,
+                        isFolder = file.isDirectory
+                    )
+
+                    if (!pinnedViewModel.isPinned(model)) {
+                        pinnedViewModel.pinFile(model)
+                        Toast.makeText(requireContext(), "Pinned ${file.name}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        pinnedViewModel.unpinFile(model)
+                        Toast.makeText(requireContext(), "Unpinned ${file.name}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                Toast.makeText(requireContext(), "No files selected to pin/unpin", Toast.LENGTH_SHORT).show()
+            }
+            adapter.clearSelection()
+            popupWindow.dismiss()
+        }
+
+
+
+
     }
 
 
@@ -442,10 +502,13 @@ class SavedFragment : Fragment() {
             )
         }
     }
-    override fun onDestroyView() {
-        super.onDestroyView()
-        fileViewModel.removedFilePaths.clear()
-    }
+
+
+
+
+
+
+
 
 
 }

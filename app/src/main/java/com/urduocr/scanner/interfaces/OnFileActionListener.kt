@@ -9,4 +9,5 @@ interface OnFileActionListener {
     fun onDelete(file: File)
     fun onShare(file: File)
     fun onPin(file: File)
+    fun onUnpin(files: File)
 }
