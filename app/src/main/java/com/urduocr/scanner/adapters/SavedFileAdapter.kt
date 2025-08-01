@@ -1,8 +1,10 @@
 package com.urduocr.scanner.adapters
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.graphics.Color
 import android.text.format.DateFormat
 import android.util.TypedValue
 import android.view.Gravity
@@ -13,8 +15,10 @@ import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.urduocr.scanner.R
 import com.urduocr.scanner.databinding.ItemFileHeaderBinding
 import com.urduocr.scanner.databinding.ItemSavedFileBinding
@@ -28,7 +32,6 @@ class SavedFileAdapter(
     var listener: OnSelectionChangedListener? = null,
     var fileActionListener: OnFileActionListener? = null,
     var onFolderClick: ((File) -> Unit)? = null
-
 
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -115,56 +118,57 @@ class SavedFileAdapter(
                     "SIZE: $sizeFormatted    DATE: $formattedDate"
                 val selectedCount = fileList.count { it is FileListItem.FileItem && it.file.isSelected }
 
-                fileHolder.binding.menuButton.visibility = when {
-                    selectedCount > 1 -> View.GONE
-                    selectedCount == 1 && file.isSelected -> View.VISIBLE
-                    selectedCount == 1 && !file.isSelected -> View.GONE
-                    else -> View.VISIBLE
+
+
+                fileHolder.binding.menuButton.visibility = if (isSelectionMode) {
+                    View.GONE
+                } else {
+                    View.VISIBLE
                 }
 
 
-
-                // ✅ Show selection icon only in selection mode
+// 3. Checkbox visibility - show only in selection mode AND if items are selected
                 fileHolder.binding.checkBoxSelect.visibility =
-                    if (isSelectionMode) View.VISIBLE else View.GONE
+                    if (isSelectionMode && getSelectedCount() > 0) View.VISIBLE else View.GONE
+
+
+
 
                 if (isSelectionMode) {
                     fileHolder.binding.checkBoxSelect.setImageResource(
                         if (file.isSelected) R.drawable.ratio_checked else R.drawable.ratio_unchecked
                     )
                 }
+                fileHolder.binding.root.setOnLongClickListener {
+                    if (!isSelectionMode) {
+                        isSelectionMode = true
+                        file.isSelected = true
+                        notifyDataSetChanged()
+                        listener?.onItemSelectionChanged()
+                    }
+                    true // important: to consume the long click
+                }
+
 
                 // ✅ Click to toggle selection
                 fileHolder.binding.root.setOnClickListener {
                     if (isSelectionMode) {
                         file.isSelected = !file.isSelected
-
-                        // 🔹 If no items are selected now → exit selection mode
                         if (getSelectedCount() == 0) {
                             isSelectionMode = false
                         }
-
                         notifyDataSetChanged()
                         listener?.onItemSelectionChanged()
                     } else {
                         if (file.isFolder) {
-                            fileHolder.binding.root.setOnClickListener {
-                                onFolderClick?.invoke(File(file.path))
-                            }
+                            onFolderClick?.invoke(File(file.path))
                         } else {
                             openFile(fileObj, file.name)
                         }
                     }
                 }
 
-                // ✅ Long click → enable selection mode
-                fileHolder.binding.root.setOnLongClickListener {
-                    isSelectionMode = true
-                    file.isSelected = true
-                    notifyDataSetChanged()
-                    listener?.onItemSelectionChanged()
-                    true
-                }
+
 
                 // ✅ Menu button logic
                 fileHolder.binding.menuButton.setOnClickListener { anchorView ->
@@ -221,16 +225,27 @@ class SavedFileAdapter(
                     val selectedFiles = getSelectedFiles()
                     val isMultiSelect = selectedFiles.size > 1
 
-                    // Show/hide menu items based on selection state
-                    popupView.findViewById<LinearLayout>(R.id.menuSelect).visibility =
-                        if (isSelectionMode) View.GONE else View.VISIBLE
+                    fileHolder.binding.menuButton.visibility =
+                        if (file.isSelected) View.GONE else View.VISIBLE
 
+
+                    popupView.findViewById<LinearLayout>(R.id.menushare).visibility =
+                        if (file.isFolder) View.GONE else View.VISIBLE
+
+                    // Inside the popup menu setup
                     popupView.findViewById<LinearLayout>(R.id.menupin).visibility =
-                        if (file.isPinned || isMultiSelect) View.GONE else View.VISIBLE
+                        if (file.isPinned) View.GONE else View.VISIBLE
 
+                    popupView.findViewById<LinearLayout>(R.id.menuUnpin).visibility =
+                        if (file.isPinned) View.VISIBLE else View.GONE
 
 
                     // [Keep your existing popup positioning code here]
+                    // Menu button visibility - hide when selected or for folders
+                    fileHolder.binding.menuButton.visibility = when {
+                        file.isSelected -> View.GONE
+                        else -> View.VISIBLE
+                    }
 
                     // Set up click listeners
                     popupView.findViewById<LinearLayout>(R.id.menuSelect).setOnClickListener {
@@ -266,12 +281,70 @@ class SavedFileAdapter(
                     }
 
                     // [Keep other menu item click listeners unchanged]
-
                     popupView.findViewById<LinearLayout>(R.id.menupin).setOnClickListener {
                         fileActionListener?.onPin(fileObj)
                         popupWindow.dismiss()
                         clearSelection()
                     }
+
+                    popupView.findViewById<LinearLayout>(R.id.menuUnpin).setOnClickListener {
+                        fileActionListener?.onUnpin(fileObj)
+                        popupWindow.dismiss()
+                        clearSelection()
+                    }
+//                    // View File
+//                    popupView.findViewById<LinearLayout>(R.id.menuviewfile).setOnClickListener {
+//                        if (!file.isFolder) {
+//                            openFile(fileObj, file.name)
+//                        } else {
+//                            Toast.makeText(context, "Cannot view a folder", Toast.LENGTH_SHORT).show()
+//                        }
+//                        popupWindow.dismiss()
+//                    }
+
+// Share File
+                    popupView.findViewById<LinearLayout>(R.id.menushare).setOnClickListener {
+                        try {
+                            val uri = FileProvider.getUriForFile(
+                                context,
+                                context.packageName + ".fileprovider",
+                                fileObj
+                            )
+                            val shareIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                type = when {
+                                    file.name.endsWith(".pdf") -> "application/pdf"
+                                    file.name.endsWith(".txt") -> "text/plain"
+                                    file.name.endsWith(".png") -> "image/png"
+                                    else -> "*/*"
+                                }
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            context.startActivity(Intent.createChooser(shareIntent, "Share file via"))
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Unable to share: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
+                        popupWindow.dismiss()
+                    }
+
+// Delete File
+                    popupView.findViewById<LinearLayout>(R.id.menudelete).setOnClickListener {
+                        // Show confirmation dialog
+                        showDeleteConfirmationDialog(fileObj) {
+                            // This lambda will execute if user confirms deletion
+                            if (fileObj.exists()) {
+                                if (fileObj.deleteRecursively()) {
+                                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                                    fileActionListener?.onDelete(fileObj)
+                                } else {
+                                    Toast.makeText(context, "Failed to delete", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                        popupWindow.dismiss()
+                    }
+
 
                 }
 
@@ -279,8 +352,8 @@ class SavedFileAdapter(
             }
         }
     }
-
-    private fun openFile(fileObj: File, name: String) {
+//viewfile open
+private fun openFile(fileObj: File, name: String) {
         try {
             val uri = FileProvider.getUriForFile(
                 context,
@@ -325,6 +398,20 @@ class SavedFileAdapter(
         isSelectionMode = false
         notifyDataSetChanged()
     }
+    private fun showDeleteConfirmationDialog(file: File, onConfirm: () -> Unit) {
+        val alertDialog = AlertDialog.Builder(context)
+            .setTitle("Delete File")
+            .setMessage("Are you sure you want to delete ${file.name}?")
+            .setPositiveButton("Delete") { dialog, _ ->
+                onConfirm()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
 
+        alertDialog.show()
+    }
     override fun getItemCount(): Int = fileList.size
 }

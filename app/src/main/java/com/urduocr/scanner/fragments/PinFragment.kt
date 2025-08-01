@@ -6,6 +6,7 @@ import android.content.res.Resources
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,6 +46,7 @@ class PinFragment : Fragment(), SavedFileAdapter.OnSelectionChangedListener {
     private var isNameAsc = true
     private var isDateAsc = true
     private var isSizeAsc = true
+    private lateinit var currentDir: File
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,11 +69,61 @@ class PinFragment : Fragment(), SavedFileAdapter.OnSelectionChangedListener {
 
         setupSearchUi()
         setupSorting()
+        //observer
         pinnedViewModel.pinnedFiles.observe(viewLifecycleOwner) { pinnedFiles ->
             val pinnedItems = pinnedFiles.map { fileModel ->
                 FileListItem.FileItem(fileModel)
             }
-            adapter.updateList(pinnedItems)
+            allFiles = pinnedItems
+            applyCurrentSort()
+        }
+
+        currentDir = arguments?.getString("dirPath")?.let(::File)
+            ?: requireContext().filesDir
+        adapter.fileActionListener = object : OnFileActionListener {
+            override fun onCopy(file: File) = doCopy(file)
+            override fun onCut(file: File) = doCut(file)
+            override fun onPaste() = doPaste()
+            override fun onDelete(file: File) = doDelete(file)
+            override fun onShare(file: File) = doShare(file)
+            override fun onPin(file: File) {
+                val internalModel = InternalFileModel(
+                    path = file.path,
+                    name = file.name,
+                    isSelected = false,
+                    isPinned = true,
+                    file = file,
+                    isFolder = file.isDirectory
+                )
+
+                if (!pinnedViewModel.isPinned(internalModel)) {
+                    pinnedViewModel.pinFile(internalModel)
+                    Toast.makeText(requireContext(), "File pinned", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "Already pinned", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onUnpin(file: File) {
+                val internalModel = InternalFileModel(
+                    path = file.path,
+                    name = file.name,
+                    isSelected = false,
+                    isPinned = false,
+                    file = file,
+                    isFolder = file.isDirectory
+                )
+
+                pinnedViewModel.unpinFile(internalModel)
+                Toast.makeText(requireContext(), "File unpinned", Toast.LENGTH_SHORT).show()
+            }
+
+
+
+
+
+
+
         }
 
         adapter.listener = object : SavedFileAdapter.OnSelectionChangedListener {
@@ -102,6 +154,34 @@ class PinFragment : Fragment(), SavedFileAdapter.OnSelectionChangedListener {
             findNavController().navigate(R.id.action_nav_pinned_to_modelScreenFragment)
         }
     }
+
+
+    private fun doCopy(file: File) {
+        fileViewModel.clearSelection()
+        fileViewModel.selectFile(file)
+        fileViewModel.copyFiles()
+        Toast.makeText(requireActivity(), "Copied ${file.name}",Toast.LENGTH_SHORT).show()
+    }
+    private fun doCut(file: File) {
+        fileViewModel.clearSelection()
+        fileViewModel.selectFile(file)
+        fileViewModel.cutFiles()
+        Toast.makeText(requireActivity(), "Cut ${file.name}",Toast.LENGTH_SHORT).show()
+    }
+    private fun doPaste() {
+        fileViewModel.pasteFiles(currentDir)
+        loadAllFiles()
+        Toast.makeText(requireContext(), "Pasted to ${currentDir.name}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun doDelete(file: File) {
+        fileViewModel.clearSelection()
+        fileViewModel.selectFile(file)
+        fileViewModel.deleteSelected()
+        loadAllFiles()
+        Toast.makeText(requireContext(), "Deleted selected files", Toast.LENGTH_SHORT).show()
+    }
+    private fun doShare(file: File) { /* ... */ }
 
     // 🔍 SEARCH – untouched
     private fun setupSearchUi() {
@@ -279,9 +359,11 @@ class PinFragment : Fragment(), SavedFileAdapter.OnSelectionChangedListener {
 
     //popup menu
     private fun showCustomPopupMenu(anchor: View) {
-        val popupView = LayoutInflater.from(requireContext()).inflate(R.layout.popup_menu_pin, null)
-        val popupWidth = (200 * resources.displayMetrics.density).toInt()
+        val context = anchor.context
+        val density = context.resources.displayMetrics.density
+        val popupWidth = (150 * density).toInt() // Fixed 200dp width
 
+        val popupView = LayoutInflater.from(context).inflate(R.layout.popup_menu_pin, null)
         val popupWindow = PopupWindow(
             popupView,
             popupWidth,
@@ -291,13 +373,40 @@ class PinFragment : Fragment(), SavedFileAdapter.OnSelectionChangedListener {
 
         popupWindow.elevation = 10f
         popupWindow.isOutsideTouchable = true
+        popupWindow.isFocusable = true
 
+        // Measure height after inflating
+        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        val popupHeight = popupView.measuredHeight
+
+        // Get screen dimensions
+        val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+        val screenWidth = Resources.getSystem().displayMetrics.widthPixels
+
+        // Get anchor view location on screen
         val location = IntArray(2)
         anchor.getLocationOnScreen(location)
-        val screenWidth = Resources.getSystem().displayMetrics.widthPixels
-        val rightMargin = (16 * resources.displayMetrics.density).toInt()
-        val xOffset = screenWidth - (location[0] + popupWidth) - rightMargin
-        popupWindow.showAsDropDown(anchor, xOffset, 0)
+        val anchorX = location[0]
+        val anchorY = location[1]
+        val anchorHeight = anchor.height
+
+        val bottomSpace = screenHeight - (anchorY + anchorHeight)
+        val topSpace = anchorY
+
+        val x = anchorX + anchor.width - popupWidth // Align right edge of popup to anchor
+        val y = if (bottomSpace >= popupHeight) {
+            // Show below anchor
+            anchorY + anchorHeight
+        } else if (topSpace >= popupHeight) {
+            // Show above anchor
+            anchorY - popupHeight
+        } else {
+            // Fit within available space (e.g., center aligned)
+            (screenHeight - popupHeight) / 2
+        }
+
+        // Show at calculated position
+        popupWindow.showAtLocation(anchor, Gravity.NO_GRAVITY, x.coerceAtLeast(0), y)
 
         // Get current selected files
         val selectedFiles = adapter.getSelectedFiles()
@@ -391,11 +500,27 @@ class PinFragment : Fragment(), SavedFileAdapter.OnSelectionChangedListener {
             val pinnedItems = pinnedFiles.map { fileModel ->
                 FileListItem.FileItem(fileModel)
             }
-            adapter.updateList(pinnedItems)
+            allFiles = pinnedItems // ✅ Important
+            adapter.updateList(allFiles)
         }
     }
-    override fun onItemSelectionChanged() {
-        TODO("Not yet implemented")
+    private fun applyCurrentSort() {
+        when {
+            !isNameAsc -> sortByNameDesc()
+            !isDateAsc -> sortByDateDesc()
+            !isSizeAsc -> sortBySizeDesc()
+            else -> adapter.updateList(allFiles)
+        }
     }
+
+
+    override fun onItemSelectionChanged() {
+        val selectedFiles = adapter.getSelectedFiles()
+            .filterIsInstance<FileListItem.FileItem>()
+            .map { File(it.file.path) }
+
+        Toast.makeText(requireContext(), "${selectedFiles.size} selected", Toast.LENGTH_SHORT).show()
+    }
+
 
 }

@@ -7,6 +7,7 @@ import android.content.res.Resources
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,8 +41,7 @@ class SavedFragment : Fragment() {
     private var isSizeAsc = true
 
     private var allFiles: List<FileListItem> = emptyList()
-    private val clipboard = mutableListOf<File>()
-    private var isCut = false
+
     private lateinit var currentDir: File
     private val fileViewModel: SavedFileViewModel by activityViewModels()
     private val pinnedViewModel: PinnedFilesViewModel by activityViewModels()
@@ -128,17 +128,22 @@ class SavedFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        validateCurrentDir()
         loadAllFiles()
     }
 
     private fun loadAllFiles() {
+        // Clear any existing removed file paths
+        fileViewModel.removedFilePaths.clear()
+
         allFiles = buildList {
-            val items = currentDir.listFiles()?.toList() ?: emptyList()
-            val folders = items.filter { it.isDirectory }.sortedBy { it.name }
-            val docs = items.filter { it.isFile && listOf(".pdf", ".txt", ".png", ".jpg", ".jpeg")
-                .any { ext -> it.name.endsWith(ext, true) } }
-                .filter { !fileViewModel.removedFilePaths.contains(it.absolutePath) }
-                .sortedByDescending { it.lastModified() }
+            val items = currentDir.listFiles()?.toList()?.distinct() ?: emptyList() // Add distinct()
+
+            // Folders first
+            val folders = items
+                .filter { it.isDirectory }
+                .filter { it.exists() } // Add existence check
+                .sortedBy { it.name }
 
             if (folders.isNotEmpty()) add(FileListItem.Header("Folders"))
             addAll(folders.map {
@@ -148,10 +153,18 @@ class SavedFragment : Fragment() {
                         path = it.absolutePath,
                         isFolder = true,
                         file = it,
-                        isPinned = pinnedViewModel.isPinned(it) // Use the File version of isPinned
-                    )
+                        isPinned = pinnedViewModel.isPinned(it)
+                    ) // This closing parenthesis was missing
                 )
             })
+
+            // Then files
+            val docs = items
+                .filter { it.isFile }
+                .filter { listOf(".pdf", ".txt", ".png", ".jpg", ".jpeg")
+                    .any { ext -> it.name.endsWith(ext, true) } }
+                .filter { it.exists() } // Add existence check
+                .sortedByDescending { it.lastModified() }
 
             if (docs.isNotEmpty()) add(FileListItem.Header("Files"))
             addAll(docs.map {
@@ -161,12 +174,23 @@ class SavedFragment : Fragment() {
                         path = it.absolutePath,
                         isFolder = false,
                         file = it,
-                        isPinned = pinnedViewModel.isPinned(it) // Use the File version of isPinned
+                        isPinned = pinnedViewModel.isPinned(it)
                     )
                 )
             })
         }
         adapter.updateList(allFiles)
+    }
+    // Add this function to validate the current directory
+    private fun validateCurrentDir() {
+        if (!currentDir.exists() || !currentDir.isDirectory) {
+            currentDir = requireContext().filesDir
+            Toast.makeText(
+                requireContext(),
+                "Invalid directory, using default",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
 
@@ -202,15 +226,41 @@ class SavedFragment : Fragment() {
 
 
     private fun showCreateFolderDialog() {
-        val input = EditText(requireContext())
+        val input = EditText(requireContext()).apply {
+            hint = "Folder name"
+        }
+
         AlertDialog.Builder(requireContext())
             .setTitle("Create Folder")
             .setView(input)
             .setPositiveButton("Create") { _, _ ->
-                val newF = File(currentDir, input.text.toString())
-                if (!newF.exists() && newF.mkdir()) loadAllFiles()
-                else Toast.makeText(requireContext(), "Failed or exists", Toast.LENGTH_SHORT).show()
-            }.setNegativeButton("Cancel",null).show()
+                val folderName = input.text.toString().trim()
+                if (folderName.isNotEmpty()) {
+                    val newFolder = File(currentDir, folderName)
+                    if (newFolder.exists()) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Folder already exists",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else if (newFolder.mkdir()) {
+                        loadAllFiles()
+                        Toast.makeText(
+                            requireContext(),
+                            "Folder created",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Failed to create folder",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun setupSearchUi() {
@@ -364,9 +414,11 @@ class SavedFragment : Fragment() {
 
     //popup menu
     private fun showCustomPopupMenu(anchor: View) {
-        val popupView = LayoutInflater.from(requireContext()).inflate(R.layout.popup_menu_save, null)
-        val popupWidth = (200 * resources.displayMetrics.density).toInt()
+        val context = anchor.context
+        val density = context.resources.displayMetrics.density
+        val popupWidth = (150 * density).toInt() // Fixed 200dp width
 
+        val popupView = LayoutInflater.from(context).inflate(R.layout.popup_menu_save, null)
         val popupWindow = PopupWindow(
             popupView,
             popupWidth,
@@ -376,13 +428,40 @@ class SavedFragment : Fragment() {
 
         popupWindow.elevation = 10f
         popupWindow.isOutsideTouchable = true
+        popupWindow.isFocusable = true
 
+        // Measure height after inflating
+        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        val popupHeight = popupView.measuredHeight
+
+        // Get screen dimensions
+        val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+        val screenWidth = Resources.getSystem().displayMetrics.widthPixels
+
+        // Get anchor view location on screen
         val location = IntArray(2)
         anchor.getLocationOnScreen(location)
-        val screenWidth = Resources.getSystem().displayMetrics.widthPixels
-        val rightMargin = (16 * resources.displayMetrics.density).toInt()
-        val xOffset = screenWidth - (location[0] + popupWidth) - rightMargin
-        popupWindow.showAsDropDown(anchor, xOffset, 0)
+        val anchorX = location[0]
+        val anchorY = location[1]
+        val anchorHeight = anchor.height
+
+        val bottomSpace = screenHeight - (anchorY + anchorHeight)
+        val topSpace = anchorY
+
+        val x = anchorX + anchor.width - popupWidth // Align right edge of popup to anchor
+        val y = if (bottomSpace >= popupHeight) {
+            // Show below anchor
+            anchorY + anchorHeight
+        } else if (topSpace >= popupHeight) {
+            // Show above anchor
+            anchorY - popupHeight
+        } else {
+            // Fit within available space (e.g., center aligned)
+            (screenHeight - popupHeight) / 2
+        }
+
+        // Show at calculated position
+        popupWindow.showAtLocation(anchor, Gravity.NO_GRAVITY, x.coerceAtLeast(0), y)
 
         // Select Mode (you can enhance this later)
         popupView.findViewById<LinearLayout>(R.id.menuSelect).setOnClickListener {
