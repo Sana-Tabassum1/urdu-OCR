@@ -21,6 +21,8 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.urduocr.scanner.R
 import com.urduocr.scanner.adapters.SavedFileAdapter
 import com.urduocr.scanner.databinding.FragmentSavedBinding
@@ -43,6 +45,8 @@ class SavedFragment : Fragment() {
     private var allFiles: List<FileListItem> = emptyList()
 
     private lateinit var currentDir: File
+    private var isGridView = false
+
     private val fileViewModel: SavedFileViewModel by activityViewModels()
     private val pinnedViewModel: PinnedFilesViewModel by activityViewModels()
 
@@ -99,6 +103,23 @@ class SavedFragment : Fragment() {
                 pinnedViewModel.unpinFile(internalModel)
                 Toast.makeText(requireContext(), "File unpinned", Toast.LENGTH_SHORT).show()
             }
+            override fun onRenameFolder(oldFile: File, newName: String) {
+                val newFile = File(oldFile.parent, newName)
+
+                if (newFile.exists()) {
+                    Toast.makeText(requireContext(), "A folder with this name already exists", Toast.LENGTH_SHORT).show()
+                    return
+                }
+
+                if (oldFile.renameTo(newFile)) {
+                    Toast.makeText(requireContext(), "Folder renamed", Toast.LENGTH_SHORT).show()
+                    loadAllFiles() // Refresh the list
+                } else {
+                    Toast.makeText(requireContext(), "Failed to rename folder", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+
 
 
 
@@ -514,6 +535,19 @@ class SavedFragment : Fragment() {
             popupWindow.dismiss()
         }
 
+        // 🔲 Switch to Grid View
+        popupView.findViewById<LinearLayout>(R.id.menUICON).setOnClickListener {
+            toggleView(true)
+            popupWindow.dismiss()
+        }
+// 📄 Switch to List View
+
+        popupView.findViewById<LinearLayout>(R.id.menuviewfile).setOnClickListener {
+            toggleView(false)
+            popupWindow.dismiss()
+        }
+
+
         // 📁 Create Folder
         popupView.findViewById<LinearLayout>(R.id.menufolder).setOnClickListener {
             showCreateFolderDialog()
@@ -554,6 +588,31 @@ class SavedFragment : Fragment() {
     }
 
 
+    private fun setupRecyclerView() {
+        binding.recyclerViewAllFiles.adapter = adapter
+
+        binding.recyclerViewAllFiles.layoutManager = if (isGridView) {
+            GridLayoutManager(requireContext(), 2).apply {
+                spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int): Int {
+                        return when (adapter.getItemViewType(position)) {
+                            SavedFileAdapter.VIEW_TYPE_HEADER -> 2 // Access through adapter class
+                            else -> 1
+                        }
+                    }
+                }
+            }
+        } else {
+            LinearLayoutManager(requireContext())
+        }
+    }
+
+    private fun toggleView(isGrid: Boolean) {
+        isGridView = isGrid
+        setupRecyclerView() // This will now use the updated layout manager
+        // Update adapter
+        adapter.setGridViewMode(isGridView)
+    }
 
 
 

@@ -10,4 +10,5 @@ interface OnFileActionListener {
     fun onShare(file: File)
     fun onPin(file: File)
     fun onUnpin(files: File)
+    fun onRenameFolder(oldFile: File, newName: String)
 }

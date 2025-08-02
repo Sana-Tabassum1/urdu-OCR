@@ -118,10 +118,9 @@ class PinFragment : Fragment(), SavedFileAdapter.OnSelectionChangedListener {
                 Toast.makeText(requireContext(), "File unpinned", Toast.LENGTH_SHORT).show()
             }
 
+            override fun onRenameFolder(oldFile: File, newName: String) {
 
-
-
-
+            }
 
 
         }
