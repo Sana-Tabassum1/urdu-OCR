@@ -28,6 +28,7 @@
             />
     </LinearLayout>
     <View
+        android:id="@+id/viewRename"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#EEEEEE"/>
@@ -158,6 +159,7 @@
             />
     </LinearLayout>
     <View
+        android:id="@+id/viewpin"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#EEEEEE"/>
@@ -183,6 +185,7 @@
             />
     </LinearLayout>
     <View
+        android:id="@+id/viewunpin"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#EEEEEE"/>
@@ -208,6 +211,7 @@
             />
     </LinearLayout>
     <View
+        android:id="@+id/viewShare"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#EEEEEE"/>

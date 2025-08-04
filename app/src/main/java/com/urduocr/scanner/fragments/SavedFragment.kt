@@ -24,6 +24,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.urduocr.scanner.R
+import com.urduocr.scanner.ViewPreferenceManager
 import com.urduocr.scanner.adapters.SavedFileAdapter
 import com.urduocr.scanner.databinding.FragmentSavedBinding
 import com.urduocr.scanner.interfaces.OnFileActionListener
@@ -46,6 +47,7 @@ class SavedFragment : Fragment() {
 
     private lateinit var currentDir: File
     private var isGridView = false
+    private lateinit var viewPreferenceManager: ViewPreferenceManager
 
     private val fileViewModel: SavedFileViewModel by activityViewModels()
     private val pinnedViewModel: PinnedFilesViewModel by activityViewModels()
@@ -61,7 +63,7 @@ class SavedFragment : Fragment() {
 
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
-
+        viewPreferenceManager = ViewPreferenceManager(requireContext())
         currentDir = arguments?.getString("dirPath")?.let(::File)
             ?: requireContext().filesDir
 
@@ -145,12 +147,21 @@ class SavedFragment : Fragment() {
         setupSearchUi()
         setupSorting()
         binding.ivMenu.setOnClickListener { showCustomPopupMenu(it) }
+        // Load saved preference
+        isGridView = viewPreferenceManager.getViewPreference()
+        setupRecyclerView() // Apply the saved layout
+
     }
 
     override fun onResume() {
         super.onResume()
         validateCurrentDir()
         loadAllFiles()
+
+        // Add these lines to restore layout mode
+        isGridView = viewPreferenceManager.getViewPreference()
+        setupRecyclerView()
+        adapter.setGridViewMode(isGridView)
     }
 
     private fun loadAllFiles() {
@@ -158,48 +169,66 @@ class SavedFragment : Fragment() {
         fileViewModel.removedFilePaths.clear()
 
         allFiles = buildList {
-            val items = currentDir.listFiles()?.toList()?.distinct() ?: emptyList() // Add distinct()
+            // Get files from directory, excluding deleted ones
+            val items = currentDir.listFiles()
+                ?.asSequence()
+                ?.distinct()
+                ?.filterNot { file ->
+                    fileViewModel.removedFilePaths.contains(file.absolutePath) ||
+                            !file.exists()
+                }
+                ?.toList() ?: emptyList()
 
-            // Folders first
+            // Process folders
             val folders = items
                 .filter { it.isDirectory }
-                .filter { it.exists() } // Add existence check
-                .sortedBy { it.name }
+                .sortedBy { it.name.lowercase() } // Case-insensitive sorting
 
-            if (folders.isNotEmpty()) add(FileListItem.Header("Folders"))
-            addAll(folders.map {
-                FileListItem.FileItem(
-                    InternalFileModel(
-                        name = it.name,
-                        path = it.absolutePath,
-                        isFolder = true,
-                        file = it,
-                        isPinned = pinnedViewModel.isPinned(it)
-                    ) // This closing parenthesis was missing
-                )
-            })
+            if (folders.isNotEmpty()) {
+                add(FileListItem.Header("Folders"))
+                addAll(folders.map {
+                    FileListItem.FileItem(
+                        InternalFileModel(
+                            name = it.name,
+                            path = it.absolutePath,
+                            isFolder = true,
+                            file = it,
+                            isPinned = pinnedViewModel.isPinned(it),
+                            isSelected = false // Reset selection state
+                        )
+                    )
+                })
+            }
 
-            // Then files
+            // Process files with supported extensions
+            val supportedExtensions = listOf(".pdf", ".txt", ".png", ".jpg", ".jpeg")
             val docs = items
                 .filter { it.isFile }
-                .filter { listOf(".pdf", ".txt", ".png", ".jpg", ".jpeg")
-                    .any { ext -> it.name.endsWith(ext, true) } }
-                .filter { it.exists() } // Add existence check
+                .filter { file ->
+                    supportedExtensions.any { ext ->
+                        file.name.endsWith(ext, ignoreCase = true)
+                    }
+                }
                 .sortedByDescending { it.lastModified() }
 
-            if (docs.isNotEmpty()) add(FileListItem.Header("Files"))
-            addAll(docs.map {
-                FileListItem.FileItem(
-                    InternalFileModel(
-                        name = it.name,
-                        path = it.absolutePath,
-                        isFolder = false,
-                        file = it,
-                        isPinned = pinnedViewModel.isPinned(it)
+            if (docs.isNotEmpty()) {
+                add(FileListItem.Header("Files"))
+                addAll(docs.map {
+                    FileListItem.FileItem(
+                        InternalFileModel(
+                            name = it.name,
+                            path = it.absolutePath,
+                            isFolder = false,
+                            file = it,
+                            isPinned = pinnedViewModel.isPinned(it),
+                            isSelected = false // Reset selection state
+                        )
                     )
-                )
-            })
+                })
+            }
         }
+
+        // Update adapter with new list
         adapter.updateList(allFiles)
     }
     // Add this function to validate the current directory
@@ -447,7 +476,7 @@ class SavedFragment : Fragment() {
             true
         )
 
-        popupWindow.elevation = 10f
+//        popupWindow.elevation = 10f
         popupWindow.isOutsideTouchable = true
         popupWindow.isFocusable = true
 
@@ -582,6 +611,45 @@ class SavedFragment : Fragment() {
             popupWindow.dismiss()
         }
 
+        popupView.findViewById<LinearLayout>(R.id.menuSelect).setOnClickListener {
+            adapter.selectAllItems()
+            Toast.makeText(requireContext(), "All items selected", Toast.LENGTH_SHORT).show()
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<LinearLayout>(R.id.menudelete).setOnClickListener {
+            val selectedCount = adapter.getSelectedFiles().size
+            if (selectedCount == 0) {
+                Toast.makeText(requireContext(), "No files selected", Toast.LENGTH_SHORT).show()
+                popupWindow.dismiss()
+                return@setOnClickListener
+            }
+
+            AlertDialog.Builder(requireContext())
+                .setTitle("Delete $selectedCount files?")
+                .setMessage("Are you sure you want to delete these files?")
+                .setPositiveButton("Delete") { _, _ ->
+                    // Get selected files before deletion
+                    val selectedFiles = adapter.getSelectedFiles()
+                        .map { File(it.file.path) }
+
+                    // Delete from adapter
+                    if (adapter.deleteSelectedFiles()) {
+                        // Delete actual files
+                        selectedFiles.forEach { file ->
+                            if (file.exists()) {
+                                file.delete()
+                                fileViewModel.removedFilePaths.add(file.absolutePath)
+                            }
+                        }
+                        Toast.makeText(requireContext(), "Deleted $selectedCount files", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+
+            popupWindow.dismiss()
+        }
+
 
 
 
@@ -589,15 +657,13 @@ class SavedFragment : Fragment() {
 
 
     private fun setupRecyclerView() {
-        binding.recyclerViewAllFiles.adapter = adapter
-
         binding.recyclerViewAllFiles.layoutManager = if (isGridView) {
             GridLayoutManager(requireContext(), 2).apply {
                 spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                     override fun getSpanSize(position: Int): Int {
                         return when (adapter.getItemViewType(position)) {
-                            SavedFileAdapter.VIEW_TYPE_HEADER -> 2 // Access through adapter class
-                            else -> 1
+                            SavedFileAdapter.VIEW_TYPE_HEADER -> 2 // Headers take full width
+                            else -> 1 // Normal items take 1 span
                         }
                     }
                 }
@@ -609,10 +675,11 @@ class SavedFragment : Fragment() {
 
     private fun toggleView(isGrid: Boolean) {
         isGridView = isGrid
-        setupRecyclerView() // This will now use the updated layout manager
-        // Update adapter
+        viewPreferenceManager.saveViewPreference(isGridView) // Save preference
+        setupRecyclerView()
         adapter.setGridViewMode(isGridView)
     }
+
 
 
 

@@ -279,7 +279,7 @@ class SavedFileAdapter(
             true
         )
 
-        popupWindow.elevation = 10f
+//        popupWindow.elevation = 10f
         popupWindow.isOutsideTouchable = true
         popupWindow.isFocusable = true
 
@@ -312,18 +312,32 @@ class SavedFileAdapter(
         // Get selected files
         val selectedFiles = getSelectedFiles()
         val isMultiSelect = selectedFiles.size > 1
-        // Menu item visibility
+        // Share item & divider
         popupView.findViewById<LinearLayout>(R.id.menushare).visibility =
             if (file.isFolder) View.GONE else View.VISIBLE
+        popupView.findViewById<View>(R.id.viewShare).visibility =
+            if (file.isFolder) View.GONE else View.VISIBLE
 
+// Pin item & divider
         popupView.findViewById<LinearLayout>(R.id.menupin).visibility =
             if (file.isPinned) View.GONE else View.VISIBLE
+        popupView.findViewById<View>(R.id.viewpin).visibility =
+            if (file.isPinned) View.GONE else View.VISIBLE
 
+// Unpin item (divider will show only if Unpin is shown)
         popupView.findViewById<LinearLayout>(R.id.menuUnpin).visibility =
             if (file.isPinned) View.VISIBLE else View.GONE
+        popupView.findViewById<View>(R.id.viewunpin).visibility =
+            if (file.isPinned) View.VISIBLE else View.GONE
 
+// Rename item & divider
         popupView.findViewById<LinearLayout>(R.id.renameFolder).visibility =
             if (file.isFolder) View.VISIBLE else View.GONE
+        popupView.findViewById<View>(R.id.viewRename).visibility =
+            if (file.isFolder) View.VISIBLE else View.GONE
+
+
+
 
         // Set up click listeners
         popupView.findViewById<LinearLayout>(R.id.menuSelect).setOnClickListener {
@@ -572,10 +586,37 @@ class SavedFileAdapter(
     }
 
     fun setGridViewMode(isGrid: Boolean) {
-        if (isGridView != isGrid) {  // Only update if changed
-            isGridView = isGrid
-            notifyDataSetChanged()  // Force complete refresh
+        this.isGridView = isGrid
+        notifyDataSetChanged() // Force UI refresh
+    }
+
+    // Add these methods to your SavedFileAdapter class
+    fun selectAllItems() {
+        fileList.forEach { item ->
+            if (item is FileListItem.FileItem) {
+                item.file.isSelected = true
+            }
         }
+        isSelectionMode = true
+        notifyDataSetChanged()
+        listener?.onItemSelectionChanged()
+    }
+
+    fun deleteSelectedFiles(): Boolean {
+        val selectedFiles = getSelectedFiles()
+        if (selectedFiles.isEmpty()) return false
+
+        // Remove selected files from the list
+        val newList = fileList.toMutableList().apply {
+            removeAll { item ->
+                item is FileListItem.FileItem && item.file.isSelected
+            }
+        }
+
+        fileList = newList
+        isSelectionMode = false
+        notifyDataSetChanged()
+        return true
     }
     override fun getItemCount(): Int = fileList.size
 }

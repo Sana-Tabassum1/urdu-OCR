@@ -50,6 +50,9 @@ class SavedFileViewModel: ViewModel() {
         selectedFiles.forEach { it.delete() }
         clearSelection()
     }
+    fun clearDeletedPaths() {
+        removedFilePaths.clear()
+    }
     fun setSelectedFiles(files: List<File>) {
         selectedFiles.clear()
         selectedFiles.addAll(files)

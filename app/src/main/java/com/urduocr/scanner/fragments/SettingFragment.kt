@@ -11,12 +11,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.urduocr.scanner.R
 import com.urduocr.scanner.bottomsheet.ModelSelectorBottomSheet
 import com.urduocr.scanner.bottomsheet.SignInBottomSheet
@@ -112,8 +115,8 @@ class SettingFragment : Fragment() {
                 binding.voicebtn.rotation = 0f
             }
         }
-        binding.btncredits.setOnClickListener {
-            findNavController().navigate(R.id.action_settingFragment_to_modelScreenFragment)
+        binding.buycredits.setOnClickListener {
+            showCreditsBottomSheet()
         }
         binding.btnrestore.setOnClickListener {
             val sheet = SignInBottomSheet()
@@ -308,6 +311,21 @@ class SettingFragment : Fragment() {
         // 3️⃣  activity stack full remove + app close
         requireActivity().finishAffinity()        // ← All activities close
     }
+    private fun showCreditsBottomSheet() {
+        val bottomSheetView = LayoutInflater.from(requireContext()).inflate(R.layout.item_credit_package, null)
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        bottomSheetDialog.setContentView(bottomSheetView)
 
+        // Set behavior to expand fully by default
+        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        // Handle continue button click
+        bottomSheetView.findViewById<TextView>(R.id.btncontinue).setOnClickListener {
+            bottomSheetDialog.dismiss()
+            // Handle purchase logic here
+        }
+
+        bottomSheetDialog.show()
+    }
 
 }

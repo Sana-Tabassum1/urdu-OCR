@@ -84,80 +84,80 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/cridets_bg"
             android:padding="5dp">
+
+
+
 
 
             <ImageView
                 android:id="@+id/ivDiamond"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginStart="10dp"
-                android:src="@drawable/daimond_shape"
+                android:layout_width="62dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/dollar"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tvCreditsTitle"
-                app:layout_constraintBottom_toBottomOf="@+id/tvCreditsSub"/>
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                android:id="@+id/tvCreditsSub"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/nunito_bold"
+                android:text="Total scans left"
+                android:textColor="@color/gray"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="@+id/tvCreditsTitle"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/btnrestore"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                android:drawableStart="@drawable/retakeicon_small"
+                android:drawablePadding="8dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:fontFamily="@font/nunito_regular"
+                android:text="Restore Purchases"
+                android:textColor="@color/green1"
+                android:textSize="10sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tvCreditsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="24dp"
-                android:fontFamily="@font/poppins_semibold"
-                android:text="Scan Credits"
+                android:fontFamily="@font/nunito_bold"
+                android:text="350 OCR Credits"
                 android:textColor="@color/black"
-                android:textSize="16sp"
-                app:layout_constraintStart_toEndOf="@id/ivDiamond"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tvCreditsSub"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="10dp"
-                android:fontFamily="@font/poppins_regular"
-                android:text="You have 12 credits left!"
-                android:textColor="@color/lightgreen"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="@+id/tvCreditsTitle"
-                app:layout_constraintHorizontal_bias="0.0"
+                android:textSize="18sp"
                 app:layout_constraintStart_toEndOf="@+id/ivDiamond"
-                app:layout_constraintTop_toBottomOf="@id/tvCreditsTitle" />
+                app:layout_constraintTop_toBottomOf="@+id/tvCreditsSub" />
 
-            <TextView
-                android:id="@+id/btnrestore"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="?selectableItemBackground"
-                android:drawableStart="@drawable/retakeicon_small"
-                android:drawablePadding="8dp"
-                android:fontFamily="@font/poppins_regular"
-                android:text="Restore Purchases"
-                android:textColor="@color/black"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/btncredits"
-                app:layout_constraintTop_toBottomOf="@+id/btncredits"/>
 
-            <TextView
-                android:id="@+id/btncredits"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="5dp"
-                android:layout_marginEnd="10dp"
-                android:background="@drawable/round_corner"
-                android:backgroundTint="@color/green1"
-                android:fontFamily="@font/poppins_medium"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/buycredits"
+                android:layout_width="130dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/button_bg"
+                android:fontFamily="@font/nunito_light"
                 android:gravity="center"
-                android:text="Buy Credits"
-                android:textColor="@color/white"
+                android:text="BUY MORE CREDITS"
+                android:textColor="@color/green1"
                 android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tvCreditsTitle"
-                app:layout_constraintBottom_toBottomOf="@+id/tvCreditsSub"/>
+                app:layout_constraintEnd_toEndOf="@id/tvCreditsTitle"
+                app:layout_constraintHorizontal_bias="0.084"
+                app:layout_constraintStart_toStartOf="@id/tvCreditsTitle"
+                app:layout_constraintTop_toBottomOf="@+id/tvCreditsTitle" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
@@ -752,49 +752,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-
-                    <!-- Info Item -->
+                    <!-- Rate Item -->
                     <RelativeLayout
-                        android:id="@+id/info"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="?selectableItemBackground"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="12dp">
-
-                        <ImageView
-                            android:id="@+id/appInfoIcon"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/app_info"
-                            android:layout_centerVertical="true"/>
-
-                        <TextView
-                            android:id="@+id/infoText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_toEndOf="@id/appInfoIcon"
-                            android:text="Info"
-                            android:textColor="@color/black"
-                            android:textSize="12sp"
-                            android:layout_centerVertical="true"
-                            android:fontFamily="@font/poppins_regular" />
-
-                        <ImageView
-                            android:id="@+id/aboutApllication"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:padding="3dp"
-                            android:layout_centerVertical="true"
-                            android:layout_alignParentEnd="true"
-                            android:src="@drawable/arrw" />
-                    </RelativeLayout>
-
-                    <!-- Privacy Item -->
-                    <RelativeLayout
-                        android:id="@+id/privacy"
+                        android:id="@+id/rateSection"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="?selectableItemBackground"
@@ -805,18 +765,18 @@
                         <ImageView
                             android:layout_width="18dp"
                             android:layout_height="18dp"
-                            android:src="@drawable/privacy"
-                            android:id="@+id/privacyIcon"
-                            android:layout_centerVertical="true"/>
+                            android:src="@drawable/star"
+                            android:layout_centerVertical="true"
+                            android:id="@+id/rateIcon"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
-                            android:text="Privacy Policy"
-                            android:layout_toEndOf="@id/privacyIcon"
-                            android:textColor="@color/black"
+                            android:text="Rate App"
                             android:layout_centerVertical="true"
+                            android:layout_toEndOf="@id/rateIcon"
+                            android:textColor="@color/black"
                             android:textSize="12sp"
                             android:fontFamily="@font/poppins_regular" />
 
@@ -867,9 +827,10 @@
                             android:src="@drawable/arrw" />
                     </RelativeLayout>
 
-                    <!-- Rate Item -->
+
+                    <!-- Privacy Item -->
                     <RelativeLayout
-                        android:id="@+id/rateSection"
+                        android:id="@+id/privacy"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="?selectableItemBackground"
@@ -880,18 +841,18 @@
                         <ImageView
                             android:layout_width="18dp"
                             android:layout_height="18dp"
-                            android:src="@drawable/star"
-                            android:layout_centerVertical="true"
-                            android:id="@+id/rateIcon"/>
+                            android:src="@drawable/privacy"
+                            android:id="@+id/privacyIcon"
+                            android:layout_centerVertical="true"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
-                            android:text="Rate App"
-                            android:layout_centerVertical="true"
-                            android:layout_toEndOf="@id/rateIcon"
+                            android:text="Privacy Policy"
+                            android:layout_toEndOf="@id/privacyIcon"
                             android:textColor="@color/black"
+                            android:layout_centerVertical="true"
                             android:textSize="12sp"
                             android:fontFamily="@font/poppins_regular" />
 
@@ -903,6 +864,47 @@
                             android:layout_alignParentEnd="true"
                             android:src="@drawable/arrw" />
                     </RelativeLayout>
+
+                    <!-- Info Item -->
+                    <RelativeLayout
+                        android:id="@+id/info"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="?selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp">
+
+                        <ImageView
+                            android:id="@+id/appInfoIcon"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/app_info"
+                            android:layout_centerVertical="true"/>
+
+                        <TextView
+                            android:id="@+id/infoText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_toEndOf="@id/appInfoIcon"
+                            android:text="More info on UrduFonts.com"
+                            android:textColor="@color/black"
+                            android:textSize="12sp"
+                            android:layout_centerVertical="true"
+                            android:fontFamily="@font/poppins_regular" />
+
+                        <ImageView
+                            android:id="@+id/aboutApllication"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:padding="3dp"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentEnd="true"
+                            android:src="@drawable/arrw" />
+                    </RelativeLayout>
+
+
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

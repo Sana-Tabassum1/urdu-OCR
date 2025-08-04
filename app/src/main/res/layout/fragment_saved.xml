@@ -23,9 +23,9 @@
             android:layout_width="127dp"
             android:layout_height="30dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="30dp"
             android:fontFamily="@font/poppins_extrabold"
-            android:text="Library"
+            android:text="Files"
             android:textColor="@color/white"
             android:textSize="25sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,21 +33,7 @@
 
         <!-- Subtitle + Icon on same line -->
 
-        <!-- Search bar -->
-        <TextView
-            android:id="@+id/subtitleText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="8dp"
-            android:fontFamily="@font/poppins_regular"
-            android:text="All your saved documents in one organized place"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toStartOf="@+id/btndaimond"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/titleText" />
+
 
         <ImageView
             android:id="@+id/btndaimond"
@@ -57,9 +43,8 @@
             android:background="@drawable/circle"
             android:scaleType="centerInside"
             android:src="@drawable/white_daimond"
-            app:layout_constraintBottom_toBottomOf="@+id/subtitleText"
+            app:layout_constraintBottom_toBottomOf="@+id/titleText"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/subtitleText"
             app:layout_constraintTop_toTopOf="@+id/titleText" />
 
         <RelativeLayout
@@ -75,7 +60,7 @@
             android:paddingEnd="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btndaimond">
+            app:layout_constraintTop_toBottomOf="@+id/btndaimond">
 
 
             <ImageView
@@ -262,17 +247,18 @@
 
         <ImageButton
             android:id="@+id/ivMenu"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:contentDescription="More"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:src="@drawable/green_dot"
-            android:foregroundGravity="center"
             android:background="@drawable/circle_lightgray"
+            android:scaleType="centerInside"
+            android:contentDescription="More"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/size"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
