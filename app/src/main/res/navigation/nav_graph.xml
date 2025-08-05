@@ -195,6 +195,9 @@
             android:id="@+id/action_savedFragment_to_modelScreenFragment"
             app:destination="@id/modelScreenFragment"
             app:launchSingleTop="true" />
+        <action
+            android:id="@+id/action_savedFragment_self"
+            app:destination="@id/nav_library" />
     </fragment>
 
 

@@ -26,7 +26,8 @@ class inapp_purchaseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.crossbtn.setOnClickListener {
-            findNavController().navigate(R.id.action_modelScreenFragment_to_nav_settings)
+            // This handles back navigation properly respecting the back stack
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 

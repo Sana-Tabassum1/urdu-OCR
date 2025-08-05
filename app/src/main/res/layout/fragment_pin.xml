@@ -23,7 +23,7 @@
             android:layout_height="30dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
-            android:fontFamily="@font/poppins_extrabold"
+            android:fontFamily="@font/nunito_extrabold"
             android:text="Pinned"
             android:textColor="@color/white"
             android:textSize="25sp"
@@ -81,7 +81,7 @@
                 android:layout_toEndOf="@id/ivSearch"
                 android:layout_toStartOf="@id/ivClear"
                 android:background="@android:color/transparent"
-                android:fontFamily="@font/poppins_regular"
+                android:fontFamily="@font/nunito_regular"
                 android:hint="Search here"
                 android:textCursorDrawable="@drawable/white_cursor"
                 android:inputType="text"
@@ -256,6 +256,21 @@
             app:layout_constraintStart_toEndOf="@+id/size"
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/emptyAnimationView"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:lottie_rawRes="@raw/animation"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerRow"/>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pinrecyclerview"

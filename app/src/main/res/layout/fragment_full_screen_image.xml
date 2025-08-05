@@ -36,7 +36,7 @@
             android:layout_marginStart="20dp"
             android:layout_weight="1"
             android:text="Preview"
-            android:fontFamily="@font/poppins_extrabold"
+            android:fontFamily="@font/nunito_extrabold"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="bold" />

@@ -6,5 +6,6 @@
     <string name="text_to_image">Text to Image</string>
     <string name="server_client_id">814397880124-pibgin26vthfs76idl1cb5vkdjm14p39.apps.googleusercontent.com</string>
     <string name="menu">saved_menu</string>
+    <string name="my_files">My Files</string>
 
 </resources>

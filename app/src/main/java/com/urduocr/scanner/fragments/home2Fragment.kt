@@ -33,6 +33,7 @@ import com.urduocr.scanner.databinding.FragmentHome2Binding
 import com.urduocr.scanner.models.SliderItem
 import com.urduocr.scanner.models.recentInternalFileModel
 import java.io.File
+import java.util.Calendar
 
 class home2Fragment : Fragment() {
 
@@ -91,7 +92,7 @@ class home2Fragment : Fragment() {
         allFiles = loadRecentFiles()
         adapter = RecentAdapter(requireContext(), allFiles, object : RecentAdapter.FileAdapterListener {
             override fun onItemSelectionChanged() {
-              
+
 
 
             }
@@ -181,31 +182,47 @@ class home2Fragment : Fragment() {
     private fun loadRecentFiles(): List<FileListItem.FileItem> {
         val rootDir = requireContext().filesDir
         val imageDir = File(rootDir, "SavedImages")
+        val currentTime = System.currentTimeMillis()
+
+        // Create a list to hold our results
         val recentFiles = mutableListOf<FileListItem.FileItem>()
 
+        // Get all files from both directories
         val allFiles = (rootDir.listFiles()?.toList() ?: emptyList()) +
                 (imageDir.listFiles()?.toList() ?: emptyList())
 
         for (file in allFiles) {
-            if (!file.name.endsWith(".txt") && !file.name.endsWith(".png") && !file.name.endsWith(".pdf")) continue
+            // Filter only supported file types
+            if (!file.name.endsWith(".txt", true) &&
+                !file.name.endsWith(".png", true) &&
+                !file.name.endsWith(".jpg", true) &&
+                !file.name.endsWith(".jpeg", true) &&
+                !file.name.endsWith(".pdf", true)) {
+                continue
+            }
 
-            val diff = System.currentTimeMillis() - file.lastModified()
-            val hours = diff / (1000 * 60 * 60)
+            // Check if file was modified within last 6 hours
+            val fileAgeInMillis = currentTime - file.lastModified()
+            val sixHoursInMillis = 6 * 60 * 60 * 1000 // 6 hours in milliseconds
 
-            if (hours < 12) {
-                val model = InternalFileModel(
-                    name = file.name,
-                    path = file.absolutePath,
-                    file = file,
-                    isFolder = false
+            if (fileAgeInMillis <= sixHoursInMillis) {
+                recentFiles.add(
+                    FileListItem.FileItem(
+                        InternalFileModel(
+                            name = file.name,
+                            path = file.absolutePath,
+                            file = file,
+                            isFolder = false,
+                            lastModified = file.lastModified()
+                        )
+                    )
                 )
-                recentFiles.add(FileListItem.FileItem(model))
             }
         }
 
-        return recentFiles
+        // Sort by newest first
+        return recentFiles.sortedByDescending { it.file.lastModified }
     }
-
 
 
 

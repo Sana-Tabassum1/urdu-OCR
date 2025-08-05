@@ -25,7 +25,7 @@
             android:layout_height="30dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
-            android:fontFamily="@font/poppins_extrabold"
+            android:fontFamily="@font/nunito_extrabold"
             android:text="Settings"
             android:textColor="@color/white"
             android:textSize="25sp"
@@ -42,7 +42,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
-            android:fontFamily="@font/poppins_regular"
+            android:fontFamily="@font/nunito_regular"
             android:text="Manage language, notifications, and privacy"
             android:textColor="@color/white"
             android:textSize="12sp"
@@ -243,7 +243,7 @@
                         android:id="@+id/title2"
                         android:layout_width="wrap_content"
                         android:layout_height="15dp"
-                        android:fontFamily="@font/poppins_regular"
+                        android:fontFamily="@font/nunito_regular"
                         android:text="OCR - Basic"
                         android:textColor="@color/black"
                         android:textSize="12sp" />
@@ -252,7 +252,7 @@
                         android:id="@+id/subtitle2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_regular"
+                        android:fontFamily="@font/nunito_regular"
                         android:lineHeight="10dp"
                         android:text="Pick how detailed you want your Urdu image recognition to be."
                         android:textColor="@color/lightgreen"
@@ -612,7 +612,7 @@
                             android:text="Languages"
                             android:textSize="12sp"
                             android:textColor="@color/black"
-                            android:fontFamily="@font/poppins_regular" />
+                            android:fontFamily="@font/nunito_regular" />
 
                         <!-- Optional subtitle: remove if not needed -->
                         <!--
@@ -704,7 +704,7 @@
                             android:text="Dark mode"
                             android:textSize="12sp"
                             android:textColor="@color/black"
-                            android:fontFamily="@font/poppins_regular" />
+                            android:fontFamily="@font/nunito_regular" />
                     </LinearLayout>
 
                     <!-- Switch -->
@@ -778,7 +778,7 @@
                             android:layout_toEndOf="@id/rateIcon"
                             android:textColor="@color/black"
                             android:textSize="12sp"
-                            android:fontFamily="@font/poppins_regular" />
+                            android:fontFamily="@font/nunito_regular" />
 
                         <ImageView
                             android:layout_width="20dp"
@@ -815,7 +815,7 @@
                             android:layout_toEndOf="@id/shareIcon"
                             android:textColor="@color/black"
                             android:textSize="12sp"
-                            android:fontFamily="@font/poppins_regular" />
+                            android:fontFamily="@font/nunito_regular" />
 
                         <ImageView
                             android:id="@+id/share"
@@ -854,7 +854,7 @@
                             android:textColor="@color/black"
                             android:layout_centerVertical="true"
                             android:textSize="12sp"
-                            android:fontFamily="@font/poppins_regular" />
+                            android:fontFamily="@font/nunito_regular" />
 
                         <ImageView
                             android:layout_width="20dp"
@@ -892,7 +892,7 @@
                             android:textColor="@color/black"
                             android:textSize="12sp"
                             android:layout_centerVertical="true"
-                            android:fontFamily="@font/poppins_regular" />
+                            android:fontFamily="@font/nunito_regular" />
 
                         <ImageView
                             android:id="@+id/aboutApllication"

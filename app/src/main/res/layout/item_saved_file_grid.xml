@@ -32,6 +32,7 @@
         app:layout_constraintStart_toEndOf="@id/checkBoxSelect"
         app:layout_constraintTop_toTopOf="parent"
         app:cardCornerRadius="8dp"
+        android:background="?selectableItemBackground"
         app:strokeWidth="1dp"
         app:strokeColor="#DDDDDD">
 
@@ -59,8 +60,10 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:padding="2dp"
-                android:textSize="12sp"
-                android:fontFamily="@font/nunito_regular"
+                android:fontFamily="@font/nunito_semibold"
+                android:text="Untitled File"
+                android:textColor="@color/black"
+                android:textSize="14sp"
                 android:textAlignment="center"
                 app:layout_constraintTop_toBottomOf="@id/ivFileIcon"
                 app:layout_constraintStart_toStartOf="parent"
@@ -75,8 +78,10 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:padding="2dp"
-                android:textSize="12sp"
-                android:fontFamily="@font/nunito_regular"
+                android:fontFamily="@font/nunito_semibold"
+                android:text="SIZE: 2 MB    DATE: 12/06/2025"
+                android:textColor="@color/gray"
+                android:textSize="10sp"
                 app:layout_constraintTop_toBottomOf="@id/tvFileName"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>

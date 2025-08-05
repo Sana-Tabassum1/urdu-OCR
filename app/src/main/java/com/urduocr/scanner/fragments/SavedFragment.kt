@@ -1,6 +1,5 @@
 package com.urduocr.scanner.fragments
 
-
 import android.app.AlertDialog
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.res.Resources
@@ -18,9 +17,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.urduocr.scanner.R
@@ -52,7 +53,6 @@ class SavedFragment : Fragment() {
     private val fileViewModel: SavedFileViewModel by activityViewModels()
     private val pinnedViewModel: PinnedFilesViewModel by activityViewModels()
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -63,113 +63,147 @@ class SavedFragment : Fragment() {
 
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
+
         viewPreferenceManager = ViewPreferenceManager(requireContext())
-        currentDir = arguments?.getString("dirPath")?.let(::File)
-            ?: requireContext().filesDir
 
-        adapter = SavedFileAdapter(requireContext(), emptyList())
-        adapter.fileActionListener = object : OnFileActionListener {
-            override fun onCopy(file: File) = doCopy(file)
-            override fun onCut(file: File) = doCut(file)
-            override fun onPaste() = doPaste()
-            override fun onDelete(file: File) = doDelete(file)
-            override fun onShare(file: File) = doShare(file)
-            override fun onPin(file: File) {
-                val internalModel = InternalFileModel(
-                    path = file.path,
-                    name = file.name,
-                    isSelected = false,
-                    isPinned = true,
-                    file = file,
-                    isFolder = file.isDirectory
-                )
+        currentDir = arguments?.getString("dirPath")?.let { path ->
+            File(path).takeIf { it.exists() && it.isDirectory }
+        } ?: requireContext().filesDir
 
-                if (!pinnedViewModel.isPinned(internalModel)) {
-                    pinnedViewModel.pinFile(internalModel)
-                    Toast.makeText(requireContext(), "File pinned", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(requireContext(), "Already pinned", Toast.LENGTH_SHORT).show()
+        // Setup back button handling
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    handleBackPress()
                 }
             }
+        )
 
-            override fun onUnpin(file: File) {
-                val internalModel = InternalFileModel(
-                    path = file.path,
-                    name = file.name,
-                    isSelected = false,
-                    isPinned = false,
-                    file = file,
-                    isFolder = file.isDirectory
-                )
-
-                pinnedViewModel.unpinFile(internalModel)
-                Toast.makeText(requireContext(), "File unpinned", Toast.LENGTH_SHORT).show()
-            }
-            override fun onRenameFolder(oldFile: File, newName: String) {
-                val newFile = File(oldFile.parent, newName)
-
-                if (newFile.exists()) {
-                    Toast.makeText(requireContext(), "A folder with this name already exists", Toast.LENGTH_SHORT).show()
-                    return
-                }
-
-                if (oldFile.renameTo(newFile)) {
-                    Toast.makeText(requireContext(), "Folder renamed", Toast.LENGTH_SHORT).show()
-                    loadAllFiles() // Refresh the list
-                } else {
-                    Toast.makeText(requireContext(), "Failed to rename folder", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-
-
-
-
-
-
-
-
-        }
-        adapter.listener = object : SavedFileAdapter.OnSelectionChangedListener {
-            override fun onItemSelectionChanged() {
-                val selectedFiles = adapter.getSelectedFiles()
-                    .filterIsInstance<FileListItem.FileItem>()
-                    .map { File(it.file.path) }
-
-                fileViewModel.setSelectedFiles(selectedFiles)
-
-                Toast.makeText(requireContext(), "${selectedFiles.size} selected", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-
-        binding.recyclerViewAllFiles.adapter = adapter
+        setupAdapter()
+        setupRecyclerView()
         setupSearchUi()
         setupSorting()
+
         binding.ivMenu.setOnClickListener { showCustomPopupMenu(it) }
+       // binding.ivBack.setOnClickListener { handleBackPress() }
+
         // Load saved preference
         isGridView = viewPreferenceManager.getViewPreference()
-        setupRecyclerView() // Apply the saved layout
-
+        loadAllFiles()
     }
 
+    private fun setupAdapter() {
+        adapter = SavedFileAdapter(
+            requireContext(),
+            emptyList(),
+            listener = object : SavedFileAdapter.OnSelectionChangedListener {
+                override fun onItemSelectionChanged() {
+                    val selectedFiles = adapter.getSelectedFiles()
+                        .filterIsInstance<FileListItem.FileItem>()
+                        .map { File(it.file.path) }
+                    fileViewModel.setSelectedFiles(selectedFiles)
+                }
+            }
+        ).apply {
+            fileActionListener = object : OnFileActionListener {
+                override fun onCopy(file: File) = doCopy(file)
+                override fun onCut(file: File) = doCut(file)
+                override fun onPaste() = doPaste()
+                override fun onDelete(file: File) = doDelete(file)
+                override fun onShare(file: File) = doShare(file)
+                override fun onPin(file: File) {
+                    val internalModel = InternalFileModel(
+                        path = file.path,
+                        name = file.name,
+                        isSelected = false,
+                        isPinned = true,
+                        file = file,
+                        isFolder = file.isDirectory
+                    )
+                    if (!pinnedViewModel.isPinned(internalModel)) {
+                        pinnedViewModel.pinFile(internalModel)
+                        Toast.makeText(requireContext(), "File pinned", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), "Already pinned", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                override fun onUnpin(file: File) {
+                    val internalModel = InternalFileModel(
+                        path = file.path,
+                        name = file.name,
+                        isSelected = false,
+                        isPinned = false,
+                        file = file,
+                        isFolder = file.isDirectory
+                    )
+                    pinnedViewModel.unpinFile(internalModel)
+                    Toast.makeText(requireContext(), "File unpinned", Toast.LENGTH_SHORT).show()
+                }
+                override fun onRenameFolder(oldFile: File, newName: String) {
+                    val newFile = File(oldFile.parent, newName)
+                    if (newFile.exists()) {
+                        Toast.makeText(requireContext(), "A folder with this name already exists", Toast.LENGTH_SHORT).show()
+                        return
+                    }
+                    if (oldFile.renameTo(newFile)) {
+                        Toast.makeText(requireContext(), "Folder renamed", Toast.LENGTH_SHORT).show()
+                        loadAllFiles()
+                    } else {
+                        Toast.makeText(requireContext(), "Failed to rename folder", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            onFolderClick = { folder ->
+                navigateToFolder(folder)
+            }
+        }
+
+        binding.recyclerViewAllFiles.adapter = adapter
+    }
+
+    private fun navigateToFolder(folder: File) {
+        currentDir = folder
+        val args = Bundle().apply {
+            putString("dirPath", folder.absolutePath)
+        }
+        findNavController().navigate(R.id.action_savedFragment_self, args)
+        loadAllFiles()
+    }
+    private fun handleBackPress() {
+        if (currentDir != requireContext().filesDir) {
+            // Navigate to parent folder
+            currentDir = currentDir.parentFile
+            loadAllFiles()
+
+            // Update the directory in arguments
+            val args = Bundle().apply {
+                putString("dirPath", currentDir.absolutePath)
+            }
+            // Replace current fragment with updated arguments
+            findNavController().navigate(R.id.action_savedFragment_self, args)
+        } else {
+            // If we're at root, navigate up
+            if (!findNavController().popBackStack()) {
+                // If nothing left in back stack, let system handle back
+                requireActivity().onBackPressed()
+            }
+        }
+    }
     override fun onResume() {
         super.onResume()
         validateCurrentDir()
         loadAllFiles()
-
-        // Add these lines to restore layout mode
         isGridView = viewPreferenceManager.getViewPreference()
         setupRecyclerView()
         adapter.setGridViewMode(isGridView)
     }
 
     private fun loadAllFiles() {
-        // Clear any existing removed file paths
         fileViewModel.removedFilePaths.clear()
 
         allFiles = buildList {
-            // Get files from directory, excluding deleted ones
             val items = currentDir.listFiles()
                 ?.asSequence()
                 ?.distinct()
@@ -180,9 +214,8 @@ class SavedFragment : Fragment() {
                 ?.toList() ?: emptyList()
 
             // Process folders
-            val folders = items
-                .filter { it.isDirectory }
-                .sortedBy { it.name.lowercase() } // Case-insensitive sorting
+            val folders = items.filter { it.isDirectory }
+                .sortedBy { it.name.lowercase() }
 
             if (folders.isNotEmpty()) {
                 add(FileListItem.Header("Folders"))
@@ -194,13 +227,13 @@ class SavedFragment : Fragment() {
                             isFolder = true,
                             file = it,
                             isPinned = pinnedViewModel.isPinned(it),
-                            isSelected = false // Reset selection state
+                            isSelected = false
                         )
                     )
                 })
             }
 
-            // Process files with supported extensions
+            // Process files
             val supportedExtensions = listOf(".pdf", ".txt", ".png", ".jpg", ".jpeg")
             val docs = items
                 .filter { it.isFile }
@@ -221,17 +254,22 @@ class SavedFragment : Fragment() {
                             isFolder = false,
                             file = it,
                             isPinned = pinnedViewModel.isPinned(it),
-                            isSelected = false // Reset selection state
+                            isSelected = false
                         )
                     )
                 })
             }
         }
 
-        // Update adapter with new list
+        updateUIState()
         adapter.updateList(allFiles)
+        binding.titleText.text = if (currentDir == requireContext().filesDir) {
+            getString(R.string.my_files)
+        } else {
+            currentDir.name
+        }
     }
-    // Add this function to validate the current directory
+
     private fun validateCurrentDir() {
         if (!currentDir.exists() || !currentDir.isDirectory) {
             currentDir = requireContext().filesDir
@@ -243,19 +281,35 @@ class SavedFragment : Fragment() {
         }
     }
 
+    private fun updateUIState() {
+        if (allFiles.isEmpty()) {
+            showEmptyState()
+        } else {
+            hideEmptyState()
+        }
+//
+//        // Show/hide back button based on current directory
+//        binding.ivBack.visibility = if (currentDir == requireContext().filesDir) {
+//            View.GONE
+//        } else {
+//            View.VISIBLE
+//        }
+    }
 
     private fun doCopy(file: File) {
         fileViewModel.clearSelection()
         fileViewModel.selectFile(file)
         fileViewModel.copyFiles()
-        Toast.makeText(requireActivity(), "Copied ${file.name}",Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireActivity(), "Copied ${file.name}", Toast.LENGTH_SHORT).show()
     }
+
     private fun doCut(file: File) {
         fileViewModel.clearSelection()
         fileViewModel.selectFile(file)
         fileViewModel.cutFiles()
-        Toast.makeText(requireActivity(), "Cut ${file.name}",Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireActivity(), "Cut ${file.name}", Toast.LENGTH_SHORT).show()
     }
+
     private fun doPaste() {
         fileViewModel.pasteFiles(currentDir)
         loadAllFiles()
@@ -269,11 +323,10 @@ class SavedFragment : Fragment() {
         loadAllFiles()
         Toast.makeText(requireContext(), "Deleted selected files", Toast.LENGTH_SHORT).show()
     }
-    private fun doShare(file: File) { /* ... */ }
 
-
-
-
+    private fun doShare(file: File) {
+        // Implement share functionality
+    }
 
     private fun showCreateFolderDialog() {
         val input = EditText(requireContext()).apply {
@@ -360,8 +413,6 @@ class SavedFragment : Fragment() {
         imm.hideSoftInputFromWindow(binding.etSearch.windowToken, 0)
     }
 
-
-    //sorting
     private fun setupSorting() {
         binding.name.setOnClickListener {
             if (isNameAsc) {
@@ -403,9 +454,7 @@ class SavedFragment : Fragment() {
     private fun sortByNameAsc() {
         val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
             .sortedBy { it.file.name.lowercase() }
-
         val headers = allFiles.filterIsInstance<FileListItem.Header>()
-
         allFiles = headers + sortedFiles
         adapter.updateList(allFiles)
     }
@@ -413,27 +462,22 @@ class SavedFragment : Fragment() {
     private fun sortByNameDesc() {
         val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
             .sortedByDescending { it.file.name.lowercase() }
-
         val headers = allFiles.filterIsInstance<FileListItem.Header>()
         allFiles = headers + sortedFiles
         adapter.updateList(allFiles)
     }
-
 
     private fun sortByDateAsc() {
         val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
             .sortedBy { File(it.file.path).lastModified() }
-
         val headers = allFiles.filterIsInstance<FileListItem.Header>()
         allFiles = headers + sortedFiles
         adapter.updateList(allFiles)
     }
 
-
     private fun sortByDateDesc() {
         val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
             .sortedByDescending { File(it.file.path).lastModified() }
-
         val headers = allFiles.filterIsInstance<FileListItem.Header>()
         allFiles = headers + sortedFiles
         adapter.updateList(allFiles)
@@ -442,7 +486,6 @@ class SavedFragment : Fragment() {
     private fun sortBySizeAsc() {
         val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
             .sortedBy { File(it.file.path).length() }
-
         val headers = allFiles.filterIsInstance<FileListItem.Header>()
         allFiles = headers + sortedFiles
         adapter.updateList(allFiles)
@@ -451,7 +494,6 @@ class SavedFragment : Fragment() {
     private fun sortBySizeDesc() {
         val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
             .sortedByDescending { File(it.file.path).length() }
-
         val headers = allFiles.filterIsInstance<FileListItem.Header>()
         allFiles = headers + sortedFiles
         adapter.updateList(allFiles)
@@ -462,11 +504,10 @@ class SavedFragment : Fragment() {
         inactive.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
     }
 
-    //popup menu
     private fun showCustomPopupMenu(anchor: View) {
         val context = anchor.context
         val density = context.resources.displayMetrics.density
-        val popupWidth = (150 * density).toInt() // Fixed 200dp width
+        val popupWidth = (150 * density).toInt()
 
         val popupView = LayoutInflater.from(context).inflate(R.layout.popup_menu_save, null)
         val popupWindow = PopupWindow(
@@ -476,19 +517,15 @@ class SavedFragment : Fragment() {
             true
         )
 
-//        popupWindow.elevation = 10f
         popupWindow.isOutsideTouchable = true
         popupWindow.isFocusable = true
 
-        // Measure height after inflating
         popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
         val popupHeight = popupView.measuredHeight
 
-        // Get screen dimensions
         val screenHeight = Resources.getSystem().displayMetrics.heightPixels
         val screenWidth = Resources.getSystem().displayMetrics.widthPixels
 
-        // Get anchor view location on screen
         val location = IntArray(2)
         anchor.getLocationOnScreen(location)
         val anchorX = location[0]
@@ -498,33 +535,28 @@ class SavedFragment : Fragment() {
         val bottomSpace = screenHeight - (anchorY + anchorHeight)
         val topSpace = anchorY
 
-        val x = anchorX + anchor.width - popupWidth // Align right edge of popup to anchor
+        val x = anchorX + anchor.width - popupWidth
         val y = if (bottomSpace >= popupHeight) {
-            // Show below anchor
             anchorY + anchorHeight
         } else if (topSpace >= popupHeight) {
-            // Show above anchor
             anchorY - popupHeight
         } else {
-            // Fit within available space (e.g., center aligned)
             (screenHeight - popupHeight) / 2
         }
 
-        // Show at calculated position
         popupWindow.showAtLocation(anchor, Gravity.NO_GRAVITY, x.coerceAtLeast(0), y)
 
-        // Select Mode (you can enhance this later)
+        // Handle menu items
         popupView.findViewById<LinearLayout>(R.id.menuSelect).setOnClickListener {
-            Toast.makeText(requireContext(), "Select Mode Enabled", Toast.LENGTH_SHORT).show()
+            adapter.selectAllItems()
+            Toast.makeText(requireContext(), "All items selected", Toast.LENGTH_SHORT).show()
             popupWindow.dismiss()
         }
 
-        // 🔄 Get current selected files
         val selectedFiles = adapter.getSelectedFiles()
             .filterIsInstance<FileListItem.FileItem>()
             .map { File(it.file.path) }
 
-        // 📋 COPY
         popupView.findViewById<LinearLayout>(R.id.menuCopy).setOnClickListener {
             fileViewModel.clearSelection()
             selectedFiles.forEach { fileViewModel.selectFile(it) }
@@ -534,7 +566,6 @@ class SavedFragment : Fragment() {
             popupWindow.dismiss()
         }
 
-        // ✂ CUT
         popupView.findViewById<LinearLayout>(R.id.menuCut).setOnClickListener {
             fileViewModel.clearSelection()
             selectedFiles.forEach { fileViewModel.selectFile(it) }
@@ -544,7 +575,6 @@ class SavedFragment : Fragment() {
             popupWindow.dismiss()
         }
 
-        // 📌 PASTE
         popupView.findViewById<LinearLayout>(R.id.menuPaste).setOnClickListener {
             fileViewModel.pasteFiles(currentDir)
             loadAllFiles()
@@ -553,37 +583,49 @@ class SavedFragment : Fragment() {
             popupWindow.dismiss()
         }
 
-        // 🗑 DELETE
         popupView.findViewById<LinearLayout>(R.id.menudelete).setOnClickListener {
-            fileViewModel.clearSelection()
-            selectedFiles.forEach { fileViewModel.selectFile(it) }
-            fileViewModel.deleteSelected()
-            loadAllFiles()
-            Toast.makeText(requireContext(), "Deleted ${selectedFiles.size} file(s)", Toast.LENGTH_SHORT).show()
-            adapter.clearSelection()
+            if (selectedFiles.isEmpty()) {
+                Toast.makeText(requireContext(), "No files selected", Toast.LENGTH_SHORT).show()
+                popupWindow.dismiss()
+                return@setOnClickListener
+            }
+
+            AlertDialog.Builder(requireContext())
+                .setTitle("Delete ${selectedFiles.size} files?")
+                .setMessage("Are you sure you want to delete these files?")
+                .setPositiveButton("Delete") { _, _ ->
+                    if (adapter.deleteSelectedFiles()) {
+                        selectedFiles.forEach { file ->
+                            if (file.exists()) {
+                                file.delete()
+                                fileViewModel.removedFilePaths.add(file.absolutePath)
+                            }
+                        }
+                        Toast.makeText(requireContext(), "Deleted ${selectedFiles.size} files", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+
             popupWindow.dismiss()
         }
 
-        // 🔲 Switch to Grid View
         popupView.findViewById<LinearLayout>(R.id.menUICON).setOnClickListener {
             toggleView(true)
             popupWindow.dismiss()
         }
-// 📄 Switch to List View
 
         popupView.findViewById<LinearLayout>(R.id.menuviewfile).setOnClickListener {
             toggleView(false)
             popupWindow.dismiss()
         }
 
-
-        // 📁 Create Folder
         popupView.findViewById<LinearLayout>(R.id.menufolder).setOnClickListener {
             showCreateFolderDialog()
             adapter.clearSelection()
             popupWindow.dismiss()
         }
-        // 📌 PIN
+
         popupView.findViewById<LinearLayout>(R.id.menupin).setOnClickListener {
             if (selectedFiles.isNotEmpty()) {
                 selectedFiles.forEach { file ->
@@ -610,51 +652,7 @@ class SavedFragment : Fragment() {
             adapter.clearSelection()
             popupWindow.dismiss()
         }
-
-        popupView.findViewById<LinearLayout>(R.id.menuSelect).setOnClickListener {
-            adapter.selectAllItems()
-            Toast.makeText(requireContext(), "All items selected", Toast.LENGTH_SHORT).show()
-            popupWindow.dismiss()
-        }
-        popupView.findViewById<LinearLayout>(R.id.menudelete).setOnClickListener {
-            val selectedCount = adapter.getSelectedFiles().size
-            if (selectedCount == 0) {
-                Toast.makeText(requireContext(), "No files selected", Toast.LENGTH_SHORT).show()
-                popupWindow.dismiss()
-                return@setOnClickListener
-            }
-
-            AlertDialog.Builder(requireContext())
-                .setTitle("Delete $selectedCount files?")
-                .setMessage("Are you sure you want to delete these files?")
-                .setPositiveButton("Delete") { _, _ ->
-                    // Get selected files before deletion
-                    val selectedFiles = adapter.getSelectedFiles()
-                        .map { File(it.file.path) }
-
-                    // Delete from adapter
-                    if (adapter.deleteSelectedFiles()) {
-                        // Delete actual files
-                        selectedFiles.forEach { file ->
-                            if (file.exists()) {
-                                file.delete()
-                                fileViewModel.removedFilePaths.add(file.absolutePath)
-                            }
-                        }
-                        Toast.makeText(requireContext(), "Deleted $selectedCount files", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                .setNegativeButton("Cancel", null)
-                .show()
-
-            popupWindow.dismiss()
-        }
-
-
-
-
     }
-
 
     private fun setupRecyclerView() {
         binding.recyclerViewAllFiles.layoutManager = if (isGridView) {
@@ -662,8 +660,8 @@ class SavedFragment : Fragment() {
                 spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                     override fun getSpanSize(position: Int): Int {
                         return when (adapter.getItemViewType(position)) {
-                            SavedFileAdapter.VIEW_TYPE_HEADER -> 2 // Headers take full width
-                            else -> 1 // Normal items take 1 span
+                            SavedFileAdapter.VIEW_TYPE_HEADER -> 2
+                            else -> 1
                         }
                     }
                 }
@@ -675,13 +673,10 @@ class SavedFragment : Fragment() {
 
     private fun toggleView(isGrid: Boolean) {
         isGridView = isGrid
-        viewPreferenceManager.saveViewPreference(isGridView) // Save preference
+        viewPreferenceManager.saveViewPreference(isGridView)
         setupRecyclerView()
         adapter.setGridViewMode(isGridView)
     }
-
-
-
 
     private fun resetOtherSortIcons(activeColumn: String) {
         if (activeColumn != "name") {
@@ -690,30 +685,23 @@ class SavedFragment : Fragment() {
         }
         if (activeColumn != "date") {
             binding.toparrow2.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
-            binding.downarrow2.setColorFilter(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.gray
-                )
-            )
+            binding.downarrow2.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
         }
         if (activeColumn != "size") {
             binding.toparrow3.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
-            binding.downarrow3.setColorFilter(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.gray
-                )
-            )
+            binding.downarrow3.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
         }
     }
 
+    private fun showEmptyState() {
+        binding.emptyAnimationView.visibility = View.VISIBLE
+        binding.recyclerViewAllFiles.visibility = View.GONE
+        binding.emptyAnimationView.playAnimation()
+    }
 
-
-
-
-
-
-
-
+    private fun hideEmptyState() {
+        binding.emptyAnimationView.visibility = View.GONE
+        binding.recyclerViewAllFiles.visibility = View.VISIBLE
+        binding.emptyAnimationView.pauseAnimation()
+    }
 }

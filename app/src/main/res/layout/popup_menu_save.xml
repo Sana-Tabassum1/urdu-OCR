@@ -13,6 +13,7 @@
         android:layout_height="40dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
+        android:background="?selectableItemBackground"
         android:clickable="true"
         android:focusable="true">
         <TextView
@@ -36,6 +37,7 @@
         android:id="@+id/menufolder"
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:background="?selectableItemBackground"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
@@ -67,6 +69,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -93,6 +96,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -119,6 +123,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -144,6 +149,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -169,6 +175,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -196,6 +203,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -223,6 +231,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"

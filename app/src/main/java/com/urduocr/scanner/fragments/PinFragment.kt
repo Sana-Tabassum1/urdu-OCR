@@ -76,7 +76,16 @@ class PinFragment : Fragment(), SavedFileAdapter.OnSelectionChangedListener {
             }
             allFiles = pinnedItems
             applyCurrentSort()
+            // Handle empty state
+            if (pinnedFiles.isEmpty()) {
+                showEmptyAnimation()
+            } else {
+                hideEmptyAnimation()
+            }
         }
+
+
+
 
         currentDir = arguments?.getString("dirPath")?.let(::File)
             ?: requireContext().filesDir
@@ -522,4 +531,16 @@ class PinFragment : Fragment(), SavedFileAdapter.OnSelectionChangedListener {
     }
 
 
+
+private fun showEmptyAnimation() {
+    binding.emptyAnimationView.visibility = View.VISIBLE
+    binding.pinrecyclerview.visibility = View.GONE
+    binding.emptyAnimationView.playAnimation()
+}
+
+private fun hideEmptyAnimation() {
+    binding.emptyAnimationView.visibility = View.GONE
+    binding.pinrecyclerview.visibility = View.VISIBLE
+    binding.emptyAnimationView.pauseAnimation()
+}
 }

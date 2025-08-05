@@ -12,6 +12,7 @@
         android:layout_height="30dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
+        android:background="?selectableItemBackground"
         android:clickable="true"
         android:focusable="true">
         <TextView
@@ -40,6 +41,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -67,6 +69,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -93,6 +96,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -119,6 +123,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -144,6 +149,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -170,6 +176,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -196,6 +203,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"
@@ -207,7 +215,7 @@
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/shareblack"
+            android:src="@drawable/shareicon"
             />
     </LinearLayout>
     <View
@@ -223,6 +231,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:clickable="true"
+        android:background="?selectableItemBackground"
         android:focusable="true">
         <TextView
             android:layout_width="0dp"

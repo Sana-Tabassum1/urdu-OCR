@@ -114,4 +114,5 @@ dependencies {
     implementation(libs.dotsindicator)
 
     implementation(libs.richeditor.android)
+    implementation("com.airbnb.android:lottie:6.6.7")
 }

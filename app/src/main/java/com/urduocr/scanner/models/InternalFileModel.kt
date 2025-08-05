@@ -8,5 +8,6 @@ data class InternalFileModel(
     var isSelected: Boolean = false,
     var isPinned: Boolean = false,
     val file: File,
-    val isFolder: Boolean = false
+    val isFolder: Boolean = false,
+    val lastModified: Long = file.lastModified() // Add this line
 )

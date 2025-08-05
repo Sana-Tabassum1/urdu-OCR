@@ -40,7 +40,7 @@
             android:layout_marginStart="20dp"
             android:layout_weight="1"
             android:text="OCR"
-            android:fontFamily="@font/poppins_extrabold"
+            android:fontFamily="@font/nunito_extrabold"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -121,7 +121,7 @@
                     android:textColor="@color/black"
                     android:text="Preview Image"
                     android:textSize="12sp"
-                    android:fontFamily="@font/poppins_regular" />
+                    android:fontFamily="@font/nunito_regular" />
             </LinearLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
@@ -487,7 +487,7 @@
             android:layout_marginStart="8dp"
             android:drawableStart="@drawable/volumeicon"
             android:drawablePadding="8dp"
-            android:fontFamily="@font/poppins_regular"
+            android:fontFamily="@font/nunito_regular"
             android:text="Listen"
             android:textSize="12sp"
             android:background="?selectableItemBackground"
@@ -520,7 +520,7 @@
             android:layout_marginStart="8dp"
             android:drawableStart="@drawable/editicn"
             android:drawablePadding="8dp"
-            android:fontFamily="@font/poppins_regular"
+            android:fontFamily="@font/nunito_regular"
             android:text="Edit"
             android:textSize="12sp"
             android:layout_marginTop="4dp"
@@ -536,7 +536,7 @@
             android:layout_marginStart="8dp"
             android:drawableStart="@drawable/copyicn"
             android:drawablePadding="8dp"
-            android:fontFamily="@font/poppins_regular"
+            android:fontFamily="@font/nunito_regular"
             android:text="Copy"
             android:textSize="12sp"
             android:layout_marginTop="4dp"
@@ -556,7 +556,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         android:background="@drawable/buuton_outlinegreen"
-        android:fontFamily="@font/poppins_semibold"
+        android:fontFamily="@font/nunito_semibold"
         android:gravity="center"
         android:text="Save"
         android:textColor="@color/green1"
