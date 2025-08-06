@@ -507,7 +507,7 @@ class SavedFragment : Fragment() {
     private fun showCustomPopupMenu(anchor: View) {
         val context = anchor.context
         val density = context.resources.displayMetrics.density
-        val popupWidth = (150 * density).toInt()
+        val popupWidth = (180 * density).toInt()
 
         val popupView = LayoutInflater.from(context).inflate(R.layout.popup_menu_save, null)
         val popupWindow = PopupWindow(

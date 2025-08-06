@@ -99,7 +99,8 @@
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/homeSlider"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"/>
 
             <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
                 android:id="@+id/sliderDots"
@@ -110,7 +111,7 @@
                 app:dotsColor="@color/greenlight"
                 app:dotsSize="4dp"
                 app:dotsSpacing="2dp"
-                android:layout_marginStart="130dp"
+                android:layout_marginStart="135dp"
                 app:selectedDotColor="@color/green1"/>
 
         </FrameLayout>

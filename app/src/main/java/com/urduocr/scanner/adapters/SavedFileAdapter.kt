@@ -269,7 +269,7 @@ class SavedFileAdapter(
     ) {
         val context = anchorView.context
         val density = context.resources.displayMetrics.density
-        val popupWidth = (150 * density).toInt()
+        val popupWidth = (180 * density).toInt()
 
         val popupView = LayoutInflater.from(context).inflate(R.layout.custom_file_popup, null)
         val popupWindow = PopupWindow(
