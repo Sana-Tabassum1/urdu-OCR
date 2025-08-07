@@ -4,9 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
-import android.graphics.Color
 import android.text.format.DateFormat
-import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -18,37 +16,30 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.urduocr.scanner.R
-import com.urduocr.scanner.databinding.ItemFileHeaderBinding
 import com.urduocr.scanner.databinding.ItemSavedFileBinding
 import com.urduocr.scanner.databinding.ItemSavedFileGridBinding
 import com.urduocr.scanner.interfaces.OnFileActionListener
-import com.urduocr.scanner.models.FileListItem
 import com.urduocr.scanner.models.InternalFileModel
 import java.io.File
 
 class SavedFileAdapter(
     private val context: Context,
-    private var fileList: List<FileListItem>,
+    private var fileList: List<InternalFileModel>,
     var listener: OnSelectionChangedListener? = null,
     var fileActionListener: OnFileActionListener? = null,
-    var onFolderClick: ((File) -> Unit)? = null,
-
-
+    var onFolderClick: ((File) -> Unit)? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
-        const val VIEW_TYPE_HEADER = 0
-        private const val VIEW_TYPE_FILE_LIST = 1
-        private const val VIEW_TYPE_FILE_GRID = 2
+        private const val VIEW_TYPE_FILE_LIST = 0
+        private const val VIEW_TYPE_FILE_GRID = 1
     }
 
-    // Add this variable to your adapter
     var isGridView = false
 
     interface OnSelectionChangedListener {
@@ -57,91 +48,54 @@ class SavedFileAdapter(
 
     private var isSelectionMode = false
 
-    inner class FileViewHolder(val binding: ItemSavedFileBinding) :
-        RecyclerView.ViewHolder(binding.root)
-
-    inner class HeaderViewHolder(val binding: ItemFileHeaderBinding) :
-        RecyclerView.ViewHolder(binding.root)
-
-    // Add this ViewHolder class
-    inner class FileGridViewHolder(val binding: ItemSavedFileGridBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    inner class FileViewHolder(val binding: ItemSavedFileBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class FileGridViewHolder(val binding: ItemSavedFileGridBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun getItemViewType(position: Int): Int {
-        return when (fileList[position]) {
-            is FileListItem.Header -> VIEW_TYPE_HEADER
-            is FileListItem.FileItem -> if (isGridView) VIEW_TYPE_FILE_GRID else VIEW_TYPE_FILE_LIST
-        }
+        return if (isGridView) VIEW_TYPE_FILE_GRID else VIEW_TYPE_FILE_LIST
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_HEADER -> {
-                HeaderViewHolder(
-                    ItemFileHeaderBinding.inflate(
-                        LayoutInflater.from(context), parent, false
-                    )
+            VIEW_TYPE_FILE_GRID -> FileGridViewHolder(
+                ItemSavedFileGridBinding.inflate(
+                    LayoutInflater.from(context), parent, false
                 )
-            }
-
-            VIEW_TYPE_FILE_LIST -> {
-                FileViewHolder(
-                    ItemSavedFileBinding.inflate(
-                        LayoutInflater.from(context), parent, false
-                    )
+            )
+            else -> FileViewHolder(
+                ItemSavedFileBinding.inflate(
+                    LayoutInflater.from(context), parent, false
                 )
-            }
-
-            VIEW_TYPE_FILE_GRID -> {
-                FileGridViewHolder(
-                    ItemSavedFileGridBinding.inflate(
-                        LayoutInflater.from(context), parent, false
-                    )
-                )
-            }
-
-            else -> throw IllegalArgumentException("Invalid view type")
+            )
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val item = fileList[position]) {
-            is FileListItem.Header -> {
-                (holder as HeaderViewHolder).binding.headerText.text = item.title
+        val file = fileList[position]
+        val fileObj = File(file.path)
+        val formattedDate = DateFormat.format("dd/MM/yyyy", fileObj.lastModified()).toString()
+        val sizeFormatted = formatFileSize(fileObj.length())
+
+        when (holder) {
+            is FileGridViewHolder -> {
+                with(holder.binding) {
+                    setFileIcon(ivFileIcon, file)
+                    tvFileName.text = file.name
+                    tvTimeSize.text = "$sizeFormatted, $formattedDate"
+                    handleSelectionUI(this, file, position)
+                }
             }
-
-            is FileListItem.FileItem -> {
-                val file = item.file
-                val fileObj = File(file.path)
-                val formattedDate = DateFormat.format("dd/MM/yyyy", fileObj.lastModified()).toString()
-                val sizeFormatted = formatFileSize(fileObj.length())
-
-                when {
-                    isGridView && holder is FileGridViewHolder -> {
-                        // Grid View Binding
-                        with(holder.binding) {
-                            setFileIcon(ivFileIcon, file)
-                            tvFileName.text = file.name
-                            tvTimeSize.text = "$sizeFormatted, $formattedDate" // Always compact for grid
-                            handleSelectionUI(this, file, position)
-                        }
-                    }
-                    holder is FileViewHolder -> {
-                        // List View Binding
-                        with(holder.binding) {
-                            setFileIcon(ivFileIcon, file)
-                            tvFileName.text = file.name
-                            tvTimeSize.text = "SIZE: $sizeFormatted    DATE: $formattedDate" // Always detailed for list
-                            handleSelectionUI(this, file, position)
-                        }
-                    }
+            is FileViewHolder -> {
+                with(holder.binding) {
+                    setFileIcon(ivFileIcon, file)
+                    tvFileName.text = file.name
+                    tvTimeSize.text = "SIZE: $sizeFormatted    DATE: $formattedDate"
+                    handleSelectionUI(this, file, position)
                 }
             }
         }
     }
 
-    // Helper function to set file icons
     private fun setFileIcon(imageView: ImageView, file: InternalFileModel) {
         imageView.setImageResource(
             when {
@@ -154,7 +108,6 @@ class SavedFileAdapter(
         )
     }
 
-    // Helper function to format file size
     private fun formatFileSize(sizeInBytes: Long): String {
         return if (sizeInBytes < 1024 * 1024) {
             String.format("%.1f KB", sizeInBytes / 1024f)
@@ -163,36 +116,31 @@ class SavedFileAdapter(
         }
     }
 
-    // Helper function to handle selection UI
     private fun handleSelectionUI(binding: ItemSavedFileBinding, file: InternalFileModel, position: Int) {
         with(binding) {
-            // Selection handling
-            checkBoxSelect.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
-            if (isSelectionMode) {
-                checkBoxSelect.setImageResource(
-                    if (file.isSelected) R.drawable.ratio_checked else R.drawable.ratio_unchecked
-                )
-            }
+            val shouldShowCheckbox = isSelectionMode && (file.isSelected || getSelectedCount() > 0)
 
-            // Menu button visibility
-            menuButton.visibility = when {
-                file.isSelected || isSelectionMode -> View.GONE
-                else -> View.VISIBLE
-            }
+            checkBoxSelect.visibility = if (shouldShowCheckbox) View.VISIBLE else View.GONE
+            checkBoxSelect.setImageResource(
+                if (file.isSelected) R.drawable.ratio_checked else R.drawable.ratio_unchecked
+            )
 
-            // Click listeners
+            materialCardView.isSelected = file.isSelected
+            menuButton.visibility = if (isSelectionMode) View.GONE else View.VISIBLE
+
             root.setOnClickListener {
                 if (isSelectionMode) {
                     file.isSelected = !file.isSelected
-                    if (getSelectedCount() == 0) isSelectionMode = false
-                    notifyDataSetChanged()
+                    if (getSelectedCount() == 0) {
+                        isSelectionMode = false
+                        notifyDataSetChanged()
+                    } else {
+                        notifyItemChanged(position)
+                    }
                     listener?.onItemSelectionChanged()
                 } else {
-                    if (file.isFolder) {
-                        onFolderClick?.invoke(File(file.path))
-                    } else {
-                        openFile(File(file.path), file.name)
-                    }
+                    if (file.isFolder) onFolderClick?.invoke(File(file.path))
+                    else openFile(File(file.path), file.name)
                 }
             }
 
@@ -214,33 +162,29 @@ class SavedFileAdapter(
 
     private fun handleSelectionUI(binding: ItemSavedFileGridBinding, file: InternalFileModel, position: Int) {
         with(binding) {
-            // Selection handling
-            checkBoxSelect.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
-            if (isSelectionMode) {
-                checkBoxSelect.setImageResource(
-                    if (file.isSelected) R.drawable.ratio_checked else R.drawable.ratio_unchecked
-                )
-            }
+            val shouldShowCheckbox = isSelectionMode && (file.isSelected || getSelectedCount() > 0)
 
-            // Menu button visibility
-            menuButton.visibility = when {
-                file.isSelected || isSelectionMode -> View.GONE
-                else -> View.VISIBLE
-            }
+            checkBoxSelect.visibility = if (shouldShowCheckbox) View.VISIBLE else View.GONE
+            checkBoxSelect.setImageResource(
+                if (file.isSelected) R.drawable.ratio_checked else R.drawable.ratio_unchecked
+            )
 
-            // Click listeners
+            cardView.isSelected = file.isSelected
+            menuButton.visibility = if (isSelectionMode) View.GONE else View.VISIBLE
+
             root.setOnClickListener {
                 if (isSelectionMode) {
                     file.isSelected = !file.isSelected
-                    if (getSelectedCount() == 0) isSelectionMode = false
-                    notifyDataSetChanged()
+                    if (getSelectedCount() == 0) {
+                        isSelectionMode = false
+                        notifyDataSetChanged()
+                    } else {
+                        notifyItemChanged(position)
+                    }
                     listener?.onItemSelectionChanged()
                 } else {
-                    if (file.isFolder) {
-                        onFolderClick?.invoke(File(file.path))
-                    } else {
-                        openFile(File(file.path), file.name)
-                    }
+                    if (file.isFolder) onFolderClick?.invoke(File(file.path))
+                    else openFile(File(file.path), file.name)
                 }
             }
 
@@ -260,7 +204,6 @@ class SavedFileAdapter(
         }
     }
 
-    // Extract popup menu logic to a separate function
     private fun showFilePopupMenu(
         anchorView: View,
         file: InternalFileModel,
@@ -279,69 +222,33 @@ class SavedFileAdapter(
             true
         )
 
-//        popupWindow.elevation = 10f
         popupWindow.isOutsideTouchable = true
         popupWindow.isFocusable = true
 
-        // Measure and position popup
-        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-        val popupHeight = popupView.measuredHeight
-
-        val location = IntArray(2)
-        anchorView.getLocationOnScreen(location)
-        val anchorX = location[0]
-        val anchorY = location[1]
-        val anchorHeight = anchorView.height
-
-        val screenHeight = Resources.getSystem().displayMetrics.heightPixels
-        val bottomSpace = screenHeight - (anchorY + anchorHeight)
-        val topSpace = anchorY
-
-        val x = anchorX + anchorView.width - popupWidth
-        val y = if (bottomSpace >= popupHeight) {
-            anchorY + anchorHeight
-        } else if (topSpace >= popupHeight) {
-            anchorY - popupHeight
-        } else {
-            (screenHeight - popupHeight) / 2
-        }
-
-        popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, x.coerceAtLeast(0), y)
-
-
-        // Get selected files
-        val selectedFiles = getSelectedFiles()
-        val isMultiSelect = selectedFiles.size > 1
-        // Share item & divider
         popupView.findViewById<LinearLayout>(R.id.menushare).visibility =
             if (file.isFolder) View.GONE else View.VISIBLE
         popupView.findViewById<View>(R.id.viewShare).visibility =
             if (file.isFolder) View.GONE else View.VISIBLE
 
-// Pin item & divider
         popupView.findViewById<LinearLayout>(R.id.menupin).visibility =
             if (file.isPinned) View.GONE else View.VISIBLE
         popupView.findViewById<View>(R.id.viewpin).visibility =
             if (file.isPinned) View.GONE else View.VISIBLE
 
-// Unpin item (divider will show only if Unpin is shown)
         popupView.findViewById<LinearLayout>(R.id.menuUnpin).visibility =
             if (file.isPinned) View.VISIBLE else View.GONE
         popupView.findViewById<View>(R.id.viewunpin).visibility =
             if (file.isPinned) View.VISIBLE else View.GONE
 
-// Rename item & divider
         popupView.findViewById<LinearLayout>(R.id.renameFolder).visibility =
             if (file.isFolder) View.VISIBLE else View.GONE
         popupView.findViewById<View>(R.id.viewRename).visibility =
             if (file.isFolder) View.VISIBLE else View.GONE
 
-
-
-
-        // Set up click listeners
         popupView.findViewById<LinearLayout>(R.id.menuSelect).setOnClickListener {
-            isSelectionMode = true
+            if (!isSelectionMode) {
+                isSelectionMode = true
+            }
             file.isSelected = true
             notifyDataSetChanged()
             listener?.onItemSelectionChanged()
@@ -351,7 +258,7 @@ class SavedFileAdapter(
         popupView.findViewById<LinearLayout>(R.id.menuCopy).setOnClickListener {
             if (isSelectionMode) {
                 getSelectedFiles().forEach { fileItem ->
-                    fileActionListener?.onCopy(File(fileItem.file.path))
+                    fileActionListener?.onCopy(File(fileItem.path))
                 }
             } else {
                 fileActionListener?.onCopy(fileObj)
@@ -362,8 +269,8 @@ class SavedFileAdapter(
 
         popupView.findViewById<LinearLayout>(R.id.menuCut).setOnClickListener {
             if (isSelectionMode) {
-                selectedFiles.forEach { fileItem ->
-                    fileActionListener?.onCut(File(fileItem.file.path))
+                getSelectedFiles().forEach { fileItem ->
+                    fileActionListener?.onCut(File(fileItem.path))
                 }
             } else {
                 fileActionListener?.onCut(fileObj)
@@ -372,7 +279,6 @@ class SavedFileAdapter(
             clearSelection()
         }
 
-        // [Keep other menu item click listeners unchanged]
         popupView.findViewById<LinearLayout>(R.id.menupin).setOnClickListener {
             file.isPinned = true
             notifyItemChanged(position)
@@ -388,7 +294,7 @@ class SavedFileAdapter(
             popupWindow.dismiss()
             clearSelection()
         }
-        // Inside the popup menu setup in onBindViewHolder
+
         popupView.findViewById<LinearLayout>(R.id.renameFolder).setOnClickListener {
             if (file.isFolder) {
                 showRenameFolderDialog(fileObj)
@@ -398,8 +304,6 @@ class SavedFileAdapter(
             popupWindow.dismiss()
         }
 
-
-// Share File
         popupView.findViewById<LinearLayout>(R.id.menushare).setOnClickListener {
             try {
                 val uri = FileProvider.getUriForFile(
@@ -425,11 +329,8 @@ class SavedFileAdapter(
             popupWindow.dismiss()
         }
 
-// Delete File
         popupView.findViewById<LinearLayout>(R.id.menudelete).setOnClickListener {
-            // Show confirmation dialog
             showDeleteConfirmationDialog(fileObj) {
-                // This lambda will execute if user confirms deletion
                 if (fileObj.exists()) {
                     if (fileObj.deleteRecursively()) {
                         Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
@@ -442,10 +343,19 @@ class SavedFileAdapter(
             popupWindow.dismiss()
         }
 
+        val popupHeight = popupView.measuredHeight
+        val location = IntArray(2)
+        anchorView.getLocationOnScreen(location)
+        val x = location[0] + anchorView.width - popupWidth
+        val y = if (Resources.getSystem().displayMetrics.heightPixels - (location[1] + anchorView.height) >= popupHeight) {
+            location[1] + anchorView.height
+        } else {
+            location[1] - popupHeight
+        }
 
+        popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, x.coerceAtLeast(0), y)
     }
 
-    //viewfile open
     private fun openFile(fileObj: File, name: String) {
         try {
             val uri = FileProvider.getUriForFile(
@@ -470,29 +380,26 @@ class SavedFileAdapter(
         }
     }
 
-    // ✅ Utility
-    fun getSelectedCount(): Int {
-        return fileList.count { it is FileListItem.FileItem && it.file.isSelected }
-    }
+    fun getSelectedCount(): Int = fileList.count { it.isSelected }
 
     fun clearSelection() {
         isSelectionMode = false
-        fileList.filterIsInstance<FileListItem.FileItem>().forEach { it.file.isSelected = false }
+        fileList.forEach { it.isSelected = false }
         notifyDataSetChanged()
+        listener?.onItemSelectionChanged()
     }
 
-    fun getSelectedFiles(): List<FileListItem.FileItem> {
-        return fileList.filterIsInstance<FileListItem.FileItem>().filter { it.file.isSelected }
-    }
+    fun getSelectedFiles(): List<InternalFileModel> = fileList.filter { it.isSelected }
 
-    fun updateList(newList: List<FileListItem>) {
-        newList.filterIsInstance<FileListItem.FileItem>().forEach { it.file.isSelected = false }
+    fun updateList(newList: List<InternalFileModel>) {
+        newList.forEach { it.isSelected = false }
         fileList = newList
         isSelectionMode = false
         notifyDataSetChanged()
     }
+
     private fun showDeleteConfirmationDialog(file: File, onConfirm: () -> Unit) {
-        val alertDialog = AlertDialog.Builder(context)
+        AlertDialog.Builder(context)
             .setTitle("Delete File")
             .setMessage("Are you sure you want to delete ${file.name}?")
             .setPositiveButton("Delete") { dialog, _ ->
@@ -503,8 +410,7 @@ class SavedFileAdapter(
                 dialog.dismiss()
             }
             .create()
-
-        alertDialog.show()
+            .show()
     }
 
     private fun showRenameFolderDialog(folder: File) {
@@ -518,11 +424,9 @@ class SavedFileAdapter(
         val btnCancel = dialogView.findViewById<TextView>(R.id.btnCancle)
         val btnSave = dialogView.findViewById<TextView>(R.id.btnSave)
 
-        // Set current folder name
         etFileName.setText(folder.name)
         etFileName.selectAll()
 
-        // Highlight function for dialog buttons
         fun highlightButton(selectedBtn: TextView) {
             listOf(btnCancel, btnSave).forEach { button ->
                 val isSelected = button == selectedBtn
@@ -539,64 +443,39 @@ class SavedFileAdapter(
             }
         }
 
-        // Initially highlight the Save button
         highlightButton(btnSave)
 
         btnCancel.setOnClickListener {
-            // Highlight the button first
             highlightButton(it as TextView)
-
-            // Add a slight delay to show the highlighted state before dismissing
-            it.postDelayed({
-                dialog.dismiss()
-            }, 150) // 150ms delay to show the pressed state
+            it.postDelayed({ dialog.dismiss() }, 150)
         }
 
         btnSave.setOnClickListener {
             highlightButton(it as TextView)
             val newName = etFileName.text.toString().trim()
-
             when {
-                newName.isEmpty() -> {
-                    Toast.makeText(context, "Please enter a name", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                newName == folder.name -> {
-                    dialog.dismiss()
-                    return@setOnClickListener
-                }
+                newName.isEmpty() -> Toast.makeText(context, "Please enter a name", Toast.LENGTH_SHORT).show()
+                newName == folder.name -> dialog.dismiss()
                 else -> {
-                    // Call the rename listener
                     fileActionListener?.onRenameFolder(folder, newName)
                     dialog.dismiss()
                 }
             }
         }
 
-        // Handle button focus changes
-        btnCancel.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) highlightButton(btnCancel)
-        }
-
-        btnSave.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) highlightButton(btnSave)
-        }
+        btnCancel.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) highlightButton(btnCancel) }
+        btnSave.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) highlightButton(btnSave) }
 
         dialog.show()
     }
 
     fun setGridViewMode(isGrid: Boolean) {
         this.isGridView = isGrid
-        notifyDataSetChanged() // Force UI refresh
+        notifyDataSetChanged()
     }
 
-    // Add these methods to your SavedFileAdapter class
     fun selectAllItems() {
-        fileList.forEach { item ->
-            if (item is FileListItem.FileItem) {
-                item.file.isSelected = true
-            }
-        }
+        fileList.forEach { it.isSelected = true }
         isSelectionMode = true
         notifyDataSetChanged()
         listener?.onItemSelectionChanged()
@@ -606,11 +485,8 @@ class SavedFileAdapter(
         val selectedFiles = getSelectedFiles()
         if (selectedFiles.isEmpty()) return false
 
-        // Remove selected files from the list
         val newList = fileList.toMutableList().apply {
-            removeAll { item ->
-                item is FileListItem.FileItem && item.file.isSelected
-            }
+            removeAll { it.isSelected }
         }
 
         fileList = newList
@@ -618,5 +494,6 @@ class SavedFileAdapter(
         notifyDataSetChanged()
         return true
     }
+
     override fun getItemCount(): Int = fileList.size
 }

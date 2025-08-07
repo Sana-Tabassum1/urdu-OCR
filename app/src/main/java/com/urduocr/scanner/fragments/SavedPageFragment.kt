@@ -118,91 +118,91 @@ class SavedPageFragment : Fragment(){
 //        }
 //    }
 
-    fun deleteSelectedFiles() {
-        val selectedFiles = adapter.getSelectedFiles()
+//    fun deleteSelectedFiles() {
+//        val selectedFiles = adapter.getSelectedFiles()
+//
+//        if (selectedFiles.isEmpty()) return
+//
+//        AlertDialog.Builder(requireContext())
+//            .setTitle("Delete Files")
+//            .setMessage("Are you sure you want to delete this file?")
+//            .setPositiveButton("Delete") { _, _ ->
+//                selectedFiles.forEach {
+//                    val file = File(it.file.path)
+//                    if (file.exists()) file.delete()
+//                }
+//                refreshList()
+//                //onItemSelectionChanged()
+//            }
+//            .setNegativeButton("Cancel", null)
+//            .show()
+//    }
 
-        if (selectedFiles.isEmpty()) return
+//    fun shareSelectedFiles() {
+//        val selectedFiles = adapter.getSelectedFiles()
+//        if (selectedFiles.isEmpty()) return
+//
+//        val uris = selectedFiles.map {
+//            FileProvider.getUriForFile(
+//                requireContext(),
+//                requireContext().packageName + ".fileprovider",
+//                File(it.file.path)
+//            )
+//        }
+//
+//        val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+//            type = "*/*"
+//            putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList<Uri>(uris))
+//            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//        }
+//
+//        startActivity(Intent.createChooser(shareIntent, "Share files via"))
+//    }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Delete Files")
-            .setMessage("Are you sure you want to delete this file?")
-            .setPositiveButton("Delete") { _, _ ->
-                selectedFiles.forEach {
-                    val file = File(it.file.path)
-                    if (file.exists()) file.delete()
-                }
-                refreshList()
-                //onItemSelectionChanged()
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    fun shareSelectedFiles() {
-        val selectedFiles = adapter.getSelectedFiles()
-        if (selectedFiles.isEmpty()) return
-
-        val uris = selectedFiles.map {
-            FileProvider.getUriForFile(
-                requireContext(),
-                requireContext().packageName + ".fileprovider",
-                File(it.file.path)
-            )
-        }
-
-        val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-            type = "*/*"
-            putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList<Uri>(uris))
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-
-        startActivity(Intent.createChooser(shareIntent, "Share files via"))
-    }
-
-    fun togglePinSelectedFiles(): Boolean {
-        val selectedItems = adapter.getSelectedFiles()
-
-        if (selectedItems.isEmpty()) {
-            Toast.makeText(requireContext(), "Select files to pin/unpin", Toast.LENGTH_SHORT).show()
-            return false
-        }
-
-        val shouldUnpin = areAllSelectedFilesPinned()
-
-        selectedItems.forEach {
-            val file = it.file
-            if (shouldUnpin) {
-                pinnedViewModel.unpinFile(file)
-            } else {
-                pinnedViewModel.pinFile(file)
-            }
-        }
-
-        clearSelection()
-        Toast.makeText(requireContext(), "Pin state updated", Toast.LENGTH_SHORT).show()
-
-        return !shouldUnpin // return new state: true means now pinned
-    }
+//    fun togglePinSelectedFiles(): Boolean {
+//        val selectedItems = adapter.getSelectedFiles()
+//
+//        if (selectedItems.isEmpty()) {
+//            Toast.makeText(requireContext(), "Select files to pin/unpin", Toast.LENGTH_SHORT).show()
+//            return false
+//        }
+//
+//        val shouldUnpin = areAllSelectedFilesPinned()
+//
+//        selectedItems.forEach {
+//            val file = it.file
+//            if (shouldUnpin) {
+//                pinnedViewModel.unpinFile(file)
+//            } else {
+//                pinnedViewModel.pinFile(file)
+//            }
+//        }
+//
+//        clearSelection()
+//        Toast.makeText(requireContext(), "Pin state updated", Toast.LENGTH_SHORT).show()
+//
+//        return !shouldUnpin // return new state: true means now pinned
+//    }
 
 
     fun clearSelection() {
         adapter.clearSelection()
        // onItemSelectionChanged()
     }
-    private fun refreshList() {
-        //val updatedFiles = loadFilesByType()
-        //adapter.updateList(updatedFiles)
-    }
+//    private fun refreshList() {
+//        //val updatedFiles = loadFilesByType()
+//        //adapter.updateList(updatedFiles)
+//    }
     /* ------------ PUBLIC FUNCTION CALLED FROM PARENT ------------ */
-    fun filterFiles(query: String) {
-        val filtered = if (query.isBlank()) {
-            allFiles
-        } else {
-            allFiles.filterIsInstance<FileListItem.FileItem>()
-                .filter { it.file.name.contains(query, ignoreCase = true) }
-        }
-        adapter.updateList(filtered)
-    }
+//    fun filterFiles(query: String) {
+//        val filtered = if (query.isBlank()) {
+//            allFiles
+//        } else {
+//            allFiles.filterIsInstance<FileListItem.FileItem>()
+//                .filter { it.file.name.contains(query, ignoreCase = true) }
+//        }
+//        adapter.updateList(filtered)
+//    }
 
 
     fun areAllSelectedFilesPinned(): Boolean {

@@ -56,65 +56,14 @@ class SettingFragment : Fragment() {
 
         fun Float.round1() = String.format("%.1f", this).toFloat()
 
-        binding.speechRate.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val rate = (progress / 100f).coerceIn(0.5f, 2.0f).round1()
-                binding.speechRateValue.setText("$rate")
-                saveSettingsFromUI()
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        binding.voiceToneSeekbar.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val tone = (progress / 100f).coerceIn(0.5f, 2.0f).round1()
-                binding.voiceToneValue.setText("$tone")
-                saveSettingsFromUI()
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        binding.audioClaritySeekbar.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val clarity = (progress / 100f).coerceIn(0.5f, 2.0f).round1()
-                binding.audioClarityValue.setText("$clarity")
-                saveSettingsFromUI()
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        binding.responseDelaySeekbar.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.responseDelayValue.setText("$progress")
-                saveSettingsFromUI()
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
 
 
-        // Default: hide voice setting layout
-        binding.voicesetting.visibility = View.GONE
 
-        binding.voicsettinglayout.setOnClickListener {
-            if (binding.voicesetting.isVisible) {
-                binding.voicesetting.visibility = View.GONE
-                binding.voicebtn.rotation = 180f
-            } else {
-                binding.voicesetting.visibility = View.VISIBLE
-                binding.voicebtn.rotation = 0f
-            }
-        }
+
+
+
+
+
         binding.buycredits.setOnClickListener {
             showCreditsBottomSheet()
         }
@@ -180,20 +129,20 @@ class SettingFragment : Fragment() {
                     .first().takeIf { it.isNotEmpty() }
             binding.title2.text = selectedModel
         }
-
-        binding.btnlogout.setOnClickListener {
-            AlertDialog.Builder(requireContext()) // if in Fragment. Use `this` if in Activity
-                .setTitle("Logout")
-                .setMessage("Are you sure you want to logout?")
-                .setPositiveButton("Yes") { dialog, _ ->
-                    dialog.dismiss()
-                    performLogout()
-                }
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
-        }
+//
+//        binding.btnlogout.setOnClickListener {
+//            AlertDialog.Builder(requireContext()) // if in Fragment. Use `this` if in Activity
+//                .setTitle("Logout")
+//                .setMessage("Are you sure you want to logout?")
+//                .setPositiveButton("Yes") { dialog, _ ->
+//                    dialog.dismiss()
+//                    performLogout()
+//                }
+//                .setNegativeButton("Cancel") { dialog, _ ->
+//                    dialog.dismiss()
+//                }
+//                .show()
+//        }
     }
 
     private fun showTextSizeDialog() {
@@ -286,20 +235,7 @@ class SettingFragment : Fragment() {
         }
     }
 
-    private fun saveSettingsFromUI() {
-        val speechRate = binding.speechRateValue.text.toString().toFloatOrNull() ?: 1.0f
-        val voiceTone = binding.voiceToneValue.text.toString().toFloatOrNull() ?: 1.0f
-        val clarity = binding.audioClarityValue.text.toString().toFloatOrNull() ?: 1.0f
-        val delay = binding.responseDelayValue.text.toString().toIntOrNull() ?: 0
 
-        val updatedSettings = VoiceSettings(
-            speechRate = speechRate,
-            voiceTone = voiceTone,
-            audioClarity = clarity,
-            responseDelay = delay
-        )
-        voiceSettingsViewModel.updateSettings(updatedSettings)
-    }
 
     private fun performLogout() {
         // 1️⃣  apna session / prefs clear kar

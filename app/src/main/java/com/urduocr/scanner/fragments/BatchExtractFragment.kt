@@ -21,7 +21,6 @@ import android.os.Handler
 import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import android.speech.tts.Voice
 import android.text.Layout
 import android.text.Spannable
 import android.text.style.AlignmentSpan
@@ -65,7 +64,6 @@ import com.urduocr.scanner.models.GPTRequest
 import com.urduocr.scanner.models.ImageUrl
 import com.urduocr.scanner.models.Message
 import com.urduocr.scanner.viewmodels.BatchScanningViewModel
-import com.urduocr.scanner.viewmodels.VoiceSettingsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -74,12 +72,10 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Locale
-import kotlin.collections.iterator
 
 class BatchExtractFragment : Fragment() {
     private lateinit var binding: FragmentBatchExtractBinding
     private val viewModel: BatchScanningViewModel by activityViewModels()
-    private val voiceSettingsViewModel: VoiceSettingsViewModel by activityViewModels()
 
     private lateinit var imagePagerAdapter: ImagePagerAdapter
     private var currentPage = 0
@@ -96,8 +92,7 @@ class BatchExtractFragment : Fragment() {
     private var selectedAlignment: View? = null
     private var alreadyProcessed = false
 
-    private val apiKey =
-        "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"
+    private val apiKey = "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"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -110,7 +105,6 @@ class BatchExtractFragment : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // sabse pehle:
 
         dataStoreAPI = PreferencesDataStoreHelper(requireActivity())
 
@@ -122,81 +116,100 @@ class BatchExtractFragment : Fragment() {
             }
         }
 
-        voiceSettingsViewModel.settings.observe(viewLifecycleOwner) { settings ->
-            if (isTtsReady) {
-                tts.setSpeechRate(settings.speechRate)
-                tts.setPitch(settings.voiceTone)
-            }
-        }
-
+        // Initialize TTS
         tts = TextToSpeech(requireContext()) { status ->
             if (status == TextToSpeech.SUCCESS) {
-                val result = tts.setLanguage(Locale("ur", "PK"))
+                val result = tts.setLanguage(Locale("ur", "PK")) // For Urdu
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    Toast.makeText(requireContext(), "Urdu TTS not supported", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(requireContext(), "Urdu TTS not supported", Toast.LENGTH_SHORT).show()
                 } else {
-                    tts.setSpeechRate(voiceSettingsViewModel.settings.value?.speechRate ?: 1.0f)
-                    tts.setPitch(voiceSettingsViewModel.settings.value?.voiceTone ?: 1.0f)
-
-                    for (voice in tts.voices) {
-                        if (
-                            voice.locale == Locale("ur", "PK") &&
-                            voice.name.contains("male", ignoreCase = true) &&
-                            voice.quality == Voice.QUALITY_NORMAL &&
-                            voice.latency <= Voice.LATENCY_NORMAL
-                        ) {
-                            tts.voice = voice
-                            break
-                        }
-                    }
-                    tts.speak("", TextToSpeech.QUEUE_FLUSH, null, "warmup")
+                    // Set default speech rate and pitch
+                    tts.setSpeechRate(1.0f) // Normal speed
+                    tts.setPitch(1.0f) // Normal pitch
                     isTtsReady = true
+
+                    // Set utterance listener for auto-stop
+                    tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                        override fun onStart(utteranceId: String?) {
+                            requireActivity().runOnUiThread {
+                                isSpeaking = true
+                                updatePlayButtonState()
+                            }
+                        }
+
+                        override fun onDone(utteranceId: String?) {
+                            requireActivity().runOnUiThread {
+                                isSpeaking = false
+                                updatePlayButtonState()
+                            }
+                        }
+
+                        override fun onError(utteranceId: String?) {
+                            requireActivity().runOnUiThread {
+                                isSpeaking = false
+                                updatePlayButtonState()
+                            }
+                        }
+                    })
                 }
             } else {
-                Toast.makeText(requireContext(), "TTS Initialization failed", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(requireContext(), "TTS Initialization failed", Toast.LENGTH_SHORT).show()
             }
         }
 
+        // Set up play/stop button
+        binding.btnPlay.setOnClickListener {
+            if (!isTtsReady) {
+                Toast.makeText(requireContext(), "TTS not ready yet", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val text = binding.etExtractedText.text.toString()
+            if (text.isBlank()) {
+                Toast.makeText(requireContext(), "No text to read", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (isSpeaking) {
+                // Manual stop
+                tts.stop()
+                isSpeaking = false
+                updatePlayButtonState()
+            } else {
+                // Start speaking
+                val params = Bundle()
+                params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "unique_id")
+                tts.speak(text, TextToSpeech.QUEUE_FLUSH, params, "unique_id")
+            }
+        }
+
+
+        // Set utterance progress listener
         tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {}
+
             override fun onDone(utteranceId: String?) {
-                isSpeaking = false
                 requireActivity().runOnUiThread {
-                    //binding.btnPlay.setImageResource(R.drawable.volumeicon)
+                    isSpeaking = false
+                    binding.btnPlay.text = "Listen"
+                    binding.btnPlay.setCompoundDrawablesWithIntrinsicBounds(
+                        ContextCompat.getDrawable(requireContext(), R.drawable.volumeicon),
+                        null, null, null
+                    )
                 }
             }
 
-            override fun onError(utteranceId: String?) {}
+            override fun onError(utteranceId: String?) {
+                requireActivity().runOnUiThread {
+                    isSpeaking = false
+                    binding.btnPlay.text = "Listen"
+                    binding.btnPlay.setCompoundDrawablesWithIntrinsicBounds(
+                        ContextCompat.getDrawable(requireContext(), R.drawable.volumeicon),
+                        null, null, null
+                    )
+                }
+            }
         })
-
-        binding.btnPlay.setOnClickListener {
-            val text = binding.etExtractedText.text.toString()
-            if (isTtsReady && text.isNotEmpty()) {
-                voiceSettingsViewModel.settings.value?.let { settings ->
-                    if (!isSpeaking) {
-                        isSpeaking = true
-                        //binding.btnPlay.setImageResource(R.drawable.volumeicon)
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "utteranceId")
-                        }, settings.responseDelay.toLong())
-                    } else {
-                        tts.stop()
-                        isSpeaking = false
-                        //  binding.btnPlay.setImageResource(R.drawable.volumeicon)
-                    }
-                }
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "TTS not ready or text is empty",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-
-
 
         viewModel.bitmapImages.observe(viewLifecycleOwner) { bitmapList ->
             imagePagerAdapter = ImagePagerAdapter(bitmapList)
@@ -204,7 +217,6 @@ class BatchExtractFragment : Fragment() {
             binding.viewPager.setCurrentItem(0, false)
             currentPage = 0
 
-            // 👇 SHOW/HIDE swipe arrows
             if (bitmapList.size <= 1) {
                 binding.leftarrow.visibility = View.GONE
                 binding.rightarrow.visibility = View.GONE
@@ -233,12 +245,10 @@ class BatchExtractFragment : Fragment() {
                     currentPage = position
                 }
             })
-
         }
 
         binding.retakeSpinner.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {
-                // Show bottom sheet
                 val bottomSheet = ModelSelectorBottomSheet { selectedModel ->
                     Toast.makeText(
                         requireContext(),
@@ -265,7 +275,6 @@ class BatchExtractFragment : Fragment() {
             )
         }
 
-        // ──────────── OCR FLOW : run only once ────────────
         if (!alreadyProcessed) {
             alreadyProcessed = true
 
@@ -286,7 +295,7 @@ class BatchExtractFragment : Fragment() {
                     binding.etExtractedText.setText(finalText)
                     binding.progressStepLayout.progressBar.visibility = View.VISIBLE
 
-                    viewModel.extractedText.value = finalText   // ⭐️ save in ViewModel
+                    viewModel.extractedText.value = finalText
                 }
             }
 
@@ -300,22 +309,18 @@ class BatchExtractFragment : Fragment() {
                 launchExtraction.invoke(getPromptText(selectedModel!!))
             }
         }
-// ──────────── OCR FLOW END ────────────
 
-
-        //edit
         binding.btnEdit.setOnClickListener {
             binding.editlayout.visibility = View.VISIBLE
-
             val text = binding.etExtractedText.text.toString()
             binding.editableExtractedText.setText(text)
             binding.etExtractedText.visibility = View.GONE
             binding.editableExtractedText.visibility = View.VISIBLE
         }
+
         setEvents()
         setupFormattingButtons()
         setupAlignmentButtons()
-
 
         binding.btnCopy.setOnClickListener {
             copyTextTOClipboard()
@@ -369,7 +374,6 @@ class BatchExtractFragment : Fragment() {
             }
         }
 
-
     fun Int.dpToPx(context: Context): Int {
         return (this * context.resources.displayMetrics.density).toInt()
     }
@@ -408,8 +412,7 @@ class BatchExtractFragment : Fragment() {
         try {
             val file = File(requireContext().filesDir, "$fileName.txt")
             file.writeText(text)
-            //  ViewModel reset
-            viewModel.clearAll()                // bitmaps gone
+            viewModel.clearAll()
             viewModel.extractedText.value = null
             Toast.makeText(requireContext(), "Saved as: ${file.name}", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
@@ -443,7 +446,6 @@ class BatchExtractFragment : Fragment() {
             FileOutputStream(file).use { pdfDoc.writeTo(it) }
             pdfDoc.close()
 
-            /* ✅  ViewModel reset */
             viewModel.clearAll()
             viewModel.extractedText.value = null
 
@@ -459,7 +461,6 @@ class BatchExtractFragment : Fragment() {
 
         popup.setOnMenuItemClickListener { item ->
             binding.fontSpinner.text = item.title
-            // Perform action based on selected item
             when (item.itemId) {
                 R.id.font_alvi -> {
                     binding.editableExtractedText.typeface =
@@ -478,7 +479,6 @@ class BatchExtractFragment : Fragment() {
                     true
                 }
             }
-
         }
         popup.show()
     }
@@ -488,7 +488,6 @@ class BatchExtractFragment : Fragment() {
         popup.menuInflater.inflate(R.menu.font_color_menu, popup.menu)
 
         popup.setOnMenuItemClickListener { item ->
-
             when (item.itemId) {
                 R.id.font_black -> {
                     binding.editableExtractedText.setTextColor(0xFF000000.toInt())
@@ -525,7 +524,6 @@ class BatchExtractFragment : Fragment() {
                     true
                 }
             }
-
         }
         popup.show()
     }
@@ -535,7 +533,6 @@ class BatchExtractFragment : Fragment() {
         popup.menuInflater.inflate(R.menu.font_color_menu, popup.menu)
 
         popup.setOnMenuItemClickListener { item ->
-
             when (item.itemId) {
                 R.id.font_black -> {
                     binding.editableExtractedText.setBackgroundColor(0xFF000000.toInt())
@@ -572,13 +569,11 @@ class BatchExtractFragment : Fragment() {
                     true
                 }
             }
-
         }
         popup.show()
     }
 
     private fun setEvents() {
-
         binding.fontSpinner.setOnClickListener {
             showFontMenu(it)
         }
@@ -610,7 +605,6 @@ class BatchExtractFragment : Fragment() {
 
         popup.show()
     }
-
 
     private fun setupFormattingButtons() {
         binding.Blod.setOnClickListener {
@@ -667,7 +661,6 @@ class BatchExtractFragment : Fragment() {
 
             var spanAlreadyExists = false
             for (existingSpan in spans) {
-                // Remove if span already applied
                 spannable.removeSpan(existingSpan)
                 spanAlreadyExists = true
             }
@@ -691,8 +684,8 @@ class BatchExtractFragment : Fragment() {
 
         for ((button, alignment) in alignmentButtons) {
             button.setOnClickListener {
-                selectedAlignment?.clearColorFilter()  // previous button unselected
-                button.setColorFilter(green)           // current selected
+                selectedAlignment?.clearColorFilter()
+                button.setColorFilter(green)
                 selectedAlignment = button
                 applyAlignment(alignment)
             }
@@ -718,26 +711,23 @@ class BatchExtractFragment : Fragment() {
             "OCR-Basic" -> "You are an OCR engine for Urdu images. Quickly scan the image and locate any Urdu text. Transcribe exactly what you see, preserving spacing and line breaks. Output only the raw Urdu text."
             "OCR-Refine" -> "You are an OCR engine for Urdu. First pass: identify all text regions in the image. Second pass: transcribe each region, preserving diacritics. Third pass: re-read your transcription against the image and fix any obvious mistakes. Output only the cleaned Urdu text."
             "OCR-Context" -> "You are an OCR engine specialized in Urdu. Visually inspect the image to find text areas. Transcribe each block, preserving formatting. For each block, note anywhere the image quality or handwriting might introduce uncertainty. In your final output, include the transcription but flag uncertain words in brackets (e.g. [ش‌بہ؟]). Output a plain-text Urdu transcript with bracketed notes."
-            "OCR-Visual" -> "You are an advanced OCR engine for Urdu images. Analyze the image’s lighting, contrast, and background to understand text clarity. Locate and transcribe every Urdu text region, preserving punctuation. Adjust your transcription to account for any skewed or stylized text. At the end, provide the final Urdu text and a one-sentence note on any challenging areas (e.g. “bottom-right corner was low contrast”). Output only the transcript and that single note."
-            "OCR-Semantic" -> "You are a semantic Urdu OCR expert. Examine the entire image, noting text layout, styles, and visual context. Transcribe all Urdu text, automatically correcting any OCR errors. Reflect on the content’s meaning and, in a brief parenthesis after each paragraph, summarize its gist in Urdu. For any named entities (people, places), highlight them in bold in your transcription. Output a clean, human-readable Urdu transcript with these inline annotations."
+            "OCR-Visual" -> "You are an advanced OCR engine for Urdu images. Analyze the image's lighting, contrast, and background to understand text clarity. Locate and transcribe every Urdu text region, preserving punctuation. Adjust your transcription to account for any skewed or stylized text. At the end, provide the final Urdu text and a one-sentence note on any challenging areas (e.g. 'bottom-right corner was low contrast'). Output only the transcript and that single note."
+            "OCR-Semantic" -> "You are a semantic Urdu OCR expert. Examine the entire image, noting text layout, styles, and visual context. Transcribe all Urdu text, automatically correcting any OCR errors. Reflect on the content's meaning and, in a brief parenthesis after each paragraph, summarize its gist in Urdu. For any named entities (people, places), highlight them in bold in your transcription. Output a clean, human-readable Urdu transcript with these inline annotations."
             else -> "Extract all Urdu text from this image and return plain text only."
         }
     }
 
     private fun showSaveDialogWithFileName(suggestedName: String) {
-
-        // layout inflate
         val view = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_save_options, null)
 
-        val etName = view.findViewById<EditText>(R.id.tvDescription)     // <-- EditText
+        val etName = view.findViewById<EditText>(R.id.tvDescription)
         val btnFile = view.findViewById<TextView>(R.id.btnSaveAsFile)
         val btnPdf = view.findViewById<TextView>(R.id.btnSaveAsPdf)
 
-        etName.setText(suggestedName)            // default fill
-        etName.setSelection(etName.text.length)  // cursor at end
+        etName.setText(suggestedName)
+        etName.setSelection(etName.text.length)
 
-        // helper to colour buttons
         fun paint(btn: TextView, selected: Boolean) {
             btn.setBackgroundResource(
                 if (selected) R.drawable.button_selector
@@ -751,7 +741,6 @@ class BatchExtractFragment : Fragment() {
             )
         }
 
-        //  default state → File selected
         var saveAsPdf = false
         paint(btnFile, true)
         paint(btnPdf, false)
@@ -762,13 +751,11 @@ class BatchExtractFragment : Fragment() {
             .create()
         dlg.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        /* helper to fetch CURRENT name */
         fun currentName(): String {
             val raw = etName.text.toString().trim()
             return if (raw.isEmpty()) "urdu_text_${System.currentTimeMillis()}" else raw
         }
 
-        /* helper to close + go home after 120ms */
         fun finishDialog() {
             Handler(Looper.getMainLooper()).postDelayed({
                 dlg.dismiss()
@@ -776,17 +763,15 @@ class BatchExtractFragment : Fragment() {
             }, 120)
         }
 
-        /* -------- click: Save as FILE -------- */
         btnFile.setOnClickListener {
-            if (saveAsPdf) {                     // toggle highlight
+            if (saveAsPdf) {
                 saveAsPdf = false
                 paint(btnFile, true); paint(btnPdf, false)
             }
-            saveTextAsFile(currentName())       // **edited name yahan use hota hai**
+            saveTextAsFile(currentName())
             finishDialog()
         }
 
-        /* -------- click: Save as PDF -------- */
         btnPdf.setOnClickListener {
             if (!saveAsPdf) {
                 saveAsPdf = true
@@ -798,7 +783,6 @@ class BatchExtractFragment : Fragment() {
 
         dlg.show()
     }
-
 
     private fun updateProgressInDialog(dialog: Dialog, stage: Int) {
         val title = dialog.findViewById<TextView>(R.id.tvProgressTitle)
@@ -839,7 +823,6 @@ class BatchExtractFragment : Fragment() {
         }
     }
 
-
     private fun animateProgressBarInDialog(progressBar: ProgressBar?, target: Int) {
         progressBar?.let {
             ObjectAnimator.ofInt(it, "progress", target).apply {
@@ -850,22 +833,18 @@ class BatchExtractFragment : Fragment() {
         }
     }
 
-
     fun showProcessingDialog(context: Context): Dialog {
         val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.progress_layout)
 
-        // Make background transparent
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        // Optional: blur/dim effect
         val layoutParams = dialog.window?.attributes
         layoutParams?.dimAmount = 0.5f
         dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
 
-        // ✅ Set dialog width to 90% of screen after show
         dialog.show()
         dialog.window?.setLayout(
             (context.resources.displayMetrics.widthPixels * 0.9).toInt(),
@@ -874,11 +853,32 @@ class BatchExtractFragment : Fragment() {
 
         return dialog
     }
+    private fun updatePlayButtonState() {
+        if (isSpeaking) {
+            binding.btnPlay.text = "Stop"
+            binding.btnPlay.setCompoundDrawablesWithIntrinsicBounds(
+                ContextCompat.getDrawable(requireContext(), R.drawable.volumeicon), // Use a stop icon
+                null, null, null
+            )
+        } else {
+            binding.btnPlay.text = "Listen"
+            binding.btnPlay.setCompoundDrawablesWithIntrinsicBounds(
+                ContextCompat.getDrawable(requireContext(), R.drawable.volumeicon), // Normal volume icon
+                null, null, null
+            )
+        }
+    }
 
+    override fun onPause() {
+        super.onPause()
+        if (isSpeaking) {
+            tts.stop()
+            isSpeaking = false
+        }
+    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        tts.stop()
+    override fun onDestroy() {
+        super.onDestroy()
         tts.shutdown()
     }
 
@@ -887,5 +887,4 @@ class BatchExtractFragment : Fragment() {
             this.colorFilter = null
         }
     }
-
 }

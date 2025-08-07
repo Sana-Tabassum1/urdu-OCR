@@ -111,7 +111,7 @@
                 app:dotsColor="@color/greenlight"
                 app:dotsSize="4dp"
                 app:dotsSpacing="2dp"
-                android:layout_marginStart="135dp"
+                android:layout_marginStart="133dp"
                 app:selectedDotColor="@color/green1"/>
 
         </FrameLayout>

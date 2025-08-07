@@ -44,7 +44,7 @@ class SavedFragment : Fragment() {
     private var isDateAsc = true
     private var isSizeAsc = true
 
-    private var allFiles: List<FileListItem> = emptyList()
+    private var allFiles: List<InternalFileModel> = emptyList()
 
     private lateinit var currentDir: File
     private var isGridView = false
@@ -86,7 +86,6 @@ class SavedFragment : Fragment() {
         setupSorting()
 
         binding.ivMenu.setOnClickListener { showCustomPopupMenu(it) }
-       // binding.ivBack.setOnClickListener { handleBackPress() }
 
         // Load saved preference
         isGridView = viewPreferenceManager.getViewPreference()
@@ -100,8 +99,7 @@ class SavedFragment : Fragment() {
             listener = object : SavedFileAdapter.OnSelectionChangedListener {
                 override fun onItemSelectionChanged() {
                     val selectedFiles = adapter.getSelectedFiles()
-                        .filterIsInstance<FileListItem.FileItem>()
-                        .map { File(it.file.path) }
+                        .map { File(it.path) }
                     fileViewModel.setSelectedFiles(selectedFiles)
                 }
             }
@@ -171,6 +169,7 @@ class SavedFragment : Fragment() {
         findNavController().navigate(R.id.action_savedFragment_self, args)
         loadAllFiles()
     }
+
     private fun handleBackPress() {
         if (currentDir != requireContext().filesDir) {
             // Navigate to parent folder
@@ -191,6 +190,7 @@ class SavedFragment : Fragment() {
             }
         }
     }
+
     override fun onResume() {
         super.onResume()
         validateCurrentDir()
@@ -216,22 +216,16 @@ class SavedFragment : Fragment() {
             // Process folders
             val folders = items.filter { it.isDirectory }
                 .sortedBy { it.name.lowercase() }
-
-            if (folders.isNotEmpty()) {
-                add(FileListItem.Header("Folders"))
-                addAll(folders.map {
-                    FileListItem.FileItem(
-                        InternalFileModel(
-                            name = it.name,
-                            path = it.absolutePath,
-                            isFolder = true,
-                            file = it,
-                            isPinned = pinnedViewModel.isPinned(it),
-                            isSelected = false
-                        )
+                .map {
+                    InternalFileModel(
+                        name = it.name,
+                        path = it.absolutePath,
+                        isFolder = true,
+                        file = it,
+                        isPinned = pinnedViewModel.isPinned(it),
+                        isSelected = false
                     )
-                })
-            }
+                }
 
             // Process files
             val supportedExtensions = listOf(".pdf", ".txt", ".png", ".jpg", ".jpeg")
@@ -243,22 +237,19 @@ class SavedFragment : Fragment() {
                     }
                 }
                 .sortedByDescending { it.lastModified() }
-
-            if (docs.isNotEmpty()) {
-                add(FileListItem.Header("Files"))
-                addAll(docs.map {
-                    FileListItem.FileItem(
-                        InternalFileModel(
-                            name = it.name,
-                            path = it.absolutePath,
-                            isFolder = false,
-                            file = it,
-                            isPinned = pinnedViewModel.isPinned(it),
-                            isSelected = false
-                        )
+                .map {
+                    InternalFileModel(
+                        name = it.name,
+                        path = it.absolutePath,
+                        isFolder = false,
+                        file = it,
+                        isPinned = pinnedViewModel.isPinned(it),
+                        isSelected = false
                     )
-                })
-            }
+                }
+
+            addAll(folders)
+            addAll(docs)
         }
 
         updateUIState()
@@ -287,13 +278,6 @@ class SavedFragment : Fragment() {
         } else {
             hideEmptyState()
         }
-//
-//        // Show/hide back button based on current directory
-//        binding.ivBack.visibility = if (currentDir == requireContext().filesDir) {
-//            View.GONE
-//        } else {
-//            View.VISIBLE
-//        }
     }
 
     private fun doCopy(file: File) {
@@ -390,8 +374,7 @@ class SavedFragment : Fragment() {
         val filtered = if (query.isBlank()) {
             allFiles
         } else {
-            allFiles.filterIsInstance<FileListItem.FileItem>()
-                .filter { it.file.name.contains(query, ignoreCase = true) }
+            allFiles.filter { it.name.contains(query, ignoreCase = true) }
         }
         adapter.updateList(filtered)
     }
@@ -452,50 +435,32 @@ class SavedFragment : Fragment() {
     }
 
     private fun sortByNameAsc() {
-        val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
-            .sortedBy { it.file.name.lowercase() }
-        val headers = allFiles.filterIsInstance<FileListItem.Header>()
-        allFiles = headers + sortedFiles
+        allFiles = allFiles.sortedBy { it.name.lowercase() }
         adapter.updateList(allFiles)
     }
 
     private fun sortByNameDesc() {
-        val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
-            .sortedByDescending { it.file.name.lowercase() }
-        val headers = allFiles.filterIsInstance<FileListItem.Header>()
-        allFiles = headers + sortedFiles
+        allFiles = allFiles.sortedByDescending { it.name.lowercase() }
         adapter.updateList(allFiles)
     }
 
     private fun sortByDateAsc() {
-        val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
-            .sortedBy { File(it.file.path).lastModified() }
-        val headers = allFiles.filterIsInstance<FileListItem.Header>()
-        allFiles = headers + sortedFiles
+        allFiles = allFiles.sortedBy { it.file.lastModified() }
         adapter.updateList(allFiles)
     }
 
     private fun sortByDateDesc() {
-        val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
-            .sortedByDescending { File(it.file.path).lastModified() }
-        val headers = allFiles.filterIsInstance<FileListItem.Header>()
-        allFiles = headers + sortedFiles
+        allFiles = allFiles.sortedByDescending { it.file.lastModified() }
         adapter.updateList(allFiles)
     }
 
     private fun sortBySizeAsc() {
-        val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
-            .sortedBy { File(it.file.path).length() }
-        val headers = allFiles.filterIsInstance<FileListItem.Header>()
-        allFiles = headers + sortedFiles
+        allFiles = allFiles.sortedBy { it.file.length() }
         adapter.updateList(allFiles)
     }
 
     private fun sortBySizeDesc() {
-        val sortedFiles = allFiles.filterIsInstance<FileListItem.FileItem>()
-            .sortedByDescending { File(it.file.path).length() }
-        val headers = allFiles.filterIsInstance<FileListItem.Header>()
-        allFiles = headers + sortedFiles
+        allFiles = allFiles.sortedByDescending { it.file.length() }
         adapter.updateList(allFiles)
     }
 
@@ -553,9 +518,7 @@ class SavedFragment : Fragment() {
             popupWindow.dismiss()
         }
 
-        val selectedFiles = adapter.getSelectedFiles()
-            .filterIsInstance<FileListItem.FileItem>()
-            .map { File(it.file.path) }
+        val selectedFiles = adapter.getSelectedFiles().map { File(it.path) }
 
         popupView.findViewById<LinearLayout>(R.id.menuCopy).setOnClickListener {
             fileViewModel.clearSelection()
@@ -656,16 +619,7 @@ class SavedFragment : Fragment() {
 
     private fun setupRecyclerView() {
         binding.recyclerViewAllFiles.layoutManager = if (isGridView) {
-            GridLayoutManager(requireContext(), 2).apply {
-                spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int {
-                        return when (adapter.getItemViewType(position)) {
-                            SavedFileAdapter.VIEW_TYPE_HEADER -> 2
-                            else -> 1
-                        }
-                    }
-                }
-            }
+            GridLayoutManager(requireContext(), 2)
         } else {
             LinearLayoutManager(requireContext())
         }
