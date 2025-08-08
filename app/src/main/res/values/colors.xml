@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
+    <color name="shadow">#10000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="green">#3ED780</color>
     <color name="green1">#005D28</color>
@@ -15,4 +16,5 @@
     <color name="pinkfiller">#FFEBE6</color>
     <color name="greenlight">#C1DFCE</color>
     <color name="lightgray">#BABABA</color>
+    <color name="gray2">#BAC1C3</color>
 </resources>

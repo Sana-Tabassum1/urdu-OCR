@@ -16,6 +16,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
@@ -24,6 +25,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.urduocr.scanner.R
 import com.urduocr.scanner.ViewPreferenceManager
 import com.urduocr.scanner.adapters.SavedFileAdapter
@@ -86,6 +89,9 @@ class SavedFragment : Fragment() {
         setupSorting()
 
         binding.ivMenu.setOnClickListener { showCustomPopupMenu(it) }
+        binding.btndaimond.setOnClickListener {
+            showCreditsBottomSheet()
+        }
 
         // Load saved preference
         isGridView = viewPreferenceManager.getViewPreference()
@@ -138,6 +144,11 @@ class SavedFragment : Fragment() {
                     pinnedViewModel.unpinFile(internalModel)
                     Toast.makeText(requireContext(), "File unpinned", Toast.LENGTH_SHORT).show()
                 }
+
+                override fun onRenameFile(file: File, newName: String) {
+                    TODO("Not yet implemented")
+                }
+
                 override fun onRenameFolder(oldFile: File, newName: String) {
                     val newFile = File(oldFile.parent, newName)
                     if (newFile.exists()) {
@@ -466,7 +477,7 @@ class SavedFragment : Fragment() {
 
     private fun highlightSort(active: ImageView, inactive: ImageView) {
         active.setColorFilter(ContextCompat.getColor(requireContext(), R.color.black))
-        inactive.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
+        inactive.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray2))
     }
 
     private fun showCustomPopupMenu(anchor: View) {
@@ -634,16 +645,16 @@ class SavedFragment : Fragment() {
 
     private fun resetOtherSortIcons(activeColumn: String) {
         if (activeColumn != "name") {
-            binding.toparrow.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
-            binding.downarrow.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
+            binding.toparrow.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray2))
+            binding.downarrow.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray2))
         }
         if (activeColumn != "date") {
-            binding.toparrow2.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
-            binding.downarrow2.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
+            binding.toparrow2.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray2))
+            binding.downarrow2.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray2))
         }
         if (activeColumn != "size") {
-            binding.toparrow3.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
-            binding.downarrow3.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
+            binding.toparrow3.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray2))
+            binding.downarrow3.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray2))
         }
     }
 
@@ -657,5 +668,21 @@ class SavedFragment : Fragment() {
         binding.emptyAnimationView.visibility = View.GONE
         binding.recyclerViewAllFiles.visibility = View.VISIBLE
         binding.emptyAnimationView.pauseAnimation()
+    }
+    private fun showCreditsBottomSheet() {
+        val bottomSheetView = LayoutInflater.from(requireContext()).inflate(R.layout.item_credit_package, null)
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        bottomSheetDialog.setContentView(bottomSheetView)
+
+        // Set behavior to expand fully by default
+        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        // Handle continue button click
+        bottomSheetView.findViewById<TextView>(R.id.btncontinue).setOnClickListener {
+            bottomSheetDialog.dismiss()
+            // Handle purchase logic here
+        }
+
+        bottomSheetDialog.show()
     }
 }

@@ -59,7 +59,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="2dp"
         android:background="#EEEEEE"/>
 
     <LinearLayout
@@ -140,7 +140,7 @@
     </LinearLayout>
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="2dp"
         android:background="#EEEEEE"/>
     <LinearLayout
         android:id="@+id/menUICON"
@@ -192,7 +192,7 @@
     </LinearLayout>
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="2dp"
         android:background="#EEEEEE"/>
 
 
@@ -209,7 +209,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="pin"
+            android:text="Pin"
             android:textColor="@color/black"
             android:textSize="14sp"/>
 
